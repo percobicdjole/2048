@@ -1,1 +1,0 @@
-linija 1 u test2.txt
