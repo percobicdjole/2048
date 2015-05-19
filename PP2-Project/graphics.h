@@ -1,7 +1,6 @@
 #include <curses.h> 
 
 //MATRIX PARAMETERS
-#define SIZE 4 //velicina table, treba da se pretvori u promenljivu predlog od 3-7 za standardnu velicinu prozora, moze se povecati rezolucija
 #define HEIGHT 3//visina jednog polja, 3 reda
 #define WIDTH 7//sirina jedndog polja, 7 znakova
 
@@ -15,8 +14,9 @@
 
 void colorPalette();//paletu boja prikazuje funkcija colorPalette
 void intiateColors();//inicijalizuje parove boja
-void matrixDisplay(unsigned short matrica[SIZE][SIZE]);//iscrtava matricu
+void diplayMatrix();//ne dozvoljava mi da koristim matrix type ovde!!
 unsigned char colorOfNumber(unsigned short x);//vraca boju odredjenog broja
 void printMenu(WINDOW *menu_win, int highlight);//ispisuje menu
-void menu();
+int menu();
+
 

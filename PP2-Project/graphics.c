@@ -1,54 +1,67 @@
 #include "graphics.h"
+#include "logic.h"
 
-int startx = 50;
-int starty = 8;
 
 char *choices[] = {
-	"New game",
-	"Game modes",
-	"Options",
+	"Normal",
+	"X-tile",
 	"Exit",
 };
 
 int n_choices = sizeof(choices) / sizeof(char *);
 
-void matrixDisplay(unsigned short matrica[SIZE][SIZE])
-//dodati opciju za x tile
+void displayMatrix(matrix m)//dodati opciju za x tile
 {
-	//unsigned short matrica[SIZE][SIZE] = { { 0, 2, 4, 8 }, { 16, 32, 64, 128 }, { 256, 512, 1024, 2048 }, { 4096, 8192, 16384, 32768 } };
 
-	for (int i = 0; i < SIZE; i++)
+	for (int i = 0; i < m.size; i++)
 	{
-		for (int j = 0; j < SIZE; j++)
+		for (int j = 0; j < m.size; j++)
 		{
-			if (matrica[i][j])
+			
+			if (m.set[i][j] == 1)
 			{
-				unsigned char boja = colorOfNumber(matrica[i][j]);
-				attron(COLOR_PAIR(boja));
-
+				attron(COLOR_PAIR(0)|A_REVERSE);
 				for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
 				{
 					for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2, l + 1, " ");
 				}
-
-				{	//ISPIS ELEMENATA MATRICE, PODESAVANJE PO HORIZONTALI
-					unsigned char y, x;
-					y = (i + 1) * HEIGHT;
-					if (matrica[i][j] < 100)									x = (j + 1) * 4 + 3 * j;
-					else if (matrica[i][j] >= 100 && matrica[i][j] < 10000)		x = (j + 1) * 4 + 3 * j - 1;
-					else if (matrica[i][j] >= 10000)							x = (j + 1) * 4 + 3 * j - 2;
-					mvprintw(y, x, "%u", matrica[i][j]);
-				}
-
-				attroff(COLOR_PAIR(boja));
+				mvprintw((i + 1) * HEIGHT, (j + 1) * 4 + 3 * j, "X");
+				attroff(COLOR_PAIR(0) | A_REVERSE);
 			}
 			else
 			{
-				attron(COLOR_PAIR(0));
-				mvprintw((i + 1) * HEIGHT, (j + 1) * 4 + 3 * j, ".");
-				attroff(COLOR_PAIR(0));
-			}
+				if (m.set[i][j])
+				{
+					unsigned char boja = colorOfNumber(m.set[i][j]);
+					attron(COLOR_PAIR(boja));
 
+					for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
+					{
+						for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2, l + 1, " ");
+					}
+
+					{	//ISPIS ELEMENATA MATRICE, PODESAVANJE PO HORIZONTALI
+						unsigned char y, x;
+						y = (i + 1) * HEIGHT;
+						if (m.set[i][j] < 100)									x = (j + 1) * 4 + 3 * j;
+						else if (m.set[i][j] >= 100 && m.set[i][j] < 10000)		x = (j + 1) * 4 + 3 * j - 1;
+						else if (m.set[i][j] >= 10000)							x = (j + 1) * 4 + 3 * j - 2;
+						mvprintw(y, x, "%u", m.set[i][j]);
+					}
+
+					attroff(COLOR_PAIR(boja));
+				}
+				else
+				{
+					attron(COLOR_PAIR(0));
+					for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
+					{
+						for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2, l + 1, " ");
+					}
+					mvprintw((i + 1) * HEIGHT, (j + 1) * 4 + 3 * j, ".");
+					attroff(COLOR_PAIR(0));
+				}
+			}
 		}
 	}
 
@@ -86,7 +99,7 @@ void intiateColors()
 	init_pair(3, WHITE, THIRD);
 	init_pair(4, WHITE, FOURTH);
 	init_pair(5, COLOR_BLACK, FIFTH);
-	init_pair(6, COLOR_BLACK, 14);
+	init_pair(6, COLOR_BLACK, 14);//za tekst
 }
 
 void printMenu(WINDOW *menu_win, int highlight)
@@ -110,16 +123,14 @@ void printMenu(WINDOW *menu_win, int highlight)
 	wrefresh(menu_win);
 }
 
-void menu()
+int menu()
 {
 	WINDOW *menu_win;
 	int highlight = 1;
 	int choice = 0;
 	int c;
 	cbreak(); 
-	startx = (30);
-	starty = (1);
-	menu_win = newwin(10, 20, starty, startx);
+	menu_win = newwin(10, 15, 5, 30);
 	keypad(menu_win, TRUE);
 	printMenu(menu_win, highlight);
 	while (TRUE)
@@ -149,7 +160,7 @@ void menu()
 			break;
 	}
 	clrtoeol();
-	refresh();
-
-
+	werase(menu_win);
+	wrefresh(menu_win);
+	return choice;
 }

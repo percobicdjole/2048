@@ -169,7 +169,7 @@ short moveStep(matrix M, short direction)
 
 
 //Pomera matricu u jednom potezu
-void move(matrix M, short direction)
+void moveMatrix(matrix M, short direction)
 {
 	short changes;
 	//Detektuje promene u matrici
@@ -206,28 +206,4 @@ void printRow(short *R, short size)
 		printf("%d ", R[i]);
 	}
 	printf("\n");
-}
-
-
-void main()
-{
-	/*Demonstracija pomeraja iz jednog poteza:
-	Gore, dole, levo desno.
-	*/
-	short i, c;
-	setSeed();
-	matrix M = newMatrix(4);
-	printMatrix(M);
-	for (i = 0; i < 4; i++)
-	{
-		move(M, UP);
-		printMatrix(M);
-		move(M, DOWN);
-		printMatrix(M);
-		move(M, LEFT);
-		printMatrix(M);
-		move(M, RIGHT);
-		printMatrix(M);
-	}
-	system("PAUSE");
 }

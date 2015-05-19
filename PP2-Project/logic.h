@@ -38,4 +38,4 @@ int randomInt(int low, int high);
 
 //Funkcije za pomeranje
 short moveStep(matrix M, short direction);
-void move(matrix M, short direction);
+void moveMatrix(matrix M, short direction);
