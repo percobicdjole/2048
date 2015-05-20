@@ -16,8 +16,7 @@
 typedef struct matrix
 {
 	short **set;//novo ime
-	char size, count;
-	short score;
+	char size;
 }matrix;
 
 

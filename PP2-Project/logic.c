@@ -26,10 +26,8 @@ matrix newMatrix(short size)
 	{
 		M[i] = calloc(size, sizeof(short));
 	}
-	N.count = 0;
 	N.set = M;
 	N.size = size;
-	N.score = 0;
 	spawnNumber(&N);
 	spawnNumber(&N);
 	return N;
@@ -57,7 +55,6 @@ void spawnNumber(matrix *M)
 	i = matrix_index / M->size;
 	j = matrix_index % M->size;
 	M->set[i][j] = 2;
-	M->count++;
 }
 
 
@@ -75,8 +72,7 @@ short moveRowStep(matrix *M, short row, short direction)
 				{
 					M->set[row][j + 1] += M->set[row][j];
 					M->set[row][j] = 0;
-					M->count--;
-					M->score += M->set[row][j + 1];
+					//M->score += M->set[row][j + 1];
 					changes++;
 				}
 			}
@@ -92,8 +88,7 @@ short moveRowStep(matrix *M, short row, short direction)
 				{
 					M->set[row][j - 1] += M->set[row][j];
 					M->set[row][j] = 0;
-					M->count--;
-					M->score += M->set[row][j - 1];
+					//M->score += M->set[row][j - 1];
 					changes++;
 				}
 			}
@@ -117,8 +112,7 @@ short moveColumnStep(matrix *M, short column, short direction)
 				{
 					M->set[i - 1][column] += M->set[i][column];
 					M->set[i][column] = 0;
-					M->count--;
-					M->score += M->set[i - 1][column];
+					//M->score += M->set[i - 1][column];
 					changes++;
 				}
 			}
@@ -134,8 +128,7 @@ short moveColumnStep(matrix *M, short column, short direction)
 				{
 					M->set[i + 1][column] += M->set[i][column];
 					M->set[i][column] = 0;
-					M->count--;
-					M->score += M->set[i + 1][column];
+					//M->score += M->set[i + 1][column];
 					changes++;
 				}
 			}
