@@ -33,12 +33,11 @@ matrix newMatrix(short size)
 	return N;
 }
 
-//Ubacuje broja 2 na random izabrano prazno mesto
+//Ubacuje broj 2 ili 4 na random izabrano prazno mesto
 void spawnNumber(matrix *M)
 {
-	//Problem sa dimnamickom memorijom
-	short i, j, array_index = -1, matrix_index = 0;
-	short *free_tiles[25];
+	short i, j, array_index = -1, matrix_index = 0, r;
+	short free_tiles[25];
 	for (i = 0; i < M->size; i++)
 		for (j = 0; j < M->size; j++)
 		{
@@ -54,12 +53,16 @@ void spawnNumber(matrix *M)
 	matrix_index = free_tiles[array_index];
 	i = matrix_index / M->size;
 	j = matrix_index % M->size;
-	M->set[i][j] = 2;
+	r = randomInt(1, 20);
+	if (r > 17)
+		M->set[i][j] = 4;
+	else
+		M->set[i][j] = 2;
 }
 
 
-//Pomera jedan red za jedno mesto
-short moveRowStep(matrix *M, short row, short direction)
+//Pomera jedan red za jedan korak i vraca broj promena
+short moveRowStep(matrix *M, short row, short direction,short *last_merged)
 {
 	short j, changes = 0;
 	if (direction == RIGHT)
@@ -68,11 +71,17 @@ short moveRowStep(matrix *M, short row, short direction)
 		{
 			if (M->set[row][j] != 0)
 			{
-				if (M->set[row][j + 1] == 0 || M->set[row][j + 1] == M->set[row][j])
+				if (M->set[row][j + 1] == 0)
 				{
-					M->set[row][j + 1] += M->set[row][j];
+					M->set[row][j + 1] = M->set[row][j];
 					M->set[row][j] = 0;
-					//M->score += M->set[row][j + 1];
+					changes++;
+				}
+				else if (M->set[row][j + 1] == M->set[row][j] && M->set[row][j] != last_merged[row])
+				{
+					(M->set[row][j + 1]) <<= 1;
+					M->set[row][j] = 0;
+					last_merged[row] = M->set[row][j + 1];
 					changes++;
 				}
 			}
@@ -84,11 +93,17 @@ short moveRowStep(matrix *M, short row, short direction)
 		{
 			if (M->set[row][j] != 0)
 			{
-				if (M->set[row][j - 1] == 0 || M->set[row][j - 1] == M->set[row][j])
+				if (M->set[row][j - 1] == 0)
 				{
-					M->set[row][j - 1] += M->set[row][j];
+					M->set[row][j - 1] = M->set[row][j];
 					M->set[row][j] = 0;
-					//M->score += M->set[row][j - 1];
+					changes++;
+				}
+				else if (M->set[row][j - 1] == M->set[row][j] && M->set[row][j]!=last_merged[row])
+				{
+					(M->set[row][j - 1]) <<= 1;
+					M->set[row][j] = 0;
+					last_merged[row] = M->set[row][j - 1];
 					changes++;
 				}
 			}
@@ -98,8 +113,8 @@ short moveRowStep(matrix *M, short row, short direction)
 }
 
 
-//Pomera jednu kolonu za jedno mesto
-short moveColumnStep(matrix *M, short column, short direction)
+//Pomera jednu kolonu za jedan korak i vraca broj promena
+short moveColumnStep(matrix *M, short column, short direction,short *last_merged)
 {
 	short i, changes = 0;
 	if (direction == UP)
@@ -108,11 +123,17 @@ short moveColumnStep(matrix *M, short column, short direction)
 		{
 			if (M->set[i][column] != 0)
 			{
-				if (M->set[i - 1][column] == 0 || M->set[i - 1][column] == M->set[i][column])
+				if (M->set[i - 1][column] == 0)
 				{
-					M->set[i - 1][column] += M->set[i][column];
+					M->set[i - 1][column] = M->set[i][column];
 					M->set[i][column] = 0;
-					//M->score += M->set[i - 1][column];
+					changes++;
+				}
+				else if (M->set[i - 1][column] == M->set[i][column] && M->set[i][column] != last_merged[column])
+				{
+					(M->set[i - 1][column]) <<= 1;
+					M->set[i][column] = 0;
+					last_merged[column] = M->set[i - 1][column];
 					changes++;
 				}
 			}
@@ -124,11 +145,17 @@ short moveColumnStep(matrix *M, short column, short direction)
 		{
 			if (M->set[i][column] != 0)
 			{
-				if (M->set[i + 1][column] == 0 || M->set[i + 1][column] == M->set[i][column])
+				if (M->set[i + 1][column] == 0)
 				{
-					M->set[i + 1][column] += M->set[i][column];
+					M->set[i + 1][column] = M->set[i][column];
 					M->set[i][column] = 0;
-					//M->score += M->set[i + 1][column];
+					changes++;
+				}
+				else if (M->set[i + 1][column] == M->set[i][column] && M->set[i][column] != last_merged[column])
+				{
+					(M->set[i + 1][column]) <<= 1;
+					M->set[i][column] = 0;
+					last_merged[column] = M->set[i + 1][column];
 					changes++;
 				}
 			}
@@ -138,45 +165,57 @@ short moveColumnStep(matrix *M, short column, short direction)
 }
 
 
-//Pomera matricu postepeno i vraca broj promena
-short moveStep(matrix M, short direction)
+
+short moveStep(matrix *M, short direction,short *last_merged)
 {
 	short i, j, changes = 0;
 	if (direction == RIGHT || direction == LEFT)
 	{
-		for (i = 0; i < M.size; i++)
+		for (i = 0; i < M->size; i++)
 		{
-			changes += moveRowStep(&M, i, direction);
+			changes += moveRowStep(M, i, direction,last_merged);
 		}
 	}
 
 	if (direction == UP || direction == DOWN)
 	{
-		for (j= 0; j < M.size; j++)
+		for (j= 0; j < M->size; j++)
 		{
-			changes += moveColumnStep(&M, j, direction);
+			changes += moveColumnStep(M, j, direction,last_merged);
 		}
 	}
 	return changes;
 }
 
 
-//Pomera matricu u jednom potezu
-void moveMatrix(matrix M, short direction)
+//Ova funkcija ne treba da se koristi!! Treba slicna na se napravi u main()
+void moveMatrix(matrix *M, short direction)
 {
-	short changes;
-	//Detektuje promene u matrici
-	changes = moveStep(M, direction);
+	short changes, moved, last_merged[5] = { 0 };
+	changes = moved = moveStep(M, direction,last_merged);
 	while (changes)
 	{
-		changes = moveStep(M, direction);
+		changes = moveStep(M, direction,last_merged);
 	}
-	if (changes)
-		spawnNumber(&M);
+	if (moved)
+		spawnNumber(M);
+}
+
+short snap(matrix *M, short direction)
+{
+	short changes, moved, last_merged[5] = { 0 };
+	changes = moved = moveStep(M, direction, last_merged);
+	while (changes)
+	{
+		changes = moveStep(M, direction, last_merged);
+	}
+	if(moved)
+		return 1;
+	else
+		return 0;
 }
 
 
-//Stampa matricu
 void printMatrix(matrix M)
 {
 	short i, j;
@@ -190,7 +229,6 @@ void printMatrix(matrix M)
 }
 
 
-//Stampa red
 void printRow(short *R, short size)
 {
 	short i, j;

@@ -25,15 +25,14 @@ main()
 			int c = getch();
 			switch (c)
 			{
-			case KEY_LEFT:moveMatrix(m, LEFT); break;
-			case KEY_RIGHT:moveMatrix(m, RIGHT); break;
-			case KEY_DOWN:moveMatrix(m, DOWN); break;
-			case KEY_UP:moveMatrix(m, UP); break;
+			case KEY_LEFT:moveMatrix(&m, LEFT); break;
+			case KEY_RIGHT:moveMatrix(&m, RIGHT); break;
+			case KEY_DOWN:moveMatrix(&m, DOWN); break;
+			case KEY_UP:moveMatrix(&m, UP); break;
 			case 'q':exit(0); break;
 			default:continue;
 			}
 			displayMatrix(m);
-			spawnNumber(&m);
 		}
 		break;
 	case 2:
@@ -50,15 +49,14 @@ main()
 			int c = getch();
 			switch (c)
 			{
-			case KEY_LEFT:moveMatrix(m, LEFT); break;
-			case KEY_RIGHT:moveMatrix(m, RIGHT); break;
-			case KEY_DOWN:moveMatrix(m, DOWN); break;
-			case KEY_UP:moveMatrix(m, UP); break;
+			case KEY_LEFT:moveMatrix(&m, LEFT); break;
+			case KEY_RIGHT:moveMatrix(&m, RIGHT); break;
+			case KEY_DOWN:moveMatrix(&m, DOWN); break;
+			case KEY_UP:moveMatrix(&m, UP); break;
 			case 'q':exit(0); break;
 			default:continue;
 			}
 			displayMatrix(m);
-			spawnNumber(&m);
 		}
 		break;
 	case 3: exit(0); break;
