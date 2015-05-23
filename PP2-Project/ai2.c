@@ -19,8 +19,8 @@ T_node* get_node(unsigned int **table, int table_size, int level)
 			node->table[i] = malloc(table_size*sizeof(unsigned int));
 			if (node->table[i] == NULL)
 				exit(4);
+			memcpy(node->table[i], table[i], table_size*sizeof(unsigned int));
 		}
-		memcpy(node->table, table, table_size*table_size*sizeof(unsigned int)); // da li moze ovako?
 		node->table_size = table_size;
 		node->weight = -1;
 		node->level = level;
@@ -32,7 +32,7 @@ T_node* get_node(unsigned int **table, int table_size, int level)
 		exit(1);
 }
 
-void free_stable(T_node *root) // provjeri?!
+void free_stable(T_node *root)
 {
 	int top = 0, i;
 	T_node **stack = malloc(10000*sizeof(T_node*)), *old;
@@ -57,10 +57,9 @@ void free_stable(T_node *root) // provjeri?!
 			}
 			else
 			{
-				while (i < number_of_elems)
+				while (i < number_of_elems && root->next[i] != NULL)
 				{
-					if (root->next[i] != NULL)
-						push(stack, root->next[i], &top);
+					push(stack, root->next[i], &top);
 					i++;
 				}
 			}
@@ -102,7 +101,7 @@ float approximate_position(unsigned int **table, int table_size)
 		{
 			if (table[i][j] > max_number)
 			{
-				max_number = table[i][j]; // sto ako je vise istih???? -->izaberi najbolju za tebe
+				max_number = table[i][j]; 
 				x = i;
 				y = j;
 			}
@@ -329,7 +328,7 @@ float approximate_position(unsigned int **table, int table_size)
 void number_of_moves_horizontally(unsigned int **table, int table_size, float *score)
 {
 	int i, j;
-	int flag = 0; // da li vazi i za 5x5
+	int flag = 0;
 	for (i = 0; i < table_size; i++)
 	{
 		for (j = 0; j < table_size-1; j++)
@@ -352,7 +351,7 @@ void number_of_moves_horizontally(unsigned int **table, int table_size, float *s
 void number_of_moves_vertically(unsigned int **table, int table_size, float *score)
 {
 	int i, j;
-	int flag = 0; // da li vazi i za 5x5
+	int flag = 0;
 	for (j = 0; j < table_size; j++)
 	{
 		for (i = 0; i < table_size-1; i++)

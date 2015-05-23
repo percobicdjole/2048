@@ -118,7 +118,7 @@ void expectimax_search(T_node *root)
 					root->weight = approximate_position(root->table, root->table_size);
 			}
 			push(stack, root, &top);
-			if (root->level % 2 == 1)  // mozda postorder ne valja ------------------------------------------------------------
+			if (root->level % 2 == 1)
 			{
 				i = 0;
 				while (root->next[i] == NULL && i < number_of_elems-1)
