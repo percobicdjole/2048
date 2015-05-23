@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "logic.h"
+
 
 #define MAX_DEPTH 8
 #define MAX_NUMBER_OF_NODES 48
@@ -26,7 +26,7 @@ typedef struct tnode
 /// \TO-DO promijeni weight u float
 
 // vraca najbolji potez
-int get_hint(matrix table);
+int get_hint();
 
 void make_tree_normal_move(T_node *root, int level);
 void make_tree_random_move(T_node *root, int level);

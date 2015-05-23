@@ -1,5 +1,6 @@
 #include "ai.h"
 #include "math.h"
+#include "logic.h"
 
 T_node* get_node(unsigned int **table, int table_size, int level)
 {
