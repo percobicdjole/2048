@@ -1,6 +1,7 @@
 //Probna verzija igre
 #include "logic.h"
 #include "graphics.h"
+#include "ai.h"
 #include <time.h>
 
 void game(matrix *m, int stayInMenu);
@@ -45,9 +46,10 @@ main()
 void game(matrix *m, int stayInMenu)
 {
 	int score = 0; 
-	short vector[10];
+	short vector[5];
 	attron(COLOR_PAIR(INTERFACE));
 	mvprintw(1, 45, "Press ESC-to get back to menu!");
+	mvprintw(2, 45, "Press h-to get hint!");
 	attroff(COLOR_PAIR(INTERFACE));
 	displayMatrix(6, 3, *m);
 	while (stayInMenu)
@@ -61,7 +63,7 @@ void game(matrix *m, int stayInMenu)
 						  { 
 							  _sleep(100); 
 							  displayMatrix(6, 3, *m); 
-						  }; break;
+			}; break;
 			case KEY_RIGHT:while (moveStep(&*m, RIGHT, vector, &score))
 			{
 							  _sleep(100);
@@ -78,6 +80,31 @@ void game(matrix *m, int stayInMenu)
 							  displayMatrix(6, 3, *m);
 			}; break;
 			case KEY_ESC:stayInMenu = 0; break;
+			case 'h': 
+				if (get_hint(*m) == LEFT)
+				{
+					attron(COLOR_PAIR(INTERFACE));
+					mvprintw(4 * 3 + 3 + 7, 7, "Najbolji izbor je levo!");
+					attroff(COLOR_PAIR(INTERFACE));
+				}
+				else if (get_hint(*m) == RIGHT)
+				{
+					attron(COLOR_PAIR(INTERFACE));
+					mvprintw(4 * 3 + 3 + 7, 7, "Najbolji izbor je desno!");
+					attroff(COLOR_PAIR(INTERFACE));
+				}
+				else if (get_hint(*m) == UP)
+				{
+					attron(COLOR_PAIR(INTERFACE));
+					mvprintw(4 * 3 + 3 + 7, 7, "Najbolji izbor je gore!");
+					attroff(COLOR_PAIR(INTERFACE));
+				}
+				else if (get_hint(*m) == DOWN)
+				{
+					attron(COLOR_PAIR(INTERFACE));
+					mvprintw(4 * 3 + 3 + 7, 7, "Najbolji izbor je dole!");
+					attroff(COLOR_PAIR(INTERFACE));
+				}
 		}
 		spawnNumber(m);
 		displayMatrix(6, 3, *m);
