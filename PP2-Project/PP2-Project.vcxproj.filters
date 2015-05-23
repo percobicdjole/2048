@@ -24,12 +24,21 @@
     <ClCompile Include="logic.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ai.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ai2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="logic.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ai.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -78,11 +78,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ai.c" />
+    <ClCompile Include="ai2.c" />
     <ClCompile Include="graphics.c" />
     <ClCompile Include="logic.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ai.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="logic.h" />
   </ItemGroup>

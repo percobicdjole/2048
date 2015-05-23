@@ -1,11 +1,9 @@
-#include <stdlib.h>
 #include "ai.h"
-#include "logic.h"
 
 void expectimax_search(T_node *root)
 {
 	int top = 0;
-	T_node **stack = malloc(10000*sizeof(T_node*));
+	T_node **stack = malloc(10000 * sizeof(T_node*));
 	if (stack == NULL)
 		exit(5);
 	int number_of_elems = root->table_size*root->table_size;
@@ -21,7 +19,7 @@ void expectimax_search(T_node *root)
 	{
 		root = pop(stack, &top);
 		if (root->weight == -1)
-		{ 
+		{
 			if (root->level == MAX_DEPTH)
 				root->weight = approximate_position(root->table, root->table_size);
 			else if (root->level % 2 == 1)
@@ -30,8 +28,8 @@ void expectimax_search(T_node *root)
 				root->weight++; // zato sto je -1
 				for (i = 0; i < number_of_elems, root->next[i] != NULL; i++)
 				{
-					root->next[i]->weight*=root->next[i]->possibility;
-					root->weight+= root->next[i]->weight;
+					root->next[i]->weight *= root->next[i]->possibility;
+					root->weight += root->next[i]->weight;
 					counter++;
 				}
 				if (i == 0)
@@ -56,7 +54,7 @@ void expectimax_search(T_node *root)
 			if (root->level % 2 == 1)
 			{
 				i = 0;
-				while (root->next[i] == NULL && i < number_of_elems-1 && root->next[i]->weight != -1)
+				while (root->next[i] == NULL && i < number_of_elems - 1 && root->next[i]->weight != -1)
 					i++;
 				root = root->next[i];
 			}
@@ -74,12 +72,13 @@ void expectimax_search(T_node *root)
 		}
 	}
 	free(stack);
+}
 
 float approximate_position(unsigned int **table, int table_size)
 {
 	int i, j, max_number = -1, empty_spaces_counter = 0;
 	int x, y;
-	float score, check_moves;
+	float score = 0, check_moves;
 
 	for (i = 0; i < table_size; i++)
 	{
@@ -191,6 +190,7 @@ float approximate_position(unsigned int **table, int table_size)
 			rows--;
 		}
 		// provjeri broj poteza
+		check_moves = score;
 		number_of_moves_horizontally(table, table_size, &score);
 		number_of_moves_vertically(table, table_size, &score);
 		if (check_moves == score)
@@ -238,6 +238,7 @@ float approximate_position(unsigned int **table, int table_size)
 			rows++;
 		}
 		// provjeri broj poteza
+		check_moves = score;
 		number_of_moves_horizontally(table, table_size, &score);
 		number_of_moves_vertically(table, table_size, &score);
 		if (check_moves == score)
@@ -285,6 +286,7 @@ float approximate_position(unsigned int **table, int table_size)
 			rows--;
 		}
 		// provjeri broj poteza
+		check_moves = score;
 		number_of_moves_horizontally(table, table_size, &score);
 		number_of_moves_vertically(table, table_size, &score);
 		if (check_moves == score)
@@ -297,6 +299,7 @@ float approximate_position(unsigned int **table, int table_size)
 	{
 		score+= max_number*MAX_NOT_IN_CORNER_PENALTY;
 		// provjeri broj poteza
+		check_moves = score;
 		number_of_moves_horizontally(table, table_size, &score);
 		number_of_moves_vertically(table, table_size, &score);
 		if (check_moves == score)

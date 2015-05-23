@@ -1,22 +1,5 @@
-#include <stdlib.h>
 #include "ai.h"
-#include "logic.h"
-
-int get_hint(matrix table)
-{
-	int move = 0;
-
-	T_node *root = get_node(table.set, table.size, 0);
-	root->possibility = 1;
-
-	make_expectimax_normal_move(root, 1);
-	expectimax_search(root);
-
-	while (root->next[move]->weight != root->weight)
-		move++;
-	free_stable(root);
-	return move;
-}
+#include "math.h"
 
 T_node* get_node(unsigned int **table, int table_size, int level)
 {
@@ -121,7 +104,7 @@ void make_tree_normal_move(T_node *root, int level)
 		else
 		{
 			root->next[i]->possibility = 1;
-			make_expectimax_random_move(root->next[i], level + 1);
+			make_tree_random_move(root->next[i], level + 1);
 		}
 	}
 }
@@ -142,17 +125,33 @@ void make_tree_random_move(T_node *root, int level)
 					root->next[counter] = get_node(root->table, root->table_size, level);
 					root->next[counter]->possibility = 0.9;
 					root->next[counter]->table[i][j] = 2;
-					make_expectimax_normal_move(root->next[counter], level + 1);
+					make_tree_normal_move(root->next[counter], level + 1);
 					counter++;
 					root->next[counter] = get_node(root->table, root->table_size, level);
 					root->next[counter]->possibility = 0.1;
 					root->next[counter]->table[i][j] = 4;
-					make_expectimax_normal_move(root->next[counter], level + 1);
+					make_tree_normal_move(root->next[counter], level + 1);
 					counter++;
 				}
 			}
 		}
 	}
+}
+
+int get_hint(matrix table)
+{
+	int move = 0;
+
+	T_node *root = get_node(table.set, table.size, 0);
+	root->possibility = 1;
+
+	make_tree_normal_move(root, 1);
+	expectimax_search(root);
+
+	while (root->next[move]->weight != root->weight)
+		move++;
+	free_stable(root);
+	return move;
 }
 
 /*  TO-DO pravljene stabla iterativno, 

@@ -28,8 +28,8 @@ typedef struct tnode
 // vraca najbolji potez
 int get_hint(matrix table);
 
-void make_tree_normal_move(T_node root, int level);
-void make_tree_random_move(T_node root, int level);
+void make_tree_normal_move(T_node *root, int level);
+void make_tree_random_move(T_node *root, int level);
 
 // trazi najbolji potez
 void expectimax_search(T_node *root);

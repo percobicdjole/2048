@@ -201,8 +201,11 @@ void moveMatrix(matrix *M, short direction)
 		spawnNumber(M);
 }
 
-short snap(matrix *M, short direction)
+short snap(unsigned int **table, int table_size, short direction)
 {
+	matrix *M = malloc(sizeof(matrix));
+	M->set = table;
+	M->size = table_size;
 	short changes, moved, last_merged[5] = { 0 };
 	changes = moved = moveStep(M, direction, last_merged);
 	while (changes)
