@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include "Logic.h"
 
 //Postavljanje SEED-a
@@ -62,7 +59,7 @@ void spawnNumber(matrix *M)
 
 
 //Pomera jedan red za jedan korak i vraca broj promena
-short moveRowStep(matrix *M, short row, short direction,short *last_merged)
+short moveRowStep(matrix *M, short row, short direction,short *last_merged,unsigned int *score)
 {
 	short j, changes = 0;
 	if (direction == RIGHT)
@@ -80,6 +77,8 @@ short moveRowStep(matrix *M, short row, short direction,short *last_merged)
 				else if (M->set[row][j + 1] == M->set[row][j] && M->set[row][j] != last_merged[row])
 				{
 					(M->set[row][j + 1]) <<= 1;
+					if (score)
+						*score += M->set[row][j + 1];
 					M->set[row][j] = 0;
 					last_merged[row] = M->set[row][j + 1];
 					changes++;
@@ -102,6 +101,8 @@ short moveRowStep(matrix *M, short row, short direction,short *last_merged)
 				else if (M->set[row][j - 1] == M->set[row][j] && M->set[row][j]!=last_merged[row])
 				{
 					(M->set[row][j - 1]) <<= 1;
+					if (score)
+						*score += M->set[row][j - 1];
 					M->set[row][j] = 0;
 					last_merged[row] = M->set[row][j - 1];
 					changes++;
@@ -114,7 +115,7 @@ short moveRowStep(matrix *M, short row, short direction,short *last_merged)
 
 
 //Pomera jednu kolonu za jedan korak i vraca broj promena
-short moveColumnStep(matrix *M, short column, short direction,short *last_merged)
+short moveColumnStep(matrix *M, short column, short direction,short *last_merged,unsigned int *score)
 {
 	short i, changes = 0;
 	if (direction == UP)
@@ -132,6 +133,8 @@ short moveColumnStep(matrix *M, short column, short direction,short *last_merged
 				else if (M->set[i - 1][column] == M->set[i][column] && M->set[i][column] != last_merged[column])
 				{
 					(M->set[i - 1][column]) <<= 1;
+					if (score)
+						*score += M->set[i - 1][column];
 					M->set[i][column] = 0;
 					last_merged[column] = M->set[i - 1][column];
 					changes++;
@@ -154,6 +157,8 @@ short moveColumnStep(matrix *M, short column, short direction,short *last_merged
 				else if (M->set[i + 1][column] == M->set[i][column] && M->set[i][column] != last_merged[column])
 				{
 					(M->set[i + 1][column]) <<= 1;
+					if (score)
+						*score += M->set[i + 1][column];
 					M->set[i][column] = 0;
 					last_merged[column] = M->set[i + 1][column];
 					changes++;
@@ -166,14 +171,14 @@ short moveColumnStep(matrix *M, short column, short direction,short *last_merged
 
 
 
-short moveStep(matrix *M, short direction,short *last_merged)
+short moveStep(matrix *M, short direction,short *last_merged,unsigned int *score)
 {
 	short i, j, changes = 0;
 	if (direction == RIGHT || direction == LEFT)
 	{
 		for (i = 0; i < M->size; i++)
 		{
-			changes += moveRowStep(M, i, direction,last_merged);
+			changes += moveRowStep(M, i, direction,last_merged,score);
 		}
 	}
 
@@ -181,7 +186,7 @@ short moveStep(matrix *M, short direction,short *last_merged)
 	{
 		for (j= 0; j < M->size; j++)
 		{
-			changes += moveColumnStep(M, j, direction,last_merged);
+			changes += moveColumnStep(M, j, direction,last_merged,score);
 		}
 	}
 	return changes;
@@ -189,13 +194,13 @@ short moveStep(matrix *M, short direction,short *last_merged)
 
 
 //Ova funkcija ne treba da se koristi!! Treba slicna na se napravi u main()
-void moveMatrix(matrix *M, short direction)
+void moveMatrix(matrix *M, short direction,unsigned int *score)
 {
 	short changes, moved, last_merged[5] = { 0 };
-	changes = moved = moveStep(M, direction,last_merged);
+	changes = moved = moveStep(M, direction,last_merged,score);
 	while (changes)
 	{
-		changes = moveStep(M, direction,last_merged);
+		changes = moveStep(M, direction,last_merged,score);
 	}
 	if (moved)
 		spawnNumber(M);
@@ -207,15 +212,37 @@ short snap(unsigned int **table, int table_size, short direction)
 	M->set = table;
 	M->size = table_size;
 	short changes, moved, last_merged[5] = { 0 };
-	changes = moved = moveStep(M, direction, last_merged);
+	changes = moved = moveStep(M, direction, last_merged,NULL);
 	while (changes)
 	{
-		changes = moveStep(M, direction, last_merged);
+		changes = moveStep(M, direction, last_merged,NULL);
 	}
 	if(moved)
 		return 1;
 	else
 		return 0;
+}
+
+void copyMatrix(matrix *dest, matrix *source)
+{
+	int i;
+	dest->size = source->size;
+	dest->set = malloc(dest->size*sizeof(short*));
+	for (i = 0; i < source->size; i++)
+	{
+		dest->set[i] = malloc(dest->size*sizeof(short));
+		memcpy(dest->set[i], source->set[i], dest->size*sizeof(short));
+	}
+}
+
+void freeMatrix(matrix *M)
+{
+	int i;
+	for (i = 0; i < M->size; i++)
+	{
+		free(M->set[i]);
+	}
+	free(M->set);
 }
 
 
