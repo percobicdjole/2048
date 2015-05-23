@@ -53,4 +53,4 @@ short moveStep(matrix *M, short direction);
 void moveMatrix(matrix *M, short direction);
 
 //Igra potez za hint
-short snap(matrix *M, short direction);
+short snap(unsigned int **table, int table_size, short direction);
