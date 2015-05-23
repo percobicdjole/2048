@@ -3,14 +3,14 @@
 
 
 char *choices[] = {
-	"Normal",
+	"Obicno",
 	"X-tile",
-	"Exit",
+	"Izlaz",
 };
 
 int n_choices = sizeof(choices) / sizeof(char *);
 
-void displayMatrix(matrix m)//dodati opciju za x tile
+void displayMatrix(int startx, int starty, matrix m)//dodati opciju za x tile
 {
 
 	for (int i = 0; i < m.size; i++)
@@ -23,9 +23,9 @@ void displayMatrix(matrix m)//dodati opciju za x tile
 				attron(COLOR_PAIR(0)|A_REVERSE);
 				for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
 				{
-					for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2, l + 1, " ");
+					for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(starty + k + 2, startx + l + 1, " ");
 				}
-				mvprintw((i + 1) * HEIGHT, (j + 1) * 4 + 3 * j, "X");
+				mvprintw((i + 1) * HEIGHT + starty, (j + 1) * 4 + 3 * j + startx, "X");
 				attroff(COLOR_PAIR(0) | A_REVERSE);
 			}
 			else
@@ -37,29 +37,29 @@ void displayMatrix(matrix m)//dodati opciju za x tile
 
 					for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
 					{
-						for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2, l + 1, " ");
+						for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2 + starty, l + 1 + startx, " ");
 					}
 
-					{	//ISPIS ELEMENATA MATRICE, PODESAVANJE PO HORIZONTALI
+					{
 						unsigned char y, x;
 						y = (i + 1) * HEIGHT;
 						if (m.set[i][j] < 100)									x = (j + 1) * 4 + 3 * j;
 						else if (m.set[i][j] >= 100 && m.set[i][j] < 10000)		x = (j + 1) * 4 + 3 * j - 1;
 						else if (m.set[i][j] >= 10000)							x = (j + 1) * 4 + 3 * j - 2;
-						mvprintw(y, x, "%u", m.set[i][j]);
+						mvprintw(y+starty, x+startx, "%u", m.set[i][j]);
 					}
 
 					attroff(COLOR_PAIR(boja));
 				}
 				else
 				{
-					attron(COLOR_PAIR(0));
+					attron(COLOR_PAIR(BW));
 					for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
 					{
-						for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2, l + 1, " ");
+						for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2+starty, l + 1+startx, " ");
 					}
-					mvprintw((i + 1) * HEIGHT, (j + 1) * 4 + 3 * j, ".");
-					attroff(COLOR_PAIR(0));
+					mvprintw((i + 1) * HEIGHT+starty, (j + 1) * 4 + 3 * j+startx, ".");
+					attroff(COLOR_PAIR(BW));
 				}
 			}
 		}
@@ -70,11 +70,11 @@ void displayMatrix(matrix m)//dodati opciju za x tile
 
 unsigned char colorOfNumber(unsigned short x)
 {
-	if (x == 2)					    return 1;
-	else if (x >= 4 && x <= 16)     return 2;
-	else if (x >= 32 && x <= 64)    return 3;
-	else if (x >= 128 && x <= 256)  return 4;
-	else if (x >= 512)				return 5;
+	if (x == 2)					    return FIRST;
+	else if (x >= 4 && x <= 16)     return SECOND;
+	else if (x >= 32 && x <= 64)    return THIRD;
+	else if (x >= 128 && x <= 256)  return FOURTH;
+	else if (x >= 512)				return FIFTH;
 	else return 0;
 }
 
@@ -91,15 +91,33 @@ void colorPalette()
 	refresh();
 }
 
-void intiateColors()
+void initiateThemes()
 {
-	init_pair(0, COLOR_BLACK, WHITE);
-	init_pair(1, COLOR_BLACK, FIRST);
-	init_pair(2, WHITE, SECOND);
-	init_pair(3, WHITE, THIRD);
-	init_pair(4, WHITE, FOURTH);
-	init_pair(5, COLOR_BLACK, FIFTH);
-	init_pair(6, COLOR_BLACK, 14);//za tekst
+	//crvena promeniti
+	crvena.first = 1;   //2	
+	crvena.second = 9;  //4-16	  
+	crvena.third = 3;   //32-64
+	crvena.fourth = 11; //128-256
+	crvena.fifth = 14;  //512-2048
+	crvena.interfaceColor = 9;
+	//plava
+	plava.first = 1;   //2	
+	plava.second = 9;  //4-16	  
+	plava.third = 3;   //32-64
+	plava.fourth = 11; //128-256
+	plava.fifth = 14;  //512-2048
+	plava.interfaceColor = 9;
+}
+
+void intiateColors(theme tema)
+{
+	init_pair(BW, COLOR_BLACK, WHITE);
+	init_pair(FIRST, WHITE, tema.first);
+	init_pair(SECOND, WHITE, tema.second);
+	init_pair(THIRD, WHITE, tema.third);
+	init_pair(FOURTH, WHITE, tema.fourth);
+	init_pair(FIFTH, WHITE, tema.fifth);
+	init_pair(INTERFACE, COLOR_BLACK, tema.interfaceColor);//za tekst
 }
 
 void printMenu(WINDOW *menu_win, int highlight)
@@ -112,9 +130,9 @@ void printMenu(WINDOW *menu_win, int highlight)
 	{
 		if (highlight == i + 1) 
 		{
-			wattron(menu_win, A_REVERSE | COLOR_PAIR(6));
+			wattron(menu_win, A_REVERSE | COLOR_PAIR(INTERFACE));
 			mvwprintw(menu_win, y, x, "%s", choices[i]);
-			wattroff(menu_win, A_REVERSE | COLOR_PAIR(6));
+			wattroff(menu_win, A_REVERSE | COLOR_PAIR(INTERFACE));
 		}
 		else
 			mvwprintw(menu_win, y, x, "%s", choices[i]);

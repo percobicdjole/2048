@@ -1,68 +1,87 @@
 //Probna verzija igre
 #include "logic.h"
 #include "graphics.h"
+#include <time.h>
+
+void game(matrix *m, int stayInMenu);
+void gamex(matrix *m, int stayInMenu);
+
 main()
 {
+	matrix m;
+	int mode=0;
+	_Bool stayInMenu = 1;
 	setSeed();
-	matrix m=newMatrix(4);
 	initscr();
 	noecho();
 	curs_set(0);
 	keypad(stdscr, TRUE);
 	start_color();
-	intiateColors();
-	mvprintw(0, 45, "2048 Alpha version (19.5.2015.)");
-	refresh();
-	switch (menu())
+	initiateThemes();
+	intiateColors(plava);
+
+	while (stayInMenu)
 	{
-	case 1:
-		attron(COLOR_PAIR(5));
-		mvprintw(1, 45, "Press Q-to quit!");
-		attroff(COLOR_PAIR(5));
-		displayMatrix(m);
-		while (TRUE)
+		mvprintw(0, 45, "2048 Alpha 2 version (23.5.2015.)");
+		refresh();
+		switch (menu())
 		{
-			int c = getch();
-			switch (c)
+			case 1:m = newMatrix(4); game(&m, stayInMenu); break;
+			case 2:
 			{
-			case KEY_LEFT:moveMatrix(&m, LEFT); break;
-			case KEY_RIGHT:moveMatrix(&m, RIGHT); break;
-			case KEY_DOWN:moveMatrix(&m, DOWN); break;
-			case KEY_UP:moveMatrix(&m, UP); break;
-			case 'q':exit(0); break;
-			default:continue;
+				m = newMatrix(4);
+				int nmb = randomInt(0, 15); //Za Ivana: napravi f-ju za postavljanje x-tilea od ovoga
+				m.set[nmb / 4][nmb % 4] = 1;
+				game(&m, stayInMenu);
 			}
-			displayMatrix(m);
+			break;
+			case 3:exit(0); break;
 		}
-		break;
-	case 2:
-		attron(COLOR_PAIR(5));
-		mvprintw(1, 45, "Press Q-to quit!");
-		attroff(COLOR_PAIR(5));
-		{
-			int nmb = randomInt(0, 15);
-			m.set[nmb / 4][nmb % 4] = 1;
-		}
-		displayMatrix(m);
-		while (TRUE)
-		{
-			int c = getch();
-			switch (c)
-			{
-			case KEY_LEFT:moveMatrix(&m, LEFT); break;
-			case KEY_RIGHT:moveMatrix(&m, RIGHT); break;
-			case KEY_DOWN:moveMatrix(&m, DOWN); break;
-			case KEY_UP:moveMatrix(&m, UP); break;
-			case 'q':exit(0); break;
-			default:continue;
-			}
-			displayMatrix(m);
-		}
-		break;
-	case 3: exit(0); break;
+		stayInMenu = 1;
 	}
-	
-
-
 	endwin();
+}
+
+void game(matrix *m, int stayInMenu)
+{
+	int score = 0; 
+	short vector[10];
+	attron(COLOR_PAIR(INTERFACE));
+	mvprintw(1, 45, "Press ESC-to get back to menu!");
+	attroff(COLOR_PAIR(INTERFACE));
+	displayMatrix(6, 3, *m);
+	while (stayInMenu)
+	{
+		attron(COLOR_PAIR(INTERFACE));
+		mvprintw(4 * 3 + 3 + 2, 7, "SCORE: %d", score);
+		attroff(COLOR_PAIR(INTERFACE));
+		switch (getch())
+		{
+			case KEY_LEFT:while (moveStep(&*m, LEFT, vector, &score))
+						  { 
+							  _sleep(100); 
+							  displayMatrix(6, 3, *m); 
+						  }; break;
+			case KEY_RIGHT:while (moveStep(&*m, RIGHT, vector, &score))
+			{
+							  _sleep(100);
+							  displayMatrix(6, 3, *m);
+			}; break;
+			case KEY_UP:while (moveStep(&*m, UP, vector, &score))
+			{
+							  _sleep(100);
+							  displayMatrix(6, 3, *m);
+			}; break;
+			case KEY_DOWN:while (moveStep(&*m, DOWN, vector, &score))
+			{
+							  _sleep(100);
+							  displayMatrix(6, 3, *m);
+			}; break;
+			case KEY_ESC:stayInMenu = 0; break;
+		}
+		spawnNumber(m);
+		displayMatrix(6, 3, *m);
+	}
+	free(*m->set);
+	erase();
 }
