@@ -18,6 +18,94 @@ int get_hint(matrix table)
 	return move;
 }
 
+T_node* get_node(unsigned int **table, int table_size, int level)
+{
+	T_node *node = malloc(sizeof(T_node));
+
+	if (node != NULL)
+	{
+		int i, number_of_nodes;
+
+		number_of_nodes = table_size * table_size - 2;
+		node->table = malloc(table_size*sizeof(unsigned int*));
+		if (node->table == NULL)
+			exit(3);
+		for (i = 0; i < table_size; i++)
+		{
+			node->table[i] = malloc(table_size*sizeof(unsigned int));
+			if (node->table[i] == NULL)
+				exit(4);
+			memcpy(node->table[i], table[i], table_size*sizeof(unsigned int));
+		}
+		node->table_size = table_size;
+		node->weight = -1;
+		node->level = level;
+		for (i = 0; i < number_of_nodes; i++)
+			node->next[i] = NULL;
+		return node;
+	}
+	else
+		exit(1);
+}
+
+void free_stable(T_node *root)
+{
+	int top = 0, i;
+	T_node **stack = malloc(10000*sizeof(T_node*)), *old;
+	if (stack == NULL)
+		exit(5);
+	int number_of_elems = root->table_size*root->table_size;
+	push(stack, root, &top);
+	while (top != 0)
+	{
+		root = pop(stack, &top);
+		while (root->next[0] != NULL)
+		{
+			i = 1;
+			if (root->level % 2 == 1)
+			{
+				while (i < 4)
+				{
+					if (root->next[i] != NULL)
+						push(stack, root->next[i], &top);
+					i++;
+				}
+			}
+			else
+			{
+				while (i < number_of_elems && root->next[i] != NULL)
+				{
+					push(stack, root->next[i], &top);
+					i++;
+				}
+			}
+			old = root;
+			root = root->next[0];
+			free(old);
+		}
+	}
+}
+
+void push(T_node **stack, T_node *elem, int *top)
+{
+	if (*top % 10000 == 0)
+	{
+		T_node **tmp;
+		tmp = realloc(stack, *top*2*sizeof(T_node*));
+		if (tmp == NULL)
+			exit(2);
+		stack = tmp;
+	}
+	stack[*top] = elem;
+	(*top)++;
+}
+
+T_node* pop(T_node **stack, int *top)
+{
+	(*top)--;
+	return (stack[*top]);
+}
+
 void make_tree_normal_move(T_node *root, int level)
 {
 	int i;
@@ -65,80 +153,6 @@ void make_tree_random_move(T_node *root, int level)
 			}
 		}
 	}
-}
-
-void expectimax_search(T_node *root)
-{
-	int top = 0;
-	T_node **stack = malloc(10000*sizeof(T_node*));
-	if (stack == NULL)
-		exit(5);
-	int number_of_elems = root->table_size*root->table_size;
-	int  i, counter;
-	float max;
-
-	while (root != NULL)
-	{
-		push(stack, root, &top);
-		root = root->next[0];
-	}
-	while (top != 0)
-	{
-		root = pop(stack, &top);
-		if (root->weight == -1)
-		{ 
-			if (root->level == MAX_DEPTH)
-				root->weight = approximate_position(root->table, root->table_size);
-			else if (root->level % 2 == 1)
-			{
-				counter = 0;
-				root->weight++; // zato sto je -1
-				for (i = 0; i < number_of_elems, root->next[i] != NULL; i++)
-				{
-					root->next[i]->weight*=root->next[i]->possibility;
-					root->weight+= root->next[i]->weight;
-					counter++;
-				}
-				if (i == 0)
-					root->weight = approximate_position(root->table, root->table_size);
-				root->weight /= counter;
-			}
-			else
-			{
-				max = 0;
-				counter = 0;
-				for (i = 0; i < 4; i++)
-				{
-					if (root->next[i] == NULL)
-						counter++;
-					else if (root->next[i]->weight > max)
-						max = root->next[i]->weight;
-				}
-				if (counter == 4)
-					root->weight = approximate_position(root->table, root->table_size);
-			}
-			push(stack, root, &top);
-			if (root->level % 2 == 1)
-			{
-				i = 0;
-				while (root->next[i] == NULL && i < number_of_elems-1)
-					i++;
-				root = root->next[i];
-			}
-			else
-			{
-				while (root->next[i] == NULL && i < 3)
-					i++;
-				root = root->next[i];
-			}
-			while (root != NULL)
-			{
-				push(stack, root, &top);
-				root = root->next[0];
-			}
-		}
-	}
-	free(stack);
 }
 
 /*  TO-DO pravljene stabla iterativno, 
