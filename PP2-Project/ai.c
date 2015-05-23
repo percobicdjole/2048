@@ -15,7 +15,7 @@ T_node* get_node(unsigned int **table, int table_size, int level)
 			exit(3);
 		for (i = 0; i < table_size; i++)
 		{
-			node->table[i] = malloc(table_size*sizeof(unsigned int));
+			node->table[i] = malloc(table_size*sizeof(unsigned int)); // problem
 			if (node->table[i] == NULL)
 				exit(4);
 			memcpy(node->table[i], table[i], table_size*sizeof(unsigned int));
@@ -96,7 +96,7 @@ void make_tree_normal_move(T_node *root, int level)
 	for (i = 0; i < 4; i++)
 	{
 		root->next[i] = get_node(root->table, root->table_size, level);
-		if (snap(root->next[i]->table, i) == 0) // mora da se prosledi matrica
+		if (snap(root->next[i]->table, root->next[i]->table_size, i) == 0)
 		{
 		 	free(root->next[i]);
 		 	root->next[i] = NULL;
@@ -155,7 +155,6 @@ int get_hint(matrix table)
 }
 
 /*  TO-DO pravljene stabla iterativno, 
-		  adaptive/iterative deepening
 		  optimizacija poteza
 		  optimizacija procjenjivanja poteza
 		  dinamicko provjeravanje, hashing
