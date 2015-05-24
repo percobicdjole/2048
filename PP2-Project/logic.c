@@ -18,14 +18,14 @@ int randomInt(int low,int high)
 }
 
 //Kreiranje nove matrice
-matrix newMatrix(short size)
+matrix newMatrix(int size)
 {
 	matrix N;
-	short i;
-	short **M = malloc(size*sizeof(short*));
+	int i;
+	int **M = malloc(size*sizeof(int*));
 	for (i = 0; i < size; i++)
 	{
-		M[i] = calloc(size, sizeof(short));
+		M[i] = calloc(size, sizeof(int));
 	}
 	N.set = M;
 	N.size = size;
@@ -37,8 +37,8 @@ matrix newMatrix(short size)
 //Ubacuje broj 2 ili 4 na random izabrano prazno mesto
 void spawnNumber(matrix *M)
 {
-	short i, j, array_index = -1, matrix_index = 0, r;
-	short free_tiles[25];
+	int i, j, array_index = -1, matrix_index = 0, r;
+	int free_tiles[25];
 	for (i = 0; i < M->size; i++)
 		for (j = 0; j < M->size; j++)
 		{
@@ -63,9 +63,9 @@ void spawnNumber(matrix *M)
 
 
 //Pomera jedan red za jedan korak i vraca broj promena
-short moveRowStep(matrix *M, short row, short direction,short *last_merged,unsigned int *score)
+int moveRowStep(matrix *M, int row, int direction,int *last_merged,unsigned int *score)
 {
-	short j, changes = 0;
+	int j, changes = 0;
 	if (direction == RIGHT)
 	{
 		for (j = M->size - 2; j >= 0; j--)
@@ -119,9 +119,9 @@ short moveRowStep(matrix *M, short row, short direction,short *last_merged,unsig
 
 
 //Pomera jednu kolonu za jedan korak i vraca broj promena
-short moveColumnStep(matrix *M, short column, short direction,short *last_merged,unsigned int *score)
+int moveColumnStep(matrix *M, int column, int direction,int *last_merged,unsigned int *score)
 {
-	short i, changes = 0;
+	int i, changes = 0;
 	if (direction == UP)
 	{
 		for (i = 1; i < M->size; i++)
@@ -175,9 +175,9 @@ short moveColumnStep(matrix *M, short column, short direction,short *last_merged
 
 
 
-short moveStep(matrix *M, short direction,short *last_merged,unsigned int *score)
+int moveStep(matrix *M, int direction,int *last_merged,unsigned int *score)
 {
-	short i, j, changes = 0;
+	int i, j, changes = 0;
 	if (direction == RIGHT || direction == LEFT)
 	{
 		for (i = 0; i < M->size; i++)
@@ -197,12 +197,12 @@ short moveStep(matrix *M, short direction,short *last_merged,unsigned int *score
 }
 
 
-short snap(unsigned int **table, int table_size, short direction)
+int snap(unsigned int **table, int table_size, int direction)
 {
 	matrix *M = malloc(sizeof(matrix));
 	M->set = table;
 	M->size = table_size;
-	short changes, moved, last_merged[5] = { 0 };
+	int changes, moved, last_merged[5] = { 0 };
 	changes = moved = moveStep(M, direction, last_merged,NULL);
 	while (changes)
 	{
@@ -218,11 +218,11 @@ void copyMatrix(matrix *dest, matrix *source)
 {
 	int i;
 	dest->size = source->size;
-	dest->set = malloc(dest->size*sizeof(short*));
+	dest->set = malloc(dest->size*sizeof(int*));
 	for (i = 0; i < source->size; i++)
 	{
-		dest->set[i] = malloc(dest->size*sizeof(short));
-		memcpy(dest->set[i], source->set[i], dest->size*sizeof(short));
+		dest->set[i] = malloc(dest->size*sizeof(int));
+		memcpy(dest->set[i], source->set[i], dest->size*sizeof(int));
 	}
 }
 
@@ -239,7 +239,7 @@ void freeMatrix(matrix *M)
 
 void printMatrix(matrix M)
 {
-	short i, j;
+	int i, j;
 	for (i = 0; i < M.size; i++)
 	{
 		for (j = 0; j < M.size; j++)
@@ -250,9 +250,9 @@ void printMatrix(matrix M)
 }
 
 
-void printRow(short *R, short size)
+void printRow(int *R, int size)
 {
-	short i, j;
+	int i, j;
 	for (i = 0; i < size; i++)
 	{
 		printf("%d ", R[i]);

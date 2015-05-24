@@ -11,13 +11,13 @@
 //Matrica
 typedef struct matrix
 {
-	short **set;
+	int **set;
 	char size;
 }matrix;
 
 
 //Funkcije za testiranje
-void printRow(short *R, short size);
+void printRow(int *R, int size);
 void printMatrix(matrix M);
 
 
@@ -25,7 +25,7 @@ void printMatrix(matrix M);
 void setSeed();
 
 //Nova matrica
-matrix newMatrix(short size);
+matrix newMatrix(int size);
 
 //Unistavanje matrice
 void freeMatrix(matrix *M);
@@ -41,8 +41,8 @@ int randomInt(int low, int high);
 
 
 //Pomera za jedan korak i vraca broj promena
-short moveStep(matrix *M, short direction, short *last_merged, unsigned int *score);
+int moveStep(matrix *M, int direction, int *last_merged, unsigned int *score);
 
 
 //Igra potez za hint
-short snap(unsigned int **table, int table_size, short direction);
+int snap(unsigned int **table, int table_size, int direction);
