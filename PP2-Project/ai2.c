@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include "logic.h"
 #include "ai.h"
 
 void expectimax_search(T_node *root)
@@ -74,9 +76,10 @@ void expectimax_search(T_node *root)
 	free(stack);
 }
 
-float approximate_position(unsigned int **table, int table_size)
+float approximate_position(int **table, int table_size)
 {
-	int i, j, max_number = -1, empty_spaces_counter = 0;
+	int i, j, empty_spaces_counter = 0;
+	int max_number = 1;
 	int x, y;
 	float score = 0, check_moves;
 
@@ -314,7 +317,7 @@ float approximate_position(unsigned int **table, int table_size)
 		return score;
 }
 
-void number_of_moves_horizontally(unsigned int **table, int table_size, float *score)
+void number_of_moves_horizontally(int **table, int table_size, float *score)
 {
 	int i, j;
 	int flag = 0;
@@ -337,7 +340,7 @@ void number_of_moves_horizontally(unsigned int **table, int table_size, float *s
 	}
 }
 
-void number_of_moves_vertically(unsigned int **table, int table_size, float *score)
+void number_of_moves_vertically(int **table, int table_size, float *score)
 {
 	int i, j;
 	int flag = 0;

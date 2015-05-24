@@ -1,8 +1,9 @@
+#include <stdlib.h>
+#include "logic.h"
 #include "ai.h"
 #include "math.h"
-#include "logic.h"
 
-T_node* get_node(unsigned int **table, int table_size, int level)
+T_node* get_node(int **table, int table_size, int level)
 {
 	T_node *node = malloc(sizeof(T_node));
 
@@ -11,15 +12,15 @@ T_node* get_node(unsigned int **table, int table_size, int level)
 		int i, number_of_nodes;
 
 		number_of_nodes = table_size * table_size - 2;
-		node->table = malloc(table_size*sizeof(unsigned int*));
+		node->table = malloc(table_size*sizeof(int*));
 		if (node->table == NULL)
 			exit(3);
 		for (i = 0; i < table_size; i++)
 		{
-			node->table[i] = malloc(table_size*sizeof(unsigned int)); // problem
+			node->table[i] = malloc(table_size*sizeof(int)); 
 			if (node->table[i] == NULL)
 				exit(4);
-			memcpy(node->table[i], table[i], table_size*sizeof(unsigned int));
+			memcpy(node->table[i], table[i], table_size*sizeof(int));
 		}
 		node->table_size = table_size;
 		node->weight = -1;
@@ -72,7 +73,7 @@ void free_stable(T_node *root)
 
 void push(T_node **stack, T_node *elem, int *top)
 {
-	if (*top % 10000 == 0)
+	if ((*top + 1) % 10000 == 0)
 	{
 		T_node **tmp;
 		tmp = realloc(stack, *top*2*sizeof(T_node*));

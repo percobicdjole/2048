@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 
-#define MAX_DEPTH 8
+#define MAX_DEPTH 2
 #define MAX_NUMBER_OF_NODES 48
 #define NUMBER_OF_FACTORS 5
 #define MAX_NUMBER_OF_NODES_IN_STABLE 1358954496 // popravi
@@ -16,7 +16,7 @@
 
 typedef struct tnode
 {
-	unsigned int **table;
+	int **table;
 	int table_size;
 	int level;
 	float weight, possibility;
@@ -26,7 +26,7 @@ typedef struct tnode
 /// \TO-DO promijeni weight u float
 
 // vraca najbolji potez
-int get_hint();
+int get_hint(matrix table);
 
 void make_tree_normal_move(T_node *root, int level);
 void make_tree_random_move(T_node *root, int level);
@@ -34,7 +34,7 @@ void make_tree_random_move(T_node *root, int level);
 // trazi najbolji potez
 void expectimax_search(T_node *root);
 
-T_node* get_node(unsigned int **table, int table_size, int level);
+T_node* get_node(int **table, int table_size, int level);
 void free_stable(T_node *root);
 
 // za postorder obilazak
@@ -42,6 +42,6 @@ void push(T_node **stack, T_node* elem, int *top);
 T_node* pop(T_node **stack, int *top);
 
 // heuristika
-float approximate_position(unsigned int **table, int table_size);
-void number_of_moves_horizontally(unsigned int **table, int table_size, float *score);
-void number_of_moves_vertically(unsigned int **table, int table_size, float *score);
+float approximate_position(int **table, int table_size);
+void number_of_moves_horizontally(int **table, int table_size, float *score);
+void number_of_moves_vertically(int **table, int table_size, float *score);
