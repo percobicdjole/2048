@@ -211,13 +211,13 @@ int get_hint(matrix table)
 	make_tree_iterative(root);
 	expectimax_search(root);
 
-	while (root->next[move] == NULL || root->next[move]->weight != root->weight)
+	while ((root->next[move] == NULL || root->next[move]->weight != root->weight) && move < 4)
 		move++;
 	free_stable(root);
 	return move;
 }
 
-/*  TO-DO brisanje stabla u expectimax_search 
+/*  TO-DO usteda memorije
 		  optimizacija poteza
 		  optimizacija procjenjivanja poteza
 		  dinamicko provjeravanje, hashing
