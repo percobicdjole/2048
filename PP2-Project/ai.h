@@ -2,7 +2,7 @@
 #define MAX_NUMBER_OF_NODES 48
 #define NUMBER_OF_FACTORS 5
 #define MAX_NUMBER_OF_NODES_IN_STABLE 1358954496 // popravi
-#define STACK_SPACE 50000
+#define STACK_SPACE 100000
 
 // konstante za heuristiku
 #define MAX_IN_CORNER 100
@@ -35,7 +35,7 @@ T_node* get_node(int **table, int table_size, int level);
 void free_stable(T_node *root);
 
 // za postorder obilazak
-void push(T_node ***stack, T_node* elem, int *top);
+void push(T_node ***stack, T_node* elem, int *top, int *stack_space);
 T_node* pop(T_node **stack, int *top);
 
 // heuristika

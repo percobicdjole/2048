@@ -5,6 +5,7 @@
 void expectimax_search(T_node *root)
 {
 	int top = 0;
+	int stack_space = STACK_SPACE;
 	T_node **stack = malloc(STACK_SPACE * sizeof(T_node*));
 	if (stack == NULL)
 		exit(5);
@@ -12,11 +13,12 @@ void expectimax_search(T_node *root)
 	int  i, counter;
 	float max;
 
-	while (root != NULL)
+	/*while (root != NULL)
 	{
-		push(&stack, root, &top);
+		push(&stack, root, &top, &stack_space);
 		root = root->next[0];
-	}
+	}*/
+	push(&stack, root, &top, &stack_space);
 	while (top != 0)
 	{
 		root = pop(stack, &top);
@@ -57,10 +59,10 @@ void expectimax_search(T_node *root)
 					root->weight = approximate_position(root->table, root->table_size);
 			}
 			// obilazak
-			push(&stack, root, &top);                   
+			/*push(&stack, root, &top, &stack_space);
 			while (root != NULL)
 			{
-				push(&stack, root, &top);
+				push(&stack, root, &top, &stack_space);
 				if (root->level % 2 == 1)
 				{
 					i = 0;
@@ -75,7 +77,7 @@ void expectimax_search(T_node *root)
 						i++;                              //  ako nije jednak jedinici njegovi sinovi su vec popunjeni
 					root = root->next[i];
 				}
-			}
+			}*/
 			/*while (root != NULL)
 			{
 				push(&stack, root, &top);
