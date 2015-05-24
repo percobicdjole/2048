@@ -5,15 +5,11 @@
 #include <time.h>
 
 void game(matrix *m, int stayInMenu);
-void gamex(matrix *m, int stayInMenu);
-void swipe(matrix *M, short direction, unsigned int *score);
-
-
+void swipe(matrix *M, int direction, unsigned int *score);
 
 main()
 {
 	matrix m;
-	int mode=0;
 	_Bool stayInMenu = 1;
 	setSeed();
 	initscr();
@@ -46,25 +42,27 @@ main()
 	endwin();
 }
 
-void swipe(matrix *M, short direction, unsigned int *score)
+void swipe(matrix *M, int direction, unsigned int *score)
 {
-	short changes, moved, last_merged[5] = { 0 };
+	int changes, moved, last_merged[5] = { 0 };
 	changes = moved = moveStep(M, direction, last_merged, score);
 	while (changes)
 	{
 		changes = moveStep(M, direction, last_merged, score);
-		_sleep(50);
+		_sleep(75);
 		displayMatrix(6, 3, *M);
 	}
 	if (moved)
+	{
+		_sleep(50);
 		spawnNumber(M);
+	}
+		
 }
 
 void game(matrix *m, int stayInMenu)
 {
 	unsigned int score = 0; 
-	short vector[5] = { 0 };
-	short changes, moved;
 	attron(COLOR_PAIR(INTERFACE));
 	mvprintw(1, 45, "Press ESC-to get back to menu!");
 	mvprintw(2, 45, "Press h-to get hint!");
@@ -115,6 +113,7 @@ void game(matrix *m, int stayInMenu)
 					mvprintw(4 * 3 + 3 + 7, 7, "Najbolji izbor je dole!");
 					attroff(COLOR_PAIR(INTERFACE));
 				}
+				break;
 		}
 		displayMatrix(6, 3, *m);
 	}
