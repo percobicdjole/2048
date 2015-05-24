@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
 #include "Logic.h"
 
 //Postavljanje SEED-a
@@ -192,19 +196,6 @@ short moveStep(matrix *M, short direction,short *last_merged,unsigned int *score
 	return changes;
 }
 
-
-//Ova funkcija ne treba da se koristi!! Treba slicna na se napravi u main()
-void moveMatrix(matrix *M, short direction,unsigned int *score)
-{
-	short changes, moved, last_merged[5] = { 0 };
-	changes = moved = moveStep(M, direction,last_merged,score);
-	while (changes)
-	{
-		changes = moveStep(M, direction,last_merged,score);
-	}
-	if (moved)
-		spawnNumber(M);
-}
 
 short snap(unsigned int **table, int table_size, short direction)
 {

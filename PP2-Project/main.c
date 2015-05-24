@@ -6,6 +6,9 @@
 
 void game(matrix *m, int stayInMenu);
 void gamex(matrix *m, int stayInMenu);
+void swipe(matrix *M, short direction, unsigned int *score);
+
+
 
 main()
 {
@@ -43,10 +46,25 @@ main()
 	endwin();
 }
 
+void swipe(matrix *M, short direction, unsigned int *score)
+{
+	short changes, moved, last_merged[5] = { 0 };
+	changes = moved = moveStep(M, direction, last_merged, score);
+	while (changes)
+	{
+		changes = moveStep(M, direction, last_merged, score);
+		_sleep(50);
+		displayMatrix(6, 3, *M);
+	}
+	if (moved)
+		spawnNumber(M);
+}
+
 void game(matrix *m, int stayInMenu)
 {
-	int score = 0; 
-	short vector[5];
+	unsigned int score = 0; 
+	short vector[5] = { 0 };
+	short changes, moved;
 	attron(COLOR_PAIR(INTERFACE));
 	mvprintw(1, 45, "Press ESC-to get back to menu!");
 	mvprintw(2, 45, "Press h-to get hint!");
@@ -59,26 +77,18 @@ void game(matrix *m, int stayInMenu)
 		attroff(COLOR_PAIR(INTERFACE));
 		switch (getch())
 		{
-			case KEY_LEFT:while (moveStep(&*m, LEFT, vector, &score))
-						  { 
-							  _sleep(100); 
-							  displayMatrix(6, 3, *m); 
-			}; break;
-			case KEY_RIGHT:while (moveStep(&*m, RIGHT, vector, &score))
-			{
-							  _sleep(100);
-							  displayMatrix(6, 3, *m);
-			}; break;
-			case KEY_UP:while (moveStep(&*m, UP, vector, &score))
-			{
-							  _sleep(100);
-							  displayMatrix(6, 3, *m);
-			}; break;
-			case KEY_DOWN:while (moveStep(&*m, DOWN, vector, &score))
-			{
-							  _sleep(100);
-							  displayMatrix(6, 3, *m);
-			}; break;
+			case KEY_LEFT:
+				swipe(m, LEFT, &score);
+				break;
+			case KEY_RIGHT:
+				swipe(m, RIGHT, &score);
+				break;
+			case KEY_UP:
+				swipe(m, UP, &score);
+				break;
+			case KEY_DOWN:
+				swipe(m, DOWN, &score);
+				break;
 			case KEY_ESC:stayInMenu = 0; break;
 			case 'h': 
 				if (get_hint(*m) == LEFT)
@@ -106,7 +116,6 @@ void game(matrix *m, int stayInMenu)
 					attroff(COLOR_PAIR(INTERFACE));
 				}
 		}
-		spawnNumber(m);
 		displayMatrix(6, 3, *m);
 	}
 	free(*m->set);

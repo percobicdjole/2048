@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-
 //Zamena za argumente funkcija pomeranja
 #define LEFT 0
 #define RIGHT 1
@@ -48,8 +43,6 @@ int randomInt(int low, int high);
 //Pomera za jedan korak i vraca broj promena
 short moveStep(matrix *M, short direction, short *last_merged, unsigned int *score);
 
-//Igra ceo potez i postavlja novi broj
-void moveMatrix(matrix *M, short direction, unsigned int *score);
 
 //Igra potez za hint
 short snap(unsigned int **table, int table_size, short direction);
