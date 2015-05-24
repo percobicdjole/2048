@@ -5,13 +5,14 @@
 
 T_node* get_node(int **table, int table_size, int level)
 {
-	T_node *node = malloc(sizeof(T_node));
+	T_node *node;
+	node = malloc(sizeof(T_node));
 
 	if (node != NULL)
 	{
 		int i, number_of_nodes;
 
-		number_of_nodes = table_size * table_size - 2;
+		number_of_nodes = 2* (table_size * table_size - 1);
 		node->table = malloc(table_size*sizeof(int*));
 		if (node->table == NULL)
 			exit(3);
@@ -36,11 +37,11 @@ T_node* get_node(int **table, int table_size, int level)
 void free_stable(T_node *root)
 {
 	int top = 0, i;
-	T_node **stack = malloc(10000*sizeof(T_node*)), *old;
+	T_node **stack = malloc(STACK_SPACE*sizeof(T_node*)), *old;
 	if (stack == NULL)
 		exit(5);
-	int number_of_elems = root->table_size*root->table_size;
-	push(stack, root, &top);
+	int number_of_elems = 2* (root->table_size*root->table_size - 1);
+	push(&stack, root, &top);
 	while (top != 0)
 	{
 		root = pop(stack, &top);
@@ -52,7 +53,7 @@ void free_stable(T_node *root)
 				while (i < 4)
 				{
 					if (root->next[i] != NULL)
-						push(stack, root->next[i], &top);
+						push(&stack, root->next[i], &top);
 					i++;
 				}
 			}
@@ -60,7 +61,7 @@ void free_stable(T_node *root)
 			{
 				while (i < number_of_elems && root->next[i] != NULL)
 				{
-					push(stack, root->next[i], &top);
+					push(&stack, root->next[i], &top);
 					i++;
 				}
 			}
@@ -71,17 +72,17 @@ void free_stable(T_node *root)
 	}
 }
 
-void push(T_node **stack, T_node *elem, int *top)
+void push(T_node ***stack, T_node *elem, int *top)
 {
-	if ((*top + 1) % 10000 == 0)
+	if ((*top+1) % STACK_SPACE == 0)
 	{
 		T_node **tmp;
-		tmp = realloc(stack, *top*2*sizeof(T_node*));
+		tmp = realloc(*stack, (*top+1)*2*sizeof(T_node*));
 		if (tmp == NULL)
 			exit(2);
-		stack = tmp;
+		*stack = tmp;
 	}
-	stack[*top] = elem;
+	(*stack)[*top] = elem;
 	(*top)++;
 }
 
@@ -140,6 +141,63 @@ void make_tree_random_move(T_node *root, int level)
 	}
 }
 
+void make_tree_iterative(T_node *root)
+{
+	T_node *helping_node;
+	T_node **stack = malloc(STACK_SPACE*sizeof(T_node*));
+	int i, j, counter, top = -1;
+
+	if (stack == NULL)
+		exit(7);
+	helping_node = root;
+	push(&stack, helping_node, &top);
+	while (top != 0)
+	{
+		helping_node = pop(stack, &top);
+	    if (helping_node->level % 2 == 0 && helping_node->level != MAX_DEPTH)
+		{
+			for (i = 0; i < 4; i++)
+			{
+				helping_node->next[i] = get_node(helping_node->table, helping_node->table_size, helping_node->level+1);
+				if (snap(helping_node->next[i]->table, helping_node->next[i]->table_size, i) == 0)
+				{
+				 	free(helping_node->next[i]); // kako skloniti
+				 	helping_node->next[i] = NULL;
+				}
+				else
+				{
+					helping_node->next[i]->possibility = 1;
+					push(&stack, helping_node->next[i], &top);
+				}
+			}
+		}
+		else if (helping_node->level != MAX_DEPTH)
+		{
+			counter = 0;
+			for (i = 0; i < root->table_size; i++)
+			{
+				for (j = 0; j < root->table_size; j++)
+				{
+					if (helping_node->table[i][j] == 0)
+					{
+						helping_node->next[counter] = get_node(helping_node->table, helping_node->table_size, helping_node->level+1);
+						helping_node->next[counter]->possibility = 0.9;
+						helping_node->next[counter]->table[i][j] = 2;
+						push(&stack, helping_node->next[counter], &top);
+						counter++;
+						helping_node->next[counter] = get_node(helping_node->table, helping_node->table_size, helping_node->level+1);
+						helping_node->next[counter]->possibility = 0.1;
+						helping_node->next[counter]->table[i][j] = 4;
+						push(&stack, helping_node->next[counter], &top);
+						counter++;
+					}
+				}
+			}
+		}
+	}
+	free(stack);
+}
+
 int get_hint(matrix table)
 {
 	int move = 0;
@@ -147,7 +205,7 @@ int get_hint(matrix table)
 	T_node *root = get_node(table.set, table.size, 0);
 	root->possibility = 1;
 
-	make_tree_normal_move(root, 1);
+	make_tree_iterative(root);
 	expectimax_search(root);
 
 	while (root->next[move]->weight != root->weight)
@@ -156,7 +214,7 @@ int get_hint(matrix table)
 	return move;
 }
 
-/*  TO-DO pravljene stabla iterativno, 
+/*  TO-DO brisanje stabla u expectimax_search 
 		  optimizacija poteza
 		  optimizacija procjenjivanja poteza
 		  dinamicko provjeravanje, hashing

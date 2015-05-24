@@ -1,10 +1,8 @@
-#include <stdlib.h>
-
-
 #define MAX_DEPTH 2
 #define MAX_NUMBER_OF_NODES 48
 #define NUMBER_OF_FACTORS 5
 #define MAX_NUMBER_OF_NODES_IN_STABLE 1358954496 // popravi
+#define STACK_SPACE 50000
 
 // konstante za heuristiku
 #define MAX_IN_CORNER 100
@@ -23,13 +21,12 @@ typedef struct tnode
 	struct tnode *next[MAX_NUMBER_OF_NODES];
 } T_node;
 
-/// \TO-DO promijeni weight u float
-
 // vraca najbolji potez
 int get_hint(matrix table);
 
 void make_tree_normal_move(T_node *root, int level);
 void make_tree_random_move(T_node *root, int level);
+void make_tree_iterative(T_node *root);
 
 // trazi najbolji potez
 void expectimax_search(T_node *root);
@@ -38,7 +35,7 @@ T_node* get_node(int **table, int table_size, int level);
 void free_stable(T_node *root);
 
 // za postorder obilazak
-void push(T_node **stack, T_node* elem, int *top);
+void push(T_node ***stack, T_node* elem, int *top);
 T_node* pop(T_node **stack, int *top);
 
 // heuristika
