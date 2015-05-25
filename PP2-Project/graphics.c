@@ -5,6 +5,7 @@
 char *choices[] = {
 	"Obicno",
 	"X-tile",
+	"Autoplay",
 	"Izlaz",
 };
 
