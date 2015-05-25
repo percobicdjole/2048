@@ -30,7 +30,7 @@ main()
 			case 2:
 			{
 				m = newMatrix(4);
-				int nmb = randomInt(0, 15); //Za Ivana: napravi f-ju za postavljanje x-tilea od ovoga
+				int nmb = randomInt(0, 15); 
 				m.set[nmb / 4][nmb % 4] = 1;
 				game(&m, stayInMenu);
 			}
@@ -76,41 +76,45 @@ void game(matrix *m, int stayInMenu)
 		switch (getch())
 		{
 			case KEY_LEFT:
+				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
 				swipe(m, LEFT, &score);
 				break;
 			case KEY_RIGHT:
+				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
 				swipe(m, RIGHT, &score);
 				break;
 			case KEY_UP:
+				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
 				swipe(m, UP, &score);
 				break;
 			case KEY_DOWN:
+				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
 				swipe(m, DOWN, &score);
 				break;
 			case KEY_ESC:stayInMenu = 0; break;
 			case 'h': 
-				if (get_hint(*m) == LEFT)
+				if (get_hint(*m) == LEFT)//privremeno resenje, u toku nedelje uraditi posebne prozore
 				{
 					attron(COLOR_PAIR(INTERFACE));
-					mvprintw(4 * 3 + 3 + 7, 7, "Najbolji izbor je levo!");
+					mvprintw(4 * 3 + 3 + 3, 7, "Najbolji izbor je levo!");
 					attroff(COLOR_PAIR(INTERFACE));
 				}
 				else if (get_hint(*m) == RIGHT)
 				{
 					attron(COLOR_PAIR(INTERFACE));
-					mvprintw(4 * 3 + 3 + 7, 7, "Najbolji izbor je desno!");
+					mvprintw(4 * 3 + 3 + 3, 7, "Najbolji izbor je desno!");
 					attroff(COLOR_PAIR(INTERFACE));
 				}
 				else if (get_hint(*m) == UP)
 				{
 					attron(COLOR_PAIR(INTERFACE));
-					mvprintw(4 * 3 + 3 + 7, 7, "Najbolji izbor je gore!");
+					mvprintw(4 * 3 + 3 + 3, 7, "Najbolji izbor je gore!");
 					attroff(COLOR_PAIR(INTERFACE));
 				}
 				else if (get_hint(*m) == DOWN)
 				{
 					attron(COLOR_PAIR(INTERFACE));
-					mvprintw(4 * 3 + 3 + 7, 7, "Najbolji izbor je dole!");
+					mvprintw(4 * 3 + 3 + 3, 7, "Najbolji izbor je dole!");
 					attroff(COLOR_PAIR(INTERFACE));
 				}
 				break;
