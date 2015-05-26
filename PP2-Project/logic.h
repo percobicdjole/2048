@@ -45,4 +45,4 @@ int moveStep(matrix *M, int direction, int *last_merged, unsigned int *score);
 
 
 //Igra potez za hint
-int snap(unsigned int **table, int table_size, int direction);
+int snap(unsigned int **table, int table_size, int direction, matrix *M);

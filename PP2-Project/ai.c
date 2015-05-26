@@ -6,7 +6,7 @@
 T_node* get_node(int **table, int table_size, int level)
 {
 	T_node *node;
-	node = malloc(sizeof(T_node));
+	node = calloc(1, sizeof(T_node));
 	
 	if (node != NULL)
 	{
@@ -26,26 +26,21 @@ T_node* get_node(int **table, int table_size, int level)
 		node->table_size = table_size;
 		node->weight = -1;
 		node->level = level;
-		for (i = 0; i < number_of_nodes; i++)
-			node->next[i] = NULL;
 		return node;
 	}
 	else
 		exit(1);
 }
 
-void free_tree(T_node *root) 
+void free_tree(T_node *root, T_node ***stack, int *stack_space)
 {
 	int top = 0, i;
-	int stack_space = STACK_SPACE;
-	T_node **stack = malloc(STACK_SPACE*sizeof(T_node*)), *old;
-	if (stack == NULL)
-		exit(5);
-	int number_of_elems = 2* (root->table_size*root->table_size - 1);
-	push(&stack, root, &top, &stack_space);
+	int number_of_elems = 2 * (root->table_size*root->table_size - 1);
+	T_node *old;
+	push(stack, root, &top, stack_space);
 	while (top != 0)
 	{
-		root = pop(stack, &top);
+		root = pop(*stack, &top);
 		while (root != NULL)
 		{
 			i = 1;
@@ -54,7 +49,7 @@ void free_tree(T_node *root)
 				while (i < 4)
 				{
 					if (root->next[i] != NULL)
-						push(&stack, root->next[i], &top, &stack_space);
+						push(stack, root->next[i], &top, stack_space);
 					i++;
 				}
 			}
@@ -62,7 +57,7 @@ void free_tree(T_node *root)
 			{
 				while (i < number_of_elems && root->next[i] != NULL)
 				{
-					push(&stack, root->next[i], &top, &stack_space);
+					push(stack, root->next[i], &top, stack_space);
 					i++;
 				}
 			}
@@ -74,7 +69,6 @@ void free_tree(T_node *root)
 			free(old);
 		}
 	}
-	free(stack);
 }
 
 void push(T_node ***stack, T_node *elem, int *top, int *stack_space)
@@ -101,11 +95,11 @@ T_node* pop(T_node **stack, int *top)
 void make_tree_normal_move(T_node *root, int level)
 {
 	int i;
-
+	matrix *M = malloc(sizeof(matrix));
 	for (i = 0; i < 4; i++)
 	{
 		root->next[i] = get_node(root->table, root->table_size, level);
-		if (snap(root->next[i]->table, root->next[i]->table_size, i) == 0)
+		if (snap(root->next[i]->table, root->next[i]->table_size, i, M) == 0)
 		{
 		 	free(root->next[i]);
 		 	root->next[i] = NULL;
@@ -147,27 +141,24 @@ void make_tree_random_move(T_node *root, int level)
 	}
 }
 
-void make_tree_iterative(T_node *root)
+void make_tree_iterative(T_node *root, T_node ***stack, int *stack_space)
 {
 	T_node *helping_node;
-	int stack_space = STACK_SPACE;
-	T_node **stack = malloc(STACK_SPACE*sizeof(T_node*));
+	matrix *M = malloc(sizeof(matrix));
 	int i, j, counter, top = 0;
 
-	if (stack == NULL)
-		exit(7);
 	helping_node = root;
-	push(&stack, helping_node, &top, &stack_space);
+	push(stack, helping_node, &top, stack_space);
 	while (top != 0)
 	{
-		helping_node = pop(stack, &top);
+		helping_node = pop(*stack, &top);
 	    if (helping_node->level % 2 == 0 && helping_node->level != MAX_DEPTH)
 		{
 			counter = 0;
 			for (i = 0; i < 4; i++)
 			{
 				helping_node->next[i] = get_node(helping_node->table, helping_node->table_size, helping_node->level+1);
-				if (snap(helping_node->next[i]->table, helping_node->next[i]->table_size, i) == 0)
+				if (snap(helping_node->next[i]->table, helping_node->next[i]->table_size, i, M) == 0)
 				{
 					for (j = 0; j < root->table_size; j++)
 						free(helping_node->next[i]->table[j]);
@@ -179,7 +170,7 @@ void make_tree_iterative(T_node *root)
 				else
 				{
 					helping_node->next[i]->possibility = 1;
-					push(&stack, helping_node->next[i], &top, &stack_space);
+					push(stack, helping_node->next[i], &top, stack_space);
 				}
 			}
 			if (counter == 4)
@@ -197,12 +188,12 @@ void make_tree_iterative(T_node *root)
 						helping_node->next[counter] = get_node(helping_node->table, helping_node->table_size, helping_node->level+1);
 						helping_node->next[counter]->possibility = 0.9;
 						helping_node->next[counter]->table[i][j] = 2;
-						push(&stack, helping_node->next[counter], &top, &stack_space);
+						push(stack, helping_node->next[counter], &top, stack_space);
 						counter++;
 						helping_node->next[counter] = get_node(helping_node->table, helping_node->table_size, helping_node->level+1);
 						helping_node->next[counter]->possibility = 0.1;
 						helping_node->next[counter]->table[i][j] = 4;
-						push(&stack, helping_node->next[counter], &top, &stack_space);
+						push(stack, helping_node->next[counter], &top, stack_space);
 						counter++;
 					}
 				}
@@ -213,22 +204,26 @@ void make_tree_iterative(T_node *root)
 		else
 			helping_node->weight = approximate_position(helping_node->table, helping_node->table_size);
 	}
-	free(stack);
+	free(M);
 }
 
 int get_hint(matrix table)
 {
 	int move = 0;
-
+	int stack_space = STACK_SPACE;
+	T_node **stack = malloc(STACK_SPACE*sizeof(T_node*));
+	if (stack == NULL)
+		exit(7);
 	T_node *root = get_node(table.set, table.size, 0);
 	root->possibility = 1;
 
-	make_tree_iterative(root);
-	expectimax_search_2(root);
+	make_tree_iterative(root, &stack, &stack_space);
+	expectimax_search_2(root, &stack, &stack_space);
 
 	while ((root->next[move] == NULL || root->next[move]->weight != root->weight) && move < 4)
 		move++;
-	free_tree(root);
+	free_tree(root, &stack, &stack_space);
+	free(stack);
 	return move;
 }
 

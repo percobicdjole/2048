@@ -197,9 +197,8 @@ int moveStep(matrix *M, int direction,int *last_merged,unsigned int *score)
 }
 
 
-int snap(unsigned int **table, int table_size, int direction)
+int snap(unsigned int **table, int table_size, int direction, matrix *M)
 {
-	matrix *M = malloc(sizeof(matrix));
 	M->set = table;
 	M->size = table_size;
 	int changes, moved, last_merged[5] = { 0 };
