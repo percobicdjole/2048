@@ -5,11 +5,12 @@
 #define STACK_SPACE 100000
 
 // konstante za heuristiku
-#define MAX_IN_CORNER 100
+#define MAX_IN_CORNER 1024
 #define MAX_NOT_IN_CORNER_PENALTY -100
-#define MONOTONICITY 30
-#define MOVES 50
-#define NO_MOVES_PENALTY -100 // *HIGH
+#define MONOTONICITY 512
+#define MOVES 64
+#define NO_MONOTONICITY_PENALTY -64
+#define NO_MOVES_PENALTY -1024 // *HIGH
 #define EMPTY_SPACES 10
 
 typedef struct tnode
