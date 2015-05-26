@@ -12,22 +12,69 @@ void expectimax_search(T_node *root)
 	int number_of_elems = 2*(root->table_size*root->table_size - 1);
 	int  i, counter;
 	float max;
+	T_node *helping_node = NULL;
 
-	/*while (root != NULL)
+	while (root != NULL)
 	{
 		push(&stack, root, &top, &stack_space);
 		root = root->next[0];
-	}*/
-	push(&stack, root, &top, &stack_space);
+	}
+	//push(&stack, root, &top, &stack_space); //
 	while (top != 0)
 	{
 		root = pop(stack, &top);
 		if (root->weight == -1)
 		{
+			root->weight = 0;
+			// obilazak
+			//push(&stack, root, &top, &stack_space);
+			//while (root != NULL)
+			//{
+				push(&stack, root, &top, &stack_space);
+				if (root->level % 2 == 1)
+				{
+					i = 0;
+					while (root->next[i] != NULL && root->next[i]->weight != -1  && i < number_of_elems)
+						i++; // mozda moraju svi da se pushuju!
+					if (i == number_of_elems)
+						break;
+					helping_node = root->next[i];
+					while (helping_node != NULL)
+					{
+						push(&stack, helping_node, &top, &stack_space);
+						helping_node = helping_node->next[0];
+					}
+				}
+				else
+				{
+					i = 0;
+					while (i < 4) // li je 3
+					{
+						while (((root->next[i] == NULL) ? 1 : ((root->next[i]->weight != -1) ? 1 : 0)) && i < 4)
+							i++;      //  ako nije jednak jedinici njegovi sinovi su vec popunjeni
+						if (i == 4)
+							break;
+						helping_node = root->next[i];
+						while (helping_node != NULL)
+						{
+							push(&stack, helping_node, &top, &stack_space);
+							helping_node = helping_node->next[0];
+						}
+					}
+				}
+		//  }
+			while (root != NULL)
+			{
+				push(&stack, root, &top, &stack_space);
+				root = root->next[0];
+			}
+		}
+		else if (root->level != MAX_DEPTH)
+		{
 			// nalazenje tezine
-			if (root->level == MAX_DEPTH)
-				root->weight = approximate_position(root->table, root->table_size);
-			else if (root->level % 2 == 1)
+			//if (root->level == MAX_DEPTH)
+			//	root->weight = approximate_position(root->table, root->table_size);
+			/*else*/ if (root->level % 2 == 1)
 			{
 				counter = 0;
 				(root->weight)++; // zato sto je -1
@@ -57,32 +104,96 @@ void expectimax_search(T_node *root)
 				}
 				if (counter == 4)
 					root->weight = approximate_position(root->table, root->table_size);
-			}
-			// obilazak
-			/*push(&stack, root, &top, &stack_space);
-			while (root != NULL)
-			{
-				push(&stack, root, &top, &stack_space);
-				if (root->level % 2 == 1)
-				{
-					i = 0;
-					while (root->next[i] != NULL && root->next[i]->weight != -1  && i < number_of_elems-1)
-						i++;
-					root = root->next[i];
-				}
 				else
-				{
-					i = 0;
-					while (((root->next[i] == NULL) ? 1 : (root->next[i]->weight != -1) ? 1 : 0) && i < 3)
-						i++;                              //  ako nije jednak jedinici njegovi sinovi su vec popunjeni
-					root = root->next[i];
-				}
-			}*/
-			/*while (root != NULL)
+					root->weight = max;
+			}
+		}
+	}
+	free(stack);
+}
+
+void expectimax_search_2(T_node *root)
+{
+	int top = 0, top2 = 1, begin = 0, end = 1;
+	int stack_space = STACK_SPACE;
+	T_node **stack = malloc(STACK_SPACE * sizeof(T_node*));
+	if (stack == NULL)
+		exit(5);
+	int number_of_elems = 2*(root->table_size*root->table_size - 1);
+	int  i, counter;
+	float max;
+
+	push(&stack, root, &top, &stack_space);
+	while (root->level != MAX_DEPTH-1)
+	{
+		if (top2 == begin)
+		{
+			begin = end;
+			top2 = top;
+			end = top;
+		}
+		root = pop(stack, &top2);
+		if (root->level % 2 == 1 && root->level != MAX_DEPTH-1)
+		{
+			i = 0;
+			while (1)
 			{
-				push(&stack, root, &top);
-				root = root->next[0];
-			}*/
+				while (i < number_of_elems && root->next[i] != NULL && root->next[i]->weight != -1)
+					i++;
+				if (i == number_of_elems || root->next[i] == NULL)
+					break;
+				push(&stack, root->next[i], &top, &stack_space);
+				i++;
+			}
+		}
+		else if (root->level != MAX_DEPTH-1)
+		{
+			i = 0;
+				while (1)
+				{
+					while (i < 4 && ((root->next[i] == NULL) ? 1 : ((root->next[i]->weight != -1) ? 1 : 0)))
+						i++;      //  ako nije jednak jedinici njegovi sinovi su vec popunjeni
+					if (i == 4)
+						break;
+					push(&stack, root->next[i], &top, &stack_space);
+					i++;
+				}
+		}
+		if (top == 1 && end == 1)
+			break; // kada nema vise poteza
+	}
+	while (top != 0)
+	{
+		root = pop(stack, &top);
+		if (root->weight == -1)
+		{
+			if (root->level % 2 == 1)
+			{
+				counter = 0;
+				(root->weight)++; // zato sto je -1
+				for (i = 0; i < number_of_elems; i++)
+				{
+					if (root->next[i] == NULL)
+						break;
+					root->next[i]->weight *= root->next[i]->possibility;
+					root->weight += root->next[i]->weight;
+					counter++;
+				}
+				root->weight /= counter;
+			}
+			else
+			{
+				max = 0;
+				counter = 0;
+				for (i = 0; i < 4; i++)
+				{
+					if (root->next[i] == NULL)
+						counter++;
+					else if (root->next[i]->weight > max)
+						max = root->next[i]->weight;
+					root->weight = max;
+				}
+			}
 		}
 	}
 	free(stack);

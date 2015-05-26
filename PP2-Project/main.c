@@ -20,7 +20,6 @@ main()
 	start_color();
 	initiateThemes();
 	intiateColors(plava);
-
 	while (stayInMenu)
 	{
 		mvprintw(0, 45, "2048 Alpha 2 version (23.5.2015.)");

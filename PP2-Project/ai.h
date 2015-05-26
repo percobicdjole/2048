@@ -1,4 +1,4 @@
-#define MAX_DEPTH 6
+#define MAX_DEPTH 5
 #define MAX_NUMBER_OF_NODES 48
 #define NUMBER_OF_FACTORS 5
 #define MAX_NUMBER_OF_NODES_IN_STABLE 1358954496 // popravi
@@ -30,9 +30,10 @@ void make_tree_iterative(T_node *root);
 
 // trazi najbolji potez
 void expectimax_search(T_node *root);
+void expectimax_search_2(T_node *root);
 
 T_node* get_node(int **table, int table_size, int level);
-void free_stable(T_node *root);
+void free_tree(T_node *root);
 
 // za postorder obilazak
 void push(T_node ***stack, T_node* elem, int *top, int *stack_space);

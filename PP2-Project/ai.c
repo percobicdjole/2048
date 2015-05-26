@@ -7,7 +7,7 @@ T_node* get_node(int **table, int table_size, int level)
 {
 	T_node *node;
 	node = malloc(sizeof(T_node));
-
+	
 	if (node != NULL)
 	{
 		int i, number_of_nodes;
@@ -34,7 +34,7 @@ T_node* get_node(int **table, int table_size, int level)
 		exit(1);
 }
 
-void free_stable(T_node *root)
+void free_tree(T_node *root) 
 {
 	int top = 0, i;
 	int stack_space = STACK_SPACE;
@@ -46,10 +46,10 @@ void free_stable(T_node *root)
 	while (top != 0)
 	{
 		root = pop(stack, &top);
-		while (root->next[0] != NULL)
+		while (root != NULL)
 		{
 			i = 1;
-			if (root->level % 2 == 1)
+			if (root->level % 2 == 0)
 			{
 				while (i < 4)
 				{
@@ -68,9 +68,13 @@ void free_stable(T_node *root)
 			}
 			old = root;
 			root = root->next[0];
+			for (i = 0; i < old->table_size; i++)
+				free(old->table[i]);
+			free(old->table);
 			free(old);
 		}
 	}
+	free(stack);
 }
 
 void push(T_node ***stack, T_node *elem, int *top, int *stack_space)
@@ -78,8 +82,8 @@ void push(T_node ***stack, T_node *elem, int *top, int *stack_space)
 	if ((*top+1) % *stack_space == 0 && *top+1 != 0)
 	{
 		T_node **tmp;
-		*stack_space *= 2;
-		tmp = realloc(*stack, 2*(*stack_space)*sizeof(T_node*)); // zasto?
+		*stack_space += STACK_SPACE;
+		tmp = realloc(*stack, (*stack_space + STACK_SPACE)*sizeof(T_node*)); // zasto?
 		if (tmp == NULL)
 			exit(2);
 		*stack = tmp;
@@ -159,13 +163,18 @@ void make_tree_iterative(T_node *root)
 		helping_node = pop(stack, &top);
 	    if (helping_node->level % 2 == 0 && helping_node->level != MAX_DEPTH)
 		{
+			counter = 0;
 			for (i = 0; i < 4; i++)
 			{
 				helping_node->next[i] = get_node(helping_node->table, helping_node->table_size, helping_node->level+1);
 				if (snap(helping_node->next[i]->table, helping_node->next[i]->table_size, i) == 0)
 				{
+					for (j = 0; j < root->table_size; j++)
+						free(helping_node->next[i]->table[j]);
+					free(helping_node->next[i]->table);
 				 	free(helping_node->next[i]); // kako skloniti
 				 	helping_node->next[i] = NULL;
+					counter++;
 				}
 				else
 				{
@@ -173,6 +182,8 @@ void make_tree_iterative(T_node *root)
 					push(&stack, helping_node->next[i], &top, &stack_space);
 				}
 			}
+			if (counter == 4)
+				helping_node->weight = 0;
 		}
 		else if (helping_node->level != MAX_DEPTH)
 		{
@@ -196,7 +207,11 @@ void make_tree_iterative(T_node *root)
 					}
 				}
 			}
+			if (counter == 0)
+				helping_node->weight = 0;
 		}
+		else
+			helping_node->weight = approximate_position(helping_node->table, helping_node->table_size);
 	}
 	free(stack);
 }
@@ -209,15 +224,16 @@ int get_hint(matrix table)
 	root->possibility = 1;
 
 	make_tree_iterative(root);
-	expectimax_search(root);
+	expectimax_search_2(root);
 
 	while ((root->next[move] == NULL || root->next[move]->weight != root->weight) && move < 4)
 		move++;
-	free_stable(root);
+	free_tree(root);
 	return move;
 }
 
-/*  TO-DO usteda memorije
+/*  TO-DO nema potrebe za stalnom alokacijom steka
+		  usteda memorije
 		  optimizacija poteza
 		  optimizacija procjenjivanja poteza
 		  dinamicko provjeravanje, hashing
