@@ -54,10 +54,10 @@ int snap(unsigned int **table, int table_size, int direction, matrix *M);
 history newHistory();
 
 //Brise poslednji podez iz istorije i vraca stanje matrice
-int **Pop(history *H, int set_size);
+int **popHistory(history *H, int set_size);
 
 //Pamti potez u istoriju
-void Push(history *H, matrix M);
+void pushHistory(history *H, matrix M);
 
 //Oslobadjanje cele matrice
 void freeMatrix(matrix *M);

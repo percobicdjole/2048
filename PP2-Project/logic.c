@@ -252,7 +252,7 @@ history newHistory()
 	return H;
 }
 
-void Push(history *H,matrix M)
+void pushHistory(history *H, matrix M)
 {
 	H->latest = (H->latest + 1) % UNDO_DEPTH;
 	if (H->latest == H->oldest)
@@ -260,7 +260,7 @@ void Push(history *H,matrix M)
 	H->stack[H->latest] = copySet(M);
 }
 
-int **Pop(history *H,int set_size)
+int **popHistory(history *H, int set_size)
 {
 	freeSet(H->stack[H->latest], set_size);
 	free(H->stack[H->latest]);
