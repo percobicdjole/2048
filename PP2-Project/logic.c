@@ -174,7 +174,6 @@ int moveColumnStep(matrix *M, int column, int direction,int *last_merged,unsigne
 }
 
 
-
 int moveStep(matrix *M, int direction,int *last_merged,unsigned int *score)
 {
 	int i, j, changes = 0;
@@ -213,48 +212,62 @@ int snap(unsigned int **table, int table_size, int direction, matrix *M)
 		return 0;
 }
 
-void copyMatrix(matrix *dest, matrix *source)
+int **copySet(matrix M)
+{
+	int i, **dest_set;
+	dest_set = malloc(M.size*sizeof(int*));
+	for (i = 0; i < M.size; i++)
+	{
+		dest_set[i] = malloc(M.size*sizeof(int));
+		memcpy(dest_set[i], M.set[i], M.size*sizeof(int));
+	}
+	return dest_set;
+}
+
+void copyMatrix(matrix *dest, matrix M)
+{
+	dest->set = copySet(M);
+	dest->size = M.size;
+}
+
+void freeSet(int **set, int size)
 {
 	int i;
-	dest->size = source->size;
-	dest->set = malloc(dest->size*sizeof(int*));
-	for (i = 0; i < source->size; i++)
+	for (i = 0; i < size; i++)
 	{
-		dest->set[i] = malloc(dest->size*sizeof(int));
-		memcpy(dest->set[i], source->set[i], dest->size*sizeof(int));
+		free(set[i]);
 	}
 }
 
 void freeMatrix(matrix *M)
 {
-	int i;
-	for (i = 0; i < M->size; i++)
-	{
-		free(M->set[i]);
-	}
+	freeSet(M->set, M->size);
 	free(M->set);
 }
 
-
-void printMatrix(matrix M)
+history newHistory()
 {
-	int i, j;
-	for (i = 0; i < M.size; i++)
-	{
-		for (j = 0; j < M.size; j++)
-			printf("%d ", M.set[i][j]);
-		printf("\n");
-	}
-	printf("\n");
+	history H;
+	H.latest = H.oldest = 0;
+	return H;
 }
 
-
-void printRow(int *R, int size)
+void Push(history *H,matrix M)
 {
-	int i, j;
-	for (i = 0; i < size; i++)
-	{
-		printf("%d ", R[i]);
-	}
-	printf("\n");
+	H->latest = (H->latest + 1) % UNDO_DEPTH;
+	if (H->latest == H->oldest)
+		H->oldest = (H->oldest + 1) % UNDO_DEPTH;
+	H->stack[H->latest] = copySet(M);
+}
+
+int **Pop(history *H,int set_size)
+{
+	freeSet(H->stack[H->latest], set_size);
+	free(H->stack[H->latest]);
+	(H->latest)--;
+	if (H->latest < H->oldest)
+		H->latest = H->oldest = 0;
+		return NULL;
+	if (H->latest < 0)
+		H->latest = UNDO_DEPTH - 1;
 }

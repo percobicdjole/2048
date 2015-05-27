@@ -7,6 +7,7 @@
 //Potrebne konstante
 #define TRUE 1
 #define FALSE 0
+#define UNDO_DEPTH 20
 
 //Matrica
 typedef struct matrix
@@ -15,10 +16,12 @@ typedef struct matrix
 	char size;
 }matrix;
 
-
-//Funkcije za testiranje
-void printRow(int *R, int size);
-void printMatrix(matrix M);
+//Istorija igre
+typedef struct history
+{
+	int **stack[UNDO_DEPTH];
+	char latest, oldest;
+}history;
 
 
 //Postavljanje seed-a
@@ -46,3 +49,24 @@ int moveStep(matrix *M, int direction, int *last_merged, unsigned int *score);
 
 //Igra potez za hint
 int snap(unsigned int **table, int table_size, int direction, matrix *M);
+
+//Inicijalizacija istorije igre
+history newHistory();
+
+//Brise poslednji podez iz istorije i vraca stanje matrice
+int **Pop(history *H, int set_size);
+
+//Pamti potez u istoriju
+void Push(history *H, matrix M);
+
+//Oslobadjanje cele matrice
+void freeMatrix(matrix *M);
+
+//Oslobadjanje seta
+void freeSet(int **set, int size);
+
+//Kopiranje matrice
+void copyMatrix(matrix *dest, matrix M);
+
+//Kopira set i vraca pokazivac novog
+int **copySet(matrix M);
