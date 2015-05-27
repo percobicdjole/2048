@@ -162,5 +162,8 @@ void autoplay(matrix *m, int stayInMenu)
 		}
 	}
 	freeMatrix(m);
+	mvprintw(18, 7, "GAME OVER");
+	mvprintw(19, 7, "Pritisni bilo koje dugme za povratak u glavni meni!");
+	getch();
 	erase();
 }
