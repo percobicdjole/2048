@@ -25,13 +25,13 @@ typedef struct tnode
 // vraca najbolji potez
 int get_hint(matrix table);
 
-void make_tree_iterative(T_node *root);
+void make_tree_iterative(T_node *root, T_node ***stack, int *stack_space);
 
 // trazi najbolji potez
-void expectimax_search(T_node *root);
+void expectimax_search(T_node *root, T_node ***stack, int *stack_space);
 
 T_node* get_node(int **table, int table_size, int level);
-void free_tree(T_node *root);
+void free_tree(T_node *root, T_node ***stack, int *stack_space);
 
 // za postorder obilazak
 void push(T_node ***stack, T_node* elem, int *top, int *stack_space);
