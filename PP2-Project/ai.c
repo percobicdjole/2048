@@ -92,55 +92,6 @@ T_node* pop(T_node **stack, int *top)
 	return (stack[*top]);
 }
 
-void make_tree_normal_move(T_node *root, int level)
-{
-	int i;
-	matrix *M = malloc(sizeof(matrix));
-	for (i = 0; i < 4; i++)
-	{
-		root->next[i] = get_node(root->table, root->table_size, level);
-		if (snap(root->next[i]->table, root->next[i]->table_size, i, M) == 0)
-		{
-		 	free(root->next[i]);
-		 	root->next[i] = NULL;
-		}
-		else
-		{
-			root->next[i]->possibility = 1;
-			make_tree_random_move(root->next[i], level + 1);
-		}
-	}
-}
-
-void make_tree_random_move(T_node *root, int level)
-{
-	if (level < MAX_DEPTH)
-	{
-		int i , j, counter = 0;
-		int number_of_elems = root->table_size*root->table_size; 
-
-		for (i = 0; i < number_of_elems; i++)
-		{
-			for (j = 0; j < number_of_elems; j++)
-			{
-				if (root->table[i][j] == 0)
-				{
-					root->next[counter] = get_node(root->table, root->table_size, level);
-					root->next[counter]->possibility = 0.9;
-					root->next[counter]->table[i][j] = 2;
-					make_tree_normal_move(root->next[counter], level + 1);
-					counter++;
-					root->next[counter] = get_node(root->table, root->table_size, level);
-					root->next[counter]->possibility = 0.1;
-					root->next[counter]->table[i][j] = 4;
-					make_tree_normal_move(root->next[counter], level + 1);
-					counter++;
-				}
-			}
-		}
-	}
-}
-
 void make_tree_iterative(T_node *root, T_node ***stack, int *stack_space)
 {
 	T_node *helping_node;
@@ -218,7 +169,7 @@ int get_hint(matrix table)
 	root->possibility = 1;
 
 	make_tree_iterative(root, &stack, &stack_space);
-	expectimax_search_2(root, &stack, &stack_space);
+	expectimax_search(root, &stack, &stack_space);
 
 	while ((root->next[move] == NULL || root->next[move]->weight != root->weight) && move < 4)
 		move++;
@@ -227,9 +178,7 @@ int get_hint(matrix table)
 	return move;
 }
 
-/*  TO-DO nema potrebe za stalnom alokacijom steka
-		  usteda memorije
-		  optimizacija poteza
+/*  TO-DO optimizacija poteza
 		  optimizacija procjenjivanja poteza
 		  dinamicko provjeravanje, hashing
 		 							      */
