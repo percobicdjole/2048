@@ -68,6 +68,7 @@ void game(matrix *m, int stayInMenu)
 	attron(COLOR_PAIR(INTERFACE));
 	mvprintw(1, 45, "Press ESC-to get back to menu!");
 	mvprintw(2, 45, "Press h-to get hint!");
+	mvprintw(3, 45, "Press u-for undo");
 	attroff(COLOR_PAIR(INTERFACE));
 	displayMatrix(6, 3, *m);
 	while (stayInMenu)
@@ -94,6 +95,8 @@ void game(matrix *m, int stayInMenu)
 				swipe(m, DOWN, &score);
 				break;
 			case KEY_ESC:stayInMenu = 0; break;
+			case 'u'://OVDE UBACI ZA UNDO ILI URADI POSEBNU F-JU
+				break;
 			case 'h': 
 				h = get_hint(*m);
 				if (h == LEFT)
@@ -124,7 +127,7 @@ void game(matrix *m, int stayInMenu)
 				break;
 		}
 	}
-	free(*m->set);
+	freeMatrix(m);
 	erase();
 }
 
@@ -154,8 +157,10 @@ void autoplay(matrix *m, int stayInMenu)
 		case DOWN:
 			swipe(m, DOWN, &score);
 			break;
+		case 4:stayInMenu = 0;
+			break;
 		}
 	}
-	free(*m->set);
+	freeMatrix(m);
 	erase();
 }

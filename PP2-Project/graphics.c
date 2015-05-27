@@ -106,7 +106,7 @@ void initiateThemes()
 	plava.second = 9;  //4-16	  
 	plava.third = 3;   //32-64
 	plava.fourth = 11; //128-256
-	plava.fifth = 14;  //512-2048
+	plava.fifth = 2;  //512-2048
 	plava.interfaceColor = 9;
 }
 
@@ -118,7 +118,7 @@ void intiateColors(theme tema)
 	init_pair(THIRD, WHITE, tema.third);
 	init_pair(FOURTH, WHITE, tema.fourth);
 	init_pair(FIFTH, WHITE, tema.fifth);
-	init_pair(INTERFACE, COLOR_BLACK, tema.interfaceColor);//za tekst
+	init_pair(INTERFACE, tema.interfaceColor, COLOR_BLACK);//za tekst
 }
 
 void printMenu(WINDOW *menu_win, int highlight)
@@ -131,9 +131,9 @@ void printMenu(WINDOW *menu_win, int highlight)
 	{
 		if (highlight == i + 1) 
 		{
-			wattron(menu_win, A_REVERSE | COLOR_PAIR(INTERFACE));
+			wattron(menu_win,  COLOR_PAIR(INTERFACE));
 			mvwprintw(menu_win, y, x, "%s", choices[i]);
-			wattroff(menu_win, A_REVERSE | COLOR_PAIR(INTERFACE));
+			wattroff(menu_win, COLOR_PAIR(INTERFACE));
 		}
 		else
 			mvwprintw(menu_win, y, x, "%s", choices[i]);
