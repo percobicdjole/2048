@@ -118,23 +118,27 @@ float approximate_position(int **table, int table_size)
 	{
 		score+= max_number*MAX_IN_CORNER;
 		// monotonost
-		for (i = 1; i < table_size; i++)
+		if (table[0][1] > table[1][0])
 		{
-			if (table[0][i] <= table[0][i-1])
-				score+= table[0][i]*MONOTONICITY;
-			else
-				break;
+			for (i = 1; i < table_size; i++)
+			{
+				if (table[0][i] <= table[0][i-1])
+					score+= table[0][i]*MONOTONICITY;
+				else
+					break;
+			}
 		}
-		for (j = 1; j < table_size; j++)
-		{
-			if (table[j][0] <= table[j-1][0])
-				score+= table[j][0]*MONOTONICITY;
-			else
-				break;
-		}
+		else
+			for (j = 1; j < table_size; j++)
+			{
+				if (table[j][0] <= table[j-1][0])
+					score+= table[j][0]*MONOTONICITY;
+				else
+					break;
+			}
 		// monotonost u sredini
 		int rows = 1, columns = 1;
-		while (rows < i)
+		/*while (rows < i)
 		{
 			while (columns < j)
 			{
@@ -151,7 +155,7 @@ float approximate_position(int **table, int table_size)
 			}
 			columns = 1;
 			rows++;
-		}
+		}*/
 		// provjeri broj poteza
 		check_moves = score;
 		number_of_moves_horizontally(table, table_size, &score);
@@ -166,23 +170,29 @@ float approximate_position(int **table, int table_size)
 	{
 		score+= max_number*MAX_IN_CORNER;
 		// monotonost
-		for (i = table_size-1; i > 0; i--)
+		if (table[0][table_size-1] > table[1][table_size-1])
 		{
-			if (table[0][i-1] <= table[0][i])
-				score+= table[0][i-1]*MONOTONICITY;
-			else
-				break;
+			for (i = table_size-1; i > 0; i--)
+			{
+				if (table[0][i-1] <= table[0][i])
+					score+= table[0][i-1]*MONOTONICITY;
+				else
+					break;
+			}
 		}
-		for (j = 1; j < table_size; j++)
+		else
 		{
-			if (table[j][table_size-1] <= table[j-1][table_size-1])
-				score+= table[j][table_size-1]*MONOTONICITY;
-			else
-				break;
+			for (j = 1; j < table_size; j++)
+			{
+				if (table[j][table_size-1] <= table[j-1][table_size-1])
+					score+= table[j][table_size-1]*MONOTONICITY;
+				else
+					break;
+			}
 		}
 		//provjeri monotonost u sredini
 		int rows = table_size-2, columns = 1;
-		while (rows > i)
+		/*while (rows > i)
 		{
 			while (columns < j)
 			{
@@ -199,7 +209,7 @@ float approximate_position(int **table, int table_size)
 			}
 			columns = 1;
 			rows--;
-		}
+		}*/
 		// provjeri broj poteza
 		check_moves = score;
 		number_of_moves_horizontally(table, table_size, &score);
@@ -214,23 +224,29 @@ float approximate_position(int **table, int table_size)
 	{
 		score+= max_number*MAX_IN_CORNER;
 		// monotonost
-		for (i = 1; i < table_size; i++)
+		if (table[table_size-1][1] > table[table_size-2][0])
 		{
-			if (table[table_size-1][i] <= table[table_size-1][i-1])
-				score+= table[table_size-1][i]*MONOTONICITY;
-			else
-				break;
+			for (i = 1; i < table_size; i++)
+			{
+				if (table[table_size-1][i] <= table[table_size-1][i-1])
+					score+= table[table_size-1][i]*MONOTONICITY;
+				else
+					break;
+			}
 		}
-		for (j = table_size-1; j > 0; j--)
+		else
 		{
-			if (table[j-1][0] <= table[j][0])
-				score+= table[j-1][0]*MONOTONICITY;
-			else
-				break;
+			for (j = table_size-1; j > 0; j--)
+			{
+				if (table[j-1][0] <= table[j][0])
+					score+= table[j-1][0]*MONOTONICITY;
+				else
+					break;
+			}
 		}
 		//provjeri monotonost u sredini
 		int rows = 1, columns = table_size-2;
-		while (rows < i)
+		/*while (rows < i)
 		{
 			while (columns > j)
 			{
@@ -247,7 +263,7 @@ float approximate_position(int **table, int table_size)
 			}
 			columns = table_size-2;
 			rows++;
-		}
+		}*/
 		// provjeri broj poteza
 		check_moves = score;
 		number_of_moves_horizontally(table, table_size, &score);
@@ -262,19 +278,25 @@ float approximate_position(int **table, int table_size)
 	{
 		score+= max_number*MAX_IN_CORNER;
 		// monotonost
-		for (i = table_size-1; i > 0; i--)
+		if (table[table_size-1][table_size-2] > table[table_size-2][table_size-1])
 		{
-			if (table[table_size-1][i-1] <= table[table_size-1][i])
-				score+= table[table_size-1][i-1]*MONOTONICITY;
-			else
-				break;
+			for (i = table_size-1; i > 0; i--)
+			{
+				if (table[table_size-1][i-1] <= table[table_size-1][i])
+					score+= table[table_size-1][i-1]*MONOTONICITY;
+				else
+					break;
+			}
 		}
-		for (j = table_size-1; j > 0; j--)
+		else
 		{
-			if (table[j-1][table_size-1] <= table[j][table_size-1])
-				score+= table[j-1][table_size-1]*MONOTONICITY;
-			else
-				break;
+			for (j = table_size-1; j > 0; j--)
+			{
+				if (table[j-1][table_size-1] <= table[j][table_size-1])
+					score+= table[j-1][table_size-1]*MONOTONICITY;
+				else
+					break;
+			}
 		}
 		//provjeri monotonost u sredini
 		int rows = table_size-2, columns = table_size-2;
