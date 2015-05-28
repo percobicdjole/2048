@@ -7,7 +7,6 @@
 //Potrebne konstante
 #define TRUE 1
 #define FALSE 0
-#define UNDO_DEPTH 20
 
 //Matrica
 typedef struct matrix
@@ -19,8 +18,9 @@ typedef struct matrix
 //Istorija igre
 typedef struct history
 {
-	int **stack[UNDO_DEPTH];
-	char latest, oldest;
+	int ***stack, latest;
+	matrix *mat;
+	unsigned int depth, prescore;
 }history;
 
 
@@ -51,14 +51,19 @@ int moveStep(matrix *M, int direction, int *last_merged, unsigned int *score);
 int snap(unsigned int **table, int table_size, int direction, matrix *M);
 
 //Inicijalizacija istorije igre
-history newHistory();
+history newHistory(short undo_depth, matrix *M);
+
+//Brisanje istorije
+void clearHistory(history *H);
+
+//Unistavanje strukture istorije
+void destroyHistory(history *H);
 
 //Brise poslednji podez iz istorije i vraca stanje matrice
-int **popHistory(history *H, int set_size);
+void popHistory(history *H);
 
 //Pamti potez u istoriju
-void pushHistory(history *H, matrix M);
-
+void pushHistory(history *H);
 //Oslobadjanje cele matrice
 void freeMatrix(matrix *M);
 

@@ -6,7 +6,7 @@
 
 void game(matrix *m, int stayInMenu);
 void autoplay(matrix *m, int stayInMenu);
-void swipe(matrix *M, int direction, unsigned int *score);
+int swipe(matrix *M, int direction, unsigned int *score);
 
 main()
 {
@@ -43,7 +43,7 @@ main()
 	endwin();
 }
 
-void swipe(matrix *M, int direction, unsigned int *score)
+int swipe(matrix *M, int direction, unsigned int *score)
 {
 	int changes, moved, last_merged[5] = { 0 };
 	changes = moved = moveStep(M, direction, last_merged, score);
@@ -59,12 +59,14 @@ void swipe(matrix *M, int direction, unsigned int *score)
 		spawnNumber(M);
 		displayMatrix(6, 3, *M);
 	}
+	return moved;
 }
 
 void game(matrix *m, int stayInMenu)
 {
 	unsigned int score = 0;
-	int h;
+	int h, valid_move=1;
+	history hist = newHistory(20, m);
 	attron(COLOR_PAIR(INTERFACE));
 	mvprintw(1, 45, "Press ESC-to get back to menu!");
 	mvprintw(2, 45, "Press h-to get hint!");
@@ -80,22 +82,37 @@ void game(matrix *m, int stayInMenu)
 		{
 			case KEY_LEFT:
 				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				swipe(m, LEFT, &score);
+				if (valid_move)
+					pushHistory(&hist);
+				valid_move = swipe(m, LEFT, &score);
+				
 				break;
 			case KEY_RIGHT:
 				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				swipe(m, RIGHT, &score);
+				if (valid_move)
+									pushHistory(&hist);
+				valid_move = swipe(m, RIGHT, &score);
+				
 				break;
 			case KEY_UP:
 				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				swipe(m, UP, &score);
+				
+				if (valid_move)
+					pushHistory(&hist);
+				valid_move = swipe(m, UP, &score);
+				
 				break;
 			case KEY_DOWN:
 				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				swipe(m, DOWN, &score);
+				if (valid_move)
+					pushHistory(&hist);
+				valid_move = swipe(m, DOWN, &score);
+				
 				break;
 			case KEY_ESC:stayInMenu = 0; break;
-			case 'u'://OVDE UBACI ZA UNDO ILI URADI POSEBNU F-JU
+			case 'u': 
+				popHistory(&hist);
+				displayMatrix(6, 3, *m);
 				break;
 			case 'h': 
 				h = get_hint(*m);
@@ -126,8 +143,10 @@ void game(matrix *m, int stayInMenu)
 				refresh();
 				break;
 		}
+		mvprintw(2, 2,"Promena: %d", valid_move);
 	}
 	freeMatrix(m);
+	destroyHistory(&hist);
 	erase();
 }
 

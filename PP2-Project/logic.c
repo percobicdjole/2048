@@ -212,21 +212,21 @@ int snap(unsigned int **table, int table_size, int direction, matrix *M)
 		return 0;
 }
 
-int **copySet(matrix M)
+int **copySet(int **source, char set_size)
 {
 	int i, **dest_set;
-	dest_set = malloc(M.size*sizeof(int*));
-	for (i = 0; i < M.size; i++)
+	dest_set = malloc(set_size*sizeof(int*));
+	for (i = 0; i < set_size; i++)
 	{
-		dest_set[i] = malloc(M.size*sizeof(int));
-		memcpy(dest_set[i], M.set[i], M.size*sizeof(int));
+		dest_set[i] = malloc(set_size*sizeof(int));
+		memcpy(dest_set[i], source[i], set_size*sizeof(int));
 	}
 	return dest_set;
 }
 
 void copyMatrix(matrix *dest, matrix M)
 {
-	dest->set = copySet(M);
+	dest->set = copySet(M.set,M.size);
 	dest->size = M.size;
 }
 
@@ -245,29 +245,54 @@ void freeMatrix(matrix *M)
 	free(M->set);
 }
 
-history newHistory()
+history newHistory(short undo_depth, matrix *M)
 {
 	history H;
-	H.latest = H.oldest = 0;
+	int i;
+	H.latest = 0;
+	H.mat = M;
+	H.depth = undo_depth;
+	H.stack = calloc(undo_depth, sizeof(int**));
 	return H;
 }
 
-void pushHistory(history *H, matrix M)
+void clearHistory(history *H)
 {
-	H->latest = (H->latest + 1) % UNDO_DEPTH;
-	if (H->latest == H->oldest)
-		H->oldest = (H->oldest + 1) % UNDO_DEPTH;
-	H->stack[H->latest] = copySet(M);
+	int i;
+	for (i = 0; i < H->depth; i++)
+	{
+		if (H->stack[i])
+			freeSet(H->stack[i], H->mat->size);
+	}
 }
 
-int **popHistory(history *H, int set_size)
+void destroyHistory(history *H)
 {
-	freeSet(H->stack[H->latest], set_size);
-	free(H->stack[H->latest]);
+	clearHistory(H);
+	free(H->stack);
+}
+
+void pushHistory(history *H)
+{
+	if (H->stack[H->latest])
+	{
+		freeSet(H->stack[H->latest], H->mat->size);
+		free(H->stack[H->latest]);
+	}
+	H->stack[H->latest] = copySet(H->mat->set,H->mat->size);
+	H->latest = (H->latest + 1) % H->depth;
+}
+
+void popHistory(history *H)
+{
 	(H->latest)--;
-	if (H->latest < H->oldest)
-		H->latest = H->oldest = 0;
-		return NULL;
 	if (H->latest < 0)
-		H->latest = UNDO_DEPTH - 1;
+		H->latest = H->depth - 1;
+	if (H->stack[H->latest])
+	{
+		freeSet(H->mat->set, H->mat->size);
+		H->mat->set = copySet(H->stack[H->latest], H->mat->size);
+		freeSet(H->stack[H->latest], H->mat->size);
+		H->stack[H->latest] = NULL;
+	}
 }
