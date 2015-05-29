@@ -245,6 +245,22 @@ void freeMatrix(matrix *M)
 	free(M->set);
 }
 
+state getState(matrix M, unsigned int score)
+{
+	state S;
+	S.score = score;
+	S.set = copySet(M.set, M.size);
+	return S;
+}
+
+void freeState(state *S, unsigned int tile_size)
+{
+	S->score = 0;
+	freeSet(S->set, tile_size);
+	free(S->set);
+	S->set = NULL;
+}
+
 history newHistory(short undo_depth, matrix *M)
 {
 	history H;
@@ -252,7 +268,11 @@ history newHistory(short undo_depth, matrix *M)
 	H.latest = 0;
 	H.mat = M;
 	H.depth = undo_depth;
-	H.stack = calloc(undo_depth, sizeof(int**));
+	H.stack = malloc(undo_depth*sizeof(state));
+	for (i = 0; i < H.depth; i++)
+	{
+		H.stack[i].set = NULL;
+	}
 	return H;
 }
 
@@ -261,8 +281,8 @@ void clearHistory(history *H)
 	int i;
 	for (i = 0; i < H->depth; i++)
 	{
-		if (H->stack[i])
-			freeSet(H->stack[i], H->mat->size);
+		if (H->stack[i].set)
+			freeState(&(H->stack[i]), H->mat->size);
 	}
 }
 
@@ -272,27 +292,28 @@ void destroyHistory(history *H)
 	free(H->stack);
 }
 
-void pushHistory(history *H)
+void pushHistory(history *H,state S)
 {
-	if (H->stack[H->latest])
+	if (H->stack[H->latest].set)
 	{
-		freeSet(H->stack[H->latest], H->mat->size);
-		free(H->stack[H->latest]);
+		freeSet(H->stack[H->latest].set, H->mat->size);
+		free(H->stack[H->latest].set);
 	}
-	H->stack[H->latest] = copySet(H->mat->set,H->mat->size);
+	H->stack[H->latest].set = copySet(S.set, H->mat->size);
+	H->stack[H->latest].score = S.score;
 	H->latest = (H->latest + 1) % H->depth;
 }
 
-void popHistory(history *H)
+void popHistory(history *H,unsigned int *score)
 {
 	(H->latest)--;
 	if (H->latest < 0)
 		H->latest = H->depth - 1;
-	if (H->stack[H->latest])
+	if (H->stack[H->latest].set)
 	{
 		freeSet(H->mat->set, H->mat->size);
-		H->mat->set = copySet(H->stack[H->latest], H->mat->size);
-		freeSet(H->stack[H->latest], H->mat->size);
-		H->stack[H->latest] = NULL;
+		H->mat->set = copySet(H->stack[H->latest].set, H->mat->size);
+		*score = H->stack[H->latest].score;
+		freeState(&(H->stack[H->latest]), H->mat->size);
 	}
 }

@@ -15,12 +15,21 @@ typedef struct matrix
 	char size;
 }matrix;
 
+
+//Stanje igre
+typedef struct state
+{
+	int **set;
+	unsigned int score;
+}state;
+
+
 //Istorija igre
 typedef struct history
 {
-	int ***stack, latest;
+	state *stack;
 	matrix *mat;
-	unsigned int depth, prescore;
+	int depth,latest;
 }history;
 
 
@@ -60,10 +69,11 @@ void clearHistory(history *H);
 void destroyHistory(history *H);
 
 //Brise poslednji podez iz istorije i vraca stanje matrice
-void popHistory(history *H);
+void popHistory(history *H, unsigned int *score);
 
 //Pamti potez u istoriju
-void pushHistory(history *H);
+void pushHistory(history *H, state S);
+
 //Oslobadjanje cele matrice
 void freeMatrix(matrix *M);
 
@@ -75,3 +85,9 @@ void copyMatrix(matrix *dest, matrix M);
 
 //Kopira set i vraca pokazivac novog
 int **copySet(matrix M);
+
+//Dohvata trenutno stanje i vraca novu strukturu
+state getState(matrix M, unsigned int score);
+
+//Oslobadja pokazivace u stanju
+void freeState(state *S, unsigned int tile_size);

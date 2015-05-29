@@ -66,7 +66,8 @@ void game(matrix *m, int stayInMenu)
 {
 	unsigned int score = 0;
 	int h, valid_move=1;
-	history hist = newHistory(20, m);
+	history hist = newHistory(5, m);
+	state previous = getState(*m, 0);
 	attron(COLOR_PAIR(INTERFACE));
 	mvprintw(1, 45, "Press ESC-to get back to menu!");
 	mvprintw(2, 45, "Press h-to get hint!");
@@ -76,42 +77,45 @@ void game(matrix *m, int stayInMenu)
 	while (stayInMenu)
 	{
 		attron(COLOR_PAIR(INTERFACE));
-		mvprintw(4 * 3 + 3 + 2, 7, "SCORE: %d", score);
+		mvprintw(4 * 3 + 3 + 2, 7, "SCORE: %4d", score);
 		attroff(COLOR_PAIR(INTERFACE));
 		switch (getch())
 		{
 			case KEY_LEFT:
 				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				if (valid_move)
-					pushHistory(&hist);
 				valid_move = swipe(m, LEFT, &score);
-				
+				if (valid_move)
+					pushHistory(&hist,previous);
+				previous = getState(*m, score);
 				break;
 			case KEY_RIGHT:
 				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				if (valid_move)
-									pushHistory(&hist);
-				valid_move = swipe(m, RIGHT, &score);
 				
+				valid_move = swipe(m, RIGHT, &score);
+				if (valid_move)
+					pushHistory(&hist,previous);
+				previous = getState(*m, score);
 				break;
 			case KEY_UP:
 				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
 				
-				if (valid_move)
-					pushHistory(&hist);
 				valid_move = swipe(m, UP, &score);
-				
+				if (valid_move)
+					pushHistory(&hist,previous);
+				previous = getState(*m, score);
 				break;
 			case KEY_DOWN:
 				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				if (valid_move)
-					pushHistory(&hist);
-				valid_move = swipe(m, DOWN, &score);
 				
+				valid_move = swipe(m, DOWN, &score);
+				if (valid_move)
+					pushHistory(&hist,previous);//Push(previous)
+				previous = getState(*m, score);
 				break;
 			case KEY_ESC:stayInMenu = 0; break;
 			case 'u': 
-				popHistory(&hist);
+				popHistory(&hist,&score);
+				previous = getState(*m, score);
 				displayMatrix(6, 3, *m);
 				break;
 			case 'h': 
@@ -143,8 +147,8 @@ void game(matrix *m, int stayInMenu)
 				refresh();
 				break;
 		}
-		mvprintw(2, 2,"Promena: %d", valid_move);
 	}
+	freeState(&previous, m->size);
 	freeMatrix(m);
 	destroyHistory(&hist);
 	erase();
