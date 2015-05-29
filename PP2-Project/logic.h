@@ -32,6 +32,12 @@ typedef struct history
 	int depth,latest;
 }history;
 
+//Highscore unos
+typedef struct entry
+{
+	char name[30];
+	unsigned int score,place;
+}entry;
 
 //Postavljanje seed-a
 void setSeed();
