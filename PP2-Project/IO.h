@@ -35,3 +35,6 @@ matrix loadGame(unsigned int *score, char *status);
 
 //Provera greske pri dodeli memorije
 void checkMemError(void *new_pointer);
+
+//Provera greske pri otvaranju datoteke
+void checkFileError(FILE *file_pointer);

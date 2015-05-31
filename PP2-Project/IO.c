@@ -11,7 +11,12 @@ void cdcEntry(entry *E)
 		*s ^= CHAR_MASK;
 		s++;
 	}
-	E->score ^= INT_MASK;
+	if (E)
+	{
+		E->score ^= INT_MASK;
+	}
+	//else
+		//Poruka o greski
 }
 
 void cdcInfo(file_info *inf)
@@ -60,6 +65,7 @@ void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 		unsigned int i = 0, mem;
 		entry *P = *score_list;
 		*score_list = realloc(*score_list, sizeof(entry)*(*entry_count));
+		checkMemError(score_list);
 		while (P[i].score > newScore.score  && i<entry_count)
 			i++;
 		P += i;
@@ -70,6 +76,7 @@ void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 	else
 	{
 		*score_list = malloc(sizeof(entry));
+		checkMemError(score_list);
 		*score_list[0] = newScore;
 	}
 }
@@ -111,6 +118,7 @@ entry *loadHsc(char *file_name, unsigned int *entry_conunt, unsigned int *bit_ch
 		if (inf.entry_count)
 		{
 			score_list = malloc(sizeof(entry)*inf.entry_count);
+			checkMemError(score_list);
 			for (i = 0; i < inf.entry_count; i++)
 			{
 				fread(&buffer, sizeof(buffer), 1, hsc_file);
@@ -130,6 +138,7 @@ void saveGame(matrix M, unsigned int score)
 	int bit_count = 0, i, j, buffer;
 	char size = M.size ^ CHAR_MASK;
 	FILE *svg = fopen("savegame.dat", "wb");
+	checkFileError(svg);
 	fseek(svg, sizeof(bit_count), SEEK_SET);
 	bit_count = countBits(score) + countBits(M.size);
 	score ^= INT_MASK;
@@ -167,9 +176,11 @@ matrix loadGame(unsigned int *score, char *status)
 		N.size ^= CHAR_MASK;
 		readBits += countBits(N.size);
 		**M = malloc(N.size*sizeof(int*));
+		checkMemError(M);
 		for (i = 0; i < N.size; i++)
 		{
 			M[i] = calloc(N.size, sizeof(int));
+			checkMemError(M[i]);
 			for (j = 0; j < N.size; j++)
 			{
 				fread(&buffer, sizeof(buffer), 1, svg);
@@ -193,6 +204,15 @@ matrix loadGame(unsigned int *score, char *status)
 void checkMemError(void *new_pointer)
 {
 	if (new_pointer == NULL)
+	{
+		//Poruka o greski
+		exit(1);
+	}
+}
+
+void checkFileError(FILE *file_pointer)
+{
+	if (file_pointer == NULL)
 	{
 		//Poruka o greski
 		exit(1);

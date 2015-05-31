@@ -218,9 +218,11 @@ int **copySet(int **source, char set_size)
 {
 	int i, **dest_set;
 	dest_set = malloc(set_size*sizeof(int*));
+	checkMemError(dest_set);
 	for (i = 0; i < set_size; i++)
 	{
 		dest_set[i] = malloc(set_size*sizeof(int));
+		checkMemError(dest_set[i]);
 		memcpy(dest_set[i], source[i], set_size*sizeof(int));
 	}
 	return dest_set;
