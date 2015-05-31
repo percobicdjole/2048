@@ -25,3 +25,9 @@ void saveHsc(char *file_name, entry *score_list, unsigned int entry_count);
 
 //Ucitava highscore iz datoteke u niz (NULL ako nema datoteke)
 entry *loadHsc(char *file_name, unsigned int *entry_conunt, unsigned int *bit_check);
+
+//Cuva stanje igre u unapred definisanu datoteku savegame.dat
+void saveGame(matrix M, unsigned int score);
+
+//Ucitava igru iz datoteke, vraca matricu ako je uspesno procitana
+matrix loadGame(unsigned int *score, char *status);

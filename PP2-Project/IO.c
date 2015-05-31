@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "IO.h"
+#include "logic.h"
 
 void cdcEntry(entry *E)
 {
@@ -123,4 +124,69 @@ entry *loadHsc(char *file_name, unsigned int *entry_conunt, unsigned int *bit_ch
 		fclose(hsc_file);
 	}
 	return score_list;
+}
+
+void saveGame(matrix M, unsigned int score)
+{
+	int bit_count = 0, i, j, buffer;
+	char size = M.size ^ CHAR_MASK;
+	FILE *svg = fopen("savegame.dat", "wb");
+	fseek(svg, sizeof(bit_count), SEEK_SET);
+	bit_count = countBits(score) + countBits(M.size);
+	score ^= INT_MASK;
+	fwrite(&score, sizeof(score), 1, svg);
+	fwrite(&size, sizeof(size), 1, svg);
+	for (i = 0; i < M.size; i++)
+		for (j = 0; j < M.size; j++)
+		{
+			buffer = M.set[i][j];
+			bit_count += countBits(buffer);
+			buffer ^= INT_MASK;
+			fwrite(&buffer, sizeof(buffer), 1, svg);
+		}
+	rewind(svg);
+	bit_count ^= INT_MASK;
+	fwrite(&bit_count, sizeof(bit_count), 1, svg);
+	fclose(svg);
+}
+
+matrix loadGame(unsigned int *score, char *status)
+{
+	FILE *svg = fopen("savegame.dat", "rb");
+	if (svg)
+	{
+		matrix N;
+		int i,j, **M;
+		int expectBits, readBits, buffer;
+		readBits = 0;
+		fread(&expectBits, sizeof(expectBits), 1, svg);
+		expectBits ^= INT_MASK;
+		fread(score, sizeof(*score), 1, svg);
+		*score ^= INT_MASK;
+		readBits += countBits(*score);
+		fread(&N.size, sizeof(N.size), 1, svg);
+		N.size ^= CHAR_MASK;
+		readBits += countBits(N.size);
+		**M = malloc(N.size*sizeof(int*));
+		for (i = 0; i < N.size; i++)
+		{
+			M[i] = calloc(N.size, sizeof(int));
+			for (j = 0; j < N.size; j++)
+			{
+				fread(&buffer, sizeof(buffer), 1, svg);
+				buffer ^= INT_MASK;
+				readBits += countBits(buffer);
+				M[i][j] = buffer;
+			}
+		}
+		N.set = M;
+		*status = (readBits == expectBits);
+		return N;
+	}
+	else
+	{
+		*status = 0;
+		*score = 0;
+		return newMatrix(4);
+	}
 }
