@@ -1,5 +1,6 @@
 #define INT_MASK 48621488
 #define CHAR_MASK 61
+#include "logic.h"
 
 //Highscire unos
 typedef struct entry
@@ -31,3 +32,6 @@ void saveGame(matrix M, unsigned int score);
 
 //Ucitava igru iz datoteke, vraca matricu ako je uspesno procitana
 matrix loadGame(unsigned int *score, char *status);
+
+//Provera greske pri dodeli memorije
+void checkMemError(void *new_pointer);

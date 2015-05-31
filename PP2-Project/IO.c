@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "IO.h"
-#include "logic.h"
 
 void cdcEntry(entry *E)
 {
@@ -188,5 +187,14 @@ matrix loadGame(unsigned int *score, char *status)
 		*status = 0;
 		*score = 0;
 		return newMatrix(4);
+	}
+}
+
+void checkMemError(void *new_pointer)
+{
+	if (new_pointer == NULL)
+	{
+		//Poruka o greski
+		exit(1);
 	}
 }

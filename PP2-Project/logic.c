@@ -23,9 +23,11 @@ matrix newMatrix(int size)
 	matrix N;
 	int i;
 	int **M = malloc(size*sizeof(int*));
+	checkMemError(M);
 	for (i = 0; i < size; i++)
 	{
 		M[i] = calloc(size, sizeof(int));
+		checkMemError(M[i]);
 	}
 	N.set = M;
 	N.size = size;
@@ -54,8 +56,8 @@ void spawnNumber(matrix *M)
 	matrix_index = free_tiles[array_index];
 	i = matrix_index / M->size;
 	j = matrix_index % M->size;
-	r = randomInt(1, 20);
-	if (r > 17)
+	r = randomInt(1, 10);
+	if (r > 8)
 		M->set[i][j] = 4;
 	else
 		M->set[i][j] = 2;
