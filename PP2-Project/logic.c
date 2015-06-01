@@ -321,3 +321,21 @@ void popHistory(history *H,unsigned int *score)
 		freeState(&(H->stack[H->latest]), H->mat->size);
 	}
 }
+
+int checkGameOver(matrix M)
+{
+	matrix N;
+	int i, c;
+	copyMatrix(&N, M);
+	for (i = 0; i < 4; i++)
+	{
+		c = snap(N.set, N.size, i, &N);
+		if (c)
+		{
+			freeMatrix(&N);
+			return 1;
+		}
+	}
+	freeMatrix(&N);
+	return 0;
+}

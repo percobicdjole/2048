@@ -91,3 +91,6 @@ state getState(matrix M, unsigned int score);
 
 //Oslobadja pokazivace u stanju
 void freeState(state *S, unsigned int tile_size);
+
+//Proverava da li je kraj igre
+int checkGameOver(matrix M);
