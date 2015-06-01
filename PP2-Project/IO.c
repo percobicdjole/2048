@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "logic.h"
 #include "IO.h"
 
 void cdcEntry(entry *E)
@@ -217,4 +218,36 @@ void checkFileError(FILE *file_pointer)
 		//Poruka o greski
 		exit(1);
 	}
+}
+
+void writeAIstats(matrix M)
+{
+	int i, j, max_tile = 0,n,tile,found = 0;
+	unsigned int cursor;
+	FILE *stats = fopen("AI stats.txt", "r+");
+	cursor = ftell(stats);
+	for (i = 0; i < M.size; i++)
+	{
+		for (j = 0; j < M.size; j++)
+		{
+			if (M.set[i][j] > max_tile)
+				max_tile = M.set[i][j];
+		}
+	}
+	while (fscanf(stats, "%d : %d\n",&tile,&n)==2)
+	{
+		if (tile == max_tile)
+		{
+			fseek(stats, cursor, SEEK_SET);
+			fprintf(stats, "%d : %d\n",tile,n+1);
+			found = 1;
+			break;
+		}
+		cursor = ftell(stats);
+	}
+	if (!found)
+	{
+		fprintf(stats, "%d : 1\n", max_tile);
+	}
+	fclose(stats);
 }

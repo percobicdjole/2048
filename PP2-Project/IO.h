@@ -1,6 +1,6 @@
 #define INT_MASK 48621488
 #define CHAR_MASK 61
-#include "logic.h"
+
 
 //Highscire unos
 typedef struct entry
@@ -38,3 +38,6 @@ void checkMemError(void *new_pointer);
 
 //Provera greske pri otvaranju datoteke
 void checkFileError(FILE *file_pointer);
+
+//Upisuje podatke o AI statistici
+void writeAIstats(matrix M);

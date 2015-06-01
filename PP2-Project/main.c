@@ -2,6 +2,7 @@
 #include "logic.h"
 #include "graphics.h"
 #include "ai.h"
+#include "IO.h"
 
 void game(matrix *m, enum modes rezim, int stayInMenu);
 int options(char *menu[]);
@@ -153,6 +154,18 @@ int swipe(matrix *M, int direction, unsigned int *score)
 	return moved;
 }
 
+void swipeSpeed(matrix *M, int direction, unsigned int *score)
+{
+	int changes, moved, last_merged[5] = { 0 };
+	changes = moved = moveStep(M, direction, last_merged, score);
+	while (changes)
+	{
+		changes = moveStep(M, direction, last_merged, score);
+		_sleep(75);
+		displayMatrix(0, -1, *M);
+	}
+}
+
 void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
 {
 	int changes, moved, last_merged[5] = { 0 };
@@ -264,11 +277,12 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 			case 4:stayInMenu = 0;
 				nocbreak();
 				mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Kraj, pritsni bilo koje dugme!");
+				writeAIstats(*m);
 				cbreak();
 				getch();
 				break;
 			}
-			if (getch() == KEY_ESC)stayInMenu = 0;
+			if (getch() == KEY_ESC)stayInMenu = 0, writeAIstats(*m);
 		}
 	case speed:
 		while (stayInMenu)
@@ -280,16 +294,16 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 			switch (getch())
 			{
 			case KEY_LEFT:
-				swipe(m, LEFT, &score);
+				swipeSpeed(m, LEFT, &score);
 				break;
 			case KEY_RIGHT:
-				swipe(m, RIGHT, &score);
+				swipeSpeed(m, RIGHT, &score);
 				break;
 			case KEY_UP:
-				swipe(m, UP, &score);
+				swipeSpeed(m, UP, &score);
 				break;
 			case KEY_DOWN:
-				swipe(m, DOWN, &score);
+				swipeSpeed(m, DOWN, &score);
 				break;
 			case KEY_ESC:stayInMenu = 0; break;
 			case ERR:spawnNumber(m); break;
