@@ -94,3 +94,6 @@ void freeState(state *S, unsigned int tile_size);
 
 //Proverava da li je kraj igre
 int checkGameOver(matrix M);
+
+//Provera da li je matrica puna
+int checkFull(matrix M);

@@ -341,3 +341,15 @@ int checkGameOver(matrix M)
 	freeMatrix(&N);
 	return 0;
 }
+
+int checkFull(matrix M)
+{
+	int i, j;
+	for (i = 0; i < M.size; i++)
+		for (j = 0; j < M.size; j++)
+		{
+			if (M.set[i][j] == 0)
+				return 0;
+		}
+	return 1;
+}
