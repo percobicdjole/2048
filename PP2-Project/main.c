@@ -12,7 +12,7 @@ void xTo2048(matrix *m);
 void doubleDouble(matrix *m);
 void freeTwo(matrix *m);
 
-enum modes {normal, xtile, autoplay, autoplayx};
+enum modes {normal, xtile, speed, autoplay, autoplayx};
 
 struct settings
 {
@@ -40,6 +40,7 @@ main()
 		"X Plocica",
 		"Autoplay",
 		"Autoplay X",
+		"Brzopotezno",
 		NULL
 	};
 
@@ -103,6 +104,7 @@ main()
 				case 2:settings.mode = xtile; break;
 				case 3:settings.mode = autoplay; break;
 				case 4:settings.mode = autoplayx; break;
+				case 5:settings.mode = speed; break;
 			}
 			break;
 			case 3: 
@@ -260,16 +262,41 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 				swipeNoAnimation(m, DOWN, &score);
 				break;
 			case 4:stayInMenu = 0;
-				mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Kraj, pritsni bilo koje dugme!");
 				nocbreak();
+				mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Kraj, pritsni bilo koje dugme!");
 				cbreak();
 				getch();
 				break;
 			}
 			if (getch() == KEY_ESC)stayInMenu = 0;
 		}
+	case speed:
+		while (stayInMenu)
+		{
+			mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score);
+			mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+			displayMatrix(0, -1, *m);
+			halfdelay(10);
+			switch (getch())
+			{
+			case KEY_LEFT:
+				swipe(m, LEFT, &score);
+				break;
+			case KEY_RIGHT:
+				swipe(m, RIGHT, &score);
+				break;
+			case KEY_UP:
+				swipe(m, UP, &score);
+				break;
+			case KEY_DOWN:
+				swipe(m, DOWN, &score);
+				break;
+			case KEY_ESC:stayInMenu = 0; break;
+			case ERR:spawnNumber(m); break;
+			}
+		}
+		break;
 	}
-	
 	freeMatrix(m);
 	erase();
 	resize_term(20, 100);
@@ -280,7 +307,9 @@ void showHint(matrix *m, int starty, int startx)
 {
 	int h = get_hint(*m);
 	WINDOW *hint;
+	cbreak();
 	hint = newwin(5, 27, starty, startx);
+	keypad(hint, TRUE);
 	wbkgd(hint, COLOR_PAIR(INTERFACE));
 	box(hint, 0, 0);
 	switch (h)
