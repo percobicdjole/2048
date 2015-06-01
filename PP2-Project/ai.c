@@ -179,6 +179,5 @@ int get_hint(matrix table)
 }
 
 /*  TO-DO optimizacija poteza
-		  optimizacija procjenjivanja poteza
 		  dinamicko provjeravanje, hashing
 		 							      */

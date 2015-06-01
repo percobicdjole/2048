@@ -88,6 +88,7 @@
     <ClCompile Include="ai.c" />
     <ClCompile Include="ai2.c" />
     <ClCompile Include="graphics.c" />
+    <ClCompile Include="IO.c" />
     <ClCompile Include="logic.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="screens.c" />
@@ -95,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="ai.h" />
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="IO.h" />
     <ClInclude Include="logic.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

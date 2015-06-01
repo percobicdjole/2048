@@ -30,7 +30,11 @@
     <ClCompile Include="ai2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="screens.c">
+=======
+    <ClCompile Include="IO.c">
+>>>>>>> origin/master
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -43,6 +47,9 @@
     </ClInclude>
     <ClInclude Include="ai.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IO.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

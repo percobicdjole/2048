@@ -4,14 +4,15 @@
 #define MAX_NUMBER_OF_NODES_IN_STABLE 1358954496 // popravi
 #define STACK_SPACE 100000
 
-// konstante za heuristiku
-#define MAX_IN_CORNER 1024
-#define MAX_NOT_IN_CORNER_PENALTY -100
-#define MONOTONICITY 512
-#define MOVES 64
-#define NO_MONOTONICITY_PENALTY -64
-#define NO_MOVES_PENALTY -1024 // *HIGH
-#define EMPTY_SPACES 10
+// konstante za heuristiku // sto manje velikih brojeva
+#define MAX_IN_CORNER 4096 // 1024 // 4096
+#define MAX_NOT_IN_CORNER_PENALTY -128 // 100  // -128
+#define MONOTONICITY 1024 // 512 mozda da se smanji  // 1024
+#define MOVES 256// 64 // 256
+#define NO_MONOTONICITY_PENALTY -128 // nije ga bilo // -256
+#define NO_MOVES_PENALTY -2048 // -1024 // -2048
+#define EMPTY_SPACES 256 // 8 // 512
+#define BIG_NUMBERS_PENALTY -4096 // nije ga bilo
 
 typedef struct tnode
 {

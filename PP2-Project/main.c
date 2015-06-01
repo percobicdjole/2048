@@ -3,6 +3,7 @@
 #include "graphics.h"
 #include "ai.h"
 
+<<<<<<< HEAD
 
 void game(matrix *m, enum modes rezim, int stayInMenu);
 int options(char *menu[]);
@@ -21,6 +22,11 @@ struct settings
 	int size;
 	theme theme;
 }settings;
+=======
+void game(matrix *m, int stayInMenu);
+void autoplay(matrix *m, int stayInMenu);
+int swipe(matrix *M, int direction, unsigned int *score);
+>>>>>>> origin/master
 
 main()
 {
@@ -133,7 +139,7 @@ main()
 	endwin();
 }
 
-void swipe(matrix *M, int direction, unsigned int *score)
+int swipe(matrix *M, int direction, unsigned int *score)
 {
 	int changes, moved, last_merged[5] = { 0 };
 	changes = moved = moveStep(M, direction, last_merged, score);
@@ -149,6 +155,7 @@ void swipe(matrix *M, int direction, unsigned int *score)
 		spawnNumber(M);
 		displayMatrix(0, -1, *M);
 	}
+	return moved;
 }
 
 void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
@@ -171,6 +178,7 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 	if (settings.size == 4) resize_term(15, 62);
 	else resize_term(18, 75);
 	unsigned int score = 0;
+<<<<<<< HEAD
 	*m = newMatrix(settings.size);
 	box(stdscr, 0, 0);
 	switch (rezim)
@@ -228,6 +236,60 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 				break;
 			case DOWN:
 				swipeNoAnimation(m, DOWN, &score);
+=======
+	int h, valid_move=1;
+	history hist = newHistory(5, m);
+	state previous = getState(*m, 0);
+	attron(COLOR_PAIR(INTERFACE));
+	mvprintw(1, 45, "Press ESC-to get back to menu!");
+	mvprintw(2, 45, "Press h-to get hint!");
+	mvprintw(3, 45, "Press u-for undo");
+	attroff(COLOR_PAIR(INTERFACE));
+	displayMatrix(6, 3, *m);
+	while (stayInMenu)
+	{
+		attron(COLOR_PAIR(INTERFACE));
+		mvprintw(4 * 3 + 3 + 2, 7, "SCORE: %4d", score);
+		attroff(COLOR_PAIR(INTERFACE));
+		switch (getch())
+		{
+			case KEY_LEFT:
+				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
+				valid_move = swipe(m, LEFT, &score);
+				if (valid_move)
+					pushHistory(&hist,previous);
+				previous = getState(*m, score);
+				break;
+			case KEY_RIGHT:
+				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
+				
+				valid_move = swipe(m, RIGHT, &score);
+				if (valid_move)
+					pushHistory(&hist,previous);
+				previous = getState(*m, score);
+				break;
+			case KEY_UP:
+				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
+				
+				valid_move = swipe(m, UP, &score);
+				if (valid_move)
+					pushHistory(&hist,previous);
+				previous = getState(*m, score);
+				break;
+			case KEY_DOWN:
+				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
+				
+				valid_move = swipe(m, DOWN, &score);
+				if (valid_move)
+					pushHistory(&hist,previous);//Push(previous)
+				previous = getState(*m, score);
+				break;
+			case KEY_ESC:stayInMenu = 0; break;
+			case 'u': 
+				popHistory(&hist,&score);
+				previous = getState(*m, score);
+				displayMatrix(6, 3, *m);
+>>>>>>> origin/master
 				break;
 			case 4:stayInMenu = 0;
 				mvprintw(4, 4 * WIDTH + 2, "Kraj, pritsni bilo koje dugme!");
@@ -239,7 +301,9 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 			if (getch() == KEY_ESC)stayInMenu = 0;
 		}
 	}
+	freeState(&previous, m->size);
 	freeMatrix(m);
+	destroyHistory(&hist);
 	erase();
 	resize_term(20, 100);
 	bkgd(COLOR_PAIR(INTERFACE)); refresh();

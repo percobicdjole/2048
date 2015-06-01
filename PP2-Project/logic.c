@@ -23,9 +23,11 @@ matrix newMatrix(int size)
 	matrix N;
 	int i;
 	int **M = malloc(size*sizeof(int*));
+	checkMemError(M);
 	for (i = 0; i < size; i++)
 	{
 		M[i] = calloc(size, sizeof(int));
+		checkMemError(M[i]);
 	}
 	N.set = M;
 	N.size = size;
@@ -54,8 +56,8 @@ void spawnNumber(matrix *M)
 	matrix_index = free_tiles[array_index];
 	i = matrix_index / M->size;
 	j = matrix_index % M->size;
-	r = randomInt(1, 20);
-	if (r > 17)
+	r = randomInt(1, 10);
+	if (r > 8)
 		M->set[i][j] = 4;
 	else
 		M->set[i][j] = 2;
@@ -212,21 +214,23 @@ int snap(unsigned int **table, int table_size, int direction, matrix *M)
 		return 0;
 }
 
-int **copySet(matrix M)
+int **copySet(int **source, char set_size)
 {
 	int i, **dest_set;
-	dest_set = malloc(M.size*sizeof(int*));
-	for (i = 0; i < M.size; i++)
+	dest_set = malloc(set_size*sizeof(int*));
+	checkMemError(dest_set);
+	for (i = 0; i < set_size; i++)
 	{
-		dest_set[i] = malloc(M.size*sizeof(int));
-		memcpy(dest_set[i], M.set[i], M.size*sizeof(int));
+		dest_set[i] = malloc(set_size*sizeof(int));
+		checkMemError(dest_set[i]);
+		memcpy(dest_set[i], source[i], set_size*sizeof(int));
 	}
 	return dest_set;
 }
 
 void copyMatrix(matrix *dest, matrix M)
 {
-	dest->set = copySet(M);
+	dest->set = copySet(M.set,M.size);
 	dest->size = M.size;
 }
 
@@ -245,29 +249,75 @@ void freeMatrix(matrix *M)
 	free(M->set);
 }
 
-history newHistory()
+state getState(matrix M, unsigned int score)
+{
+	state S;
+	S.score = score;
+	S.set = copySet(M.set, M.size);
+	return S;
+}
+
+void freeState(state *S, unsigned int tile_size)
+{
+	S->score = 0;
+	freeSet(S->set, tile_size);
+	free(S->set);
+	S->set = NULL;
+}
+
+history newHistory(short undo_depth, matrix *M)
 {
 	history H;
-	H.latest = H.oldest = 0;
+	int i;
+	H.latest = 0;
+	H.mat = M;
+	H.depth = undo_depth;
+	H.stack = malloc(undo_depth*sizeof(state));
+	for (i = 0; i < H.depth; i++)
+	{
+		H.stack[i].set = NULL;
+	}
 	return H;
 }
 
-void pushHistory(history *H, matrix M)
+void clearHistory(history *H)
 {
-	H->latest = (H->latest + 1) % UNDO_DEPTH;
-	if (H->latest == H->oldest)
-		H->oldest = (H->oldest + 1) % UNDO_DEPTH;
-	H->stack[H->latest] = copySet(M);
+	int i;
+	for (i = 0; i < H->depth; i++)
+	{
+		if (H->stack[i].set)
+			freeState(&(H->stack[i]), H->mat->size);
+	}
 }
 
-int **popHistory(history *H, int set_size)
+void destroyHistory(history *H)
 {
-	freeSet(H->stack[H->latest], set_size);
-	free(H->stack[H->latest]);
+	clearHistory(H);
+	free(H->stack);
+}
+
+void pushHistory(history *H,state S)
+{
+	if (H->stack[H->latest].set)
+	{
+		freeSet(H->stack[H->latest].set, H->mat->size);
+		free(H->stack[H->latest].set);
+	}
+	H->stack[H->latest].set = copySet(S.set, H->mat->size);
+	H->stack[H->latest].score = S.score;
+	H->latest = (H->latest + 1) % H->depth;
+}
+
+void popHistory(history *H,unsigned int *score)
+{
 	(H->latest)--;
-	if (H->latest < H->oldest)
-		H->latest = H->oldest = 0;
-		return NULL;
 	if (H->latest < 0)
-		H->latest = UNDO_DEPTH - 1;
+		H->latest = H->depth - 1;
+	if (H->stack[H->latest].set)
+	{
+		freeSet(H->mat->set, H->mat->size);
+		H->mat->set = copySet(H->stack[H->latest].set, H->mat->size);
+		*score = H->stack[H->latest].score;
+		freeState(&(H->stack[H->latest]), H->mat->size);
+	}
 }

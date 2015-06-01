@@ -7,7 +7,6 @@
 //Potrebne konstante
 #define TRUE 1
 #define FALSE 0
-#define UNDO_DEPTH 20
 
 //Matrica
 typedef struct matrix
@@ -16,11 +15,21 @@ typedef struct matrix
 	char size;
 }matrix;
 
+
+//Stanje igre
+typedef struct state
+{
+	int **set;
+	unsigned int score;
+}state;
+
+
 //Istorija igre
 typedef struct history
 {
-	int **stack[UNDO_DEPTH];
-	char latest, oldest;
+	state *stack;
+	matrix *mat;
+	int depth,latest;
 }history;
 
 
@@ -51,13 +60,19 @@ int moveStep(matrix *M, int direction, int *last_merged, unsigned int *score);
 int snap(unsigned int **table, int table_size, int direction, matrix *M);
 
 //Inicijalizacija istorije igre
-history newHistory();
+history newHistory(short undo_depth, matrix *M);
+
+//Brisanje istorije
+void clearHistory(history *H);
+
+//Unistavanje strukture istorije
+void destroyHistory(history *H);
 
 //Brise poslednji podez iz istorije i vraca stanje matrice
-int **popHistory(history *H, int set_size);
+void popHistory(history *H, unsigned int *score);
 
 //Pamti potez u istoriju
-void pushHistory(history *H, matrix M);
+void pushHistory(history *H, state S);
 
 //Oslobadjanje cele matrice
 void freeMatrix(matrix *M);
@@ -70,3 +85,9 @@ void copyMatrix(matrix *dest, matrix M);
 
 //Kopira set i vraca pokazivac novog
 int **copySet(matrix M);
+
+//Dohvata trenutno stanje i vraca novu strukturu
+state getState(matrix M, unsigned int score);
+
+//Oslobadja pokazivace u stanju
+void freeState(state *S, unsigned int tile_size);
