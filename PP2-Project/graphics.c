@@ -1,27 +1,16 @@
 #include "graphics.h"
 #include "logic.h"
 
-
-char *choices[] = {
-	"Obicno",
-	"X-tile",
-	"Autoplay",
-	"Izlaz",
-};
-
-int n_choices = sizeof(choices) / sizeof(char *);
-
 void displayMatrix(int startx, int starty, matrix m)//dodati opciju za x tile
 {
-
 	for (int i = 0; i < m.size; i++)
 	{
 		for (int j = 0; j < m.size; j++)
 		{
 			
-			if (m.set[i][j] == 1)
+			if (m.set[i][j] == 3)
 			{
-				attron(COLOR_PAIR(0)|A_REVERSE);
+				attron(COLOR_PAIR(0) | A_REVERSE);
 				for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
 				{
 					for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(starty + k + 2, startx + l + 1, " ");
@@ -45,9 +34,9 @@ void displayMatrix(int startx, int starty, matrix m)//dodati opciju za x tile
 						unsigned char y, x;
 						y = (i + 1) * HEIGHT;
 						if (m.set[i][j] < 100)									x = (j + 1) * 4 + 3 * j;
-						else if (m.set[i][j] >= 100 && m.set[i][j] < 10000)		x = (j + 1) * 4 + 3 * j - 1;
-						else if (m.set[i][j] >= 10000)							x = (j + 1) * 4 + 3 * j - 2;
-						mvprintw(y+starty, x+startx, "%u", m.set[i][j]);
+						else if (m.set[i][j] >= 100 && m.set[i][j] < 1000)		x = (j + 1) * 4 + 3 * j - 1;
+						else if (m.set[i][j] >= 1000)							x = (j + 1) * 4 + 3 * j - 2;
+						mvprintw(y+starty, x+startx, "%d", m.set[i][j]);
 					}
 
 					attroff(COLOR_PAIR(boja));
@@ -92,22 +81,47 @@ void colorPalette()
 	refresh();
 }
 
+mystrcpy(char dest[], char src[])
+{
+	int i = 0;
+
+	while (src[i] != '\0')
+	{
+		dest[i] = src[i];
+		i++;
+	}
+
+	dest[i] = '\0';
+}
+
 void initiateThemes()
 {
-	//crvena promeniti
-	crvena.first = 1;   //2	
-	crvena.second = 9;  //4-16	  
-	crvena.third = 3;   //32-64
-	crvena.fourth = 11; //128-256
-	crvena.fifth = 14;  //512-2048
-	crvena.interfaceColor = 9;
+	//crvena
+	crvena.first = 4;   //2	
+	crvena.second = 12;  //4-16	  
+	crvena.third = 5;   //32-64
+	crvena.fourth = 13; //128-256
+	crvena.fifth = 8;  //512-2048
+	crvena.interfaceColor = 12;
+	mystrcpy(crvena.name, "crvena");
+	
 	//plava
 	plava.first = 1;   //2	
 	plava.second = 9;  //4-16	  
 	plava.third = 3;   //32-64
 	plava.fourth = 11; //128-256
-	plava.fifth = 2;  //512-2048
+	plava.fifth = 8;  //512-2048
 	plava.interfaceColor = 9;
+	mystrcpy(plava.name, "plava");
+
+	//zelena
+	zelena.first = 2;   //2	
+	zelena.second = 10;  //4-16	  
+	zelena.third = 5;   //32-64
+	zelena.fourth = 13; //128-256
+	zelena.fifth = 8;  //512-2048
+	zelena.interfaceColor = 10;
+	mystrcpy(zelena.name, "zelena");
 }
 
 void intiateColors(theme tema)
@@ -118,40 +132,18 @@ void intiateColors(theme tema)
 	init_pair(THIRD, WHITE, tema.third);
 	init_pair(FOURTH, WHITE, tema.fourth);
 	init_pair(FIFTH, WHITE, tema.fifth);
-	init_pair(INTERFACE, tema.interfaceColor, COLOR_BLACK);//za tekst
+	init_pair(INTERFACE, tema.interfaceColor, 0);//za tekst
 }
 
-void printMenu(WINDOW *menu_win, int highlight)
-{
-	int x, y, i;
-	x = 2;
-	y = 2;
-	box(menu_win, 0, 0);
-	for (i = 0; i < n_choices; ++i)
-	{
-		if (highlight == i + 1) 
-		{
-			wattron(menu_win,  COLOR_PAIR(INTERFACE));
-			mvwprintw(menu_win, y, x, "%s", choices[i]);
-			wattroff(menu_win, COLOR_PAIR(INTERFACE));
-		}
-		else
-			mvwprintw(menu_win, y, x, "%s", choices[i]);
-		++y;
-	}
-	wrefresh(menu_win);
-}
-
-int menu()
+int menu(char *choices[], int starty, int startx)
 {
 	WINDOW *menu_win;
-	int highlight = 1;
-	int choice = 0;
-	int c;
+	int highlight = 1, choice = 0, c, n_choices;
+	for (n_choices = 0; choices[n_choices]; n_choices++);
 	cbreak(); 
-	menu_win = newwin(10, 15, 5, 30);
+	menu_win = newwin(20, 20, starty, startx);
 	keypad(menu_win, TRUE);
-	printMenu(menu_win, highlight);
+	printMenu(menu_win, choices, n_choices, highlight);
 	while (TRUE)
 	{
 		c = wgetch(menu_win);
@@ -172,14 +164,33 @@ int menu()
 		case 10:
 			choice = highlight;
 			break;
-
 		}
-		printMenu(menu_win, highlight);
+		printMenu(menu_win, choices, n_choices, highlight);
 		if (choice != 0) 
 			break;
 	}
-	clrtoeol();
 	werase(menu_win);
 	wrefresh(menu_win);
 	return choice;
+}
+
+void printMenu(WINDOW *menu_win, char *choices[], int n_choices, int highlight)
+{
+	int x, y, i;
+	x = 3;
+	y = 2;
+	wbkgd(menu_win, COLOR_PAIR(INTERFACE));
+	box(menu_win, 0, 0);
+	for (i = 0; i < n_choices; ++i)
+	{
+		if (highlight == i + 1)
+		{
+			wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+			mvwprintw(menu_win, y + i, x, "%s", choices[i]);
+			wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+		}
+		else mvwprintw(menu_win, y + i, x, "%s", choices[i]);
+		++y;
+	}
+	wrefresh(menu_win);
 }

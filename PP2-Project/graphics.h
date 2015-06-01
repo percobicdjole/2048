@@ -3,9 +3,10 @@
 typedef struct theme
 {
 	unsigned char first, second, third, fourth, fifth, interfaceColor;
+	char name[10];
 }theme;
 
-theme crvena, zelena, plava, RGB;
+theme crvena, zelena, plava;
 
 //MATRIX PARAMETERS
 #define HEIGHT 3//visina jednog polja, 3 reda
@@ -27,6 +28,6 @@ void intiateColors();//inicijalizuje parove boja
 void initiateThemes(); //inicijalizuje boje za teme
 void displayMatrix();//ne dozvoljava mi da koristim matrix type ovde!! nije odgovarajuci opis! ->> void displayMatrix(int startx, int starty, matrix m);
 unsigned char colorOfNumber(unsigned short x);//vraca boju odredjenog broja
-void printMenu(WINDOW *menu_win, int highlight);//ispisuje menu
-int menu();
+void printMenu(WINDOW *menu_win, char *choices[], int n_choices, int highlight);//ispisuje menu
+int menu(char *choices[], int starty, int startx);
 

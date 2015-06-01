@@ -30,16 +30,19 @@
     <ClCompile Include="ai2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="screens.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="graphics.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="logic.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ai.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

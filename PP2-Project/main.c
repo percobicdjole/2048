@@ -2,41 +2,131 @@
 #include "logic.h"
 #include "graphics.h"
 #include "ai.h"
-#include <time.h>
 
-void game(matrix *m, int stayInMenu);
-void autoplay(matrix *m, int stayInMenu);
+
+void game(matrix *m, enum modes rezim, int stayInMenu);
+int options(char *menu[]);
 void swipe(matrix *M, int direction, unsigned int *score);
+void swipeNoAnimation(matrix *M, int direction, unsigned int *score);
+void showHint(matrix *m, int starty, int startx);
+void xTo2048(matrix *m);
+void doubleDouble(matrix *m);
+void freeTwo(matrix *m);
+
+enum modes {normal, xtile, autoplay, autoplayx};
+
+struct settings
+{
+	enum rezim mode;
+	int size;
+	theme theme;
+}settings;
 
 main()
 {
 	matrix m;
+
+	char *mainMenu[] = {
+		"Igraj",
+		"Rezim",
+		"Opcije",
+		"Uputstvo",
+		"O autorima",
+		"Izlaz",
+		NULL
+	};
+
+	char *modesMenu[] = {
+		"Obican",
+		"X Plocica",
+		"Autoplay",
+		"Autoplay X",
+		NULL
+	};
+
+	char *optionsMenu[] = {
+		"Dimenzije",
+		"Tema",
+	//	"Pozadina",
+		"Nazad",
+		NULL
+	};
+
+	char *sizeMenu[] =
+	{
+		"4x4",
+		"5x5",
+		NULL
+	};
+
+	char *themesMenu[] =
+	{
+		"Plava",
+		"Crvena",
+		"Zelena",
+		NULL
+	};
+
 	_Bool stayInMenu = 1;
-	setSeed();
+	
+	
+	//CURSES INCIJALIZACIJA
 	initscr();
 	noecho();
 	curs_set(0);
 	keypad(stdscr, TRUE);
 	start_color();
 	initiateThemes();
-	intiateColors(plava);
+	resize_term(40, 80);
+		
+	splashScreen();  //ETF SPLASH SCREEN
+	
+	//Podrazumevana settings
+	settings.mode = normal;
+	settings.size = 4;
+	settings.theme = zelena;
+	//
+	
+	intiateColors(settings.theme);
+
+	setSeed();
+	resize_term(20, 100);
+	bkgd(COLOR_PAIR(INTERFACE)); refresh();
 	while (stayInMenu)
 	{
-		mvprintw(0, 45, "2048 Alpha 2 version (23.5.2015.)");
-		refresh();
-		switch (menu())
+		display2048(0, 20);
+		switch (menu(mainMenu,0,0))
 		{
-			case 1:m = newMatrix(4); game(&m, stayInMenu); break;
-			case 2:
+			case 1: erase(); game(&m, settings.mode, stayInMenu); break;
+			case 2: switch (menu(modesMenu, 0, 0))
 			{
-				m = newMatrix(4);
-				int nmb = randomInt(0, 15); 
-				m.set[nmb / 4][nmb % 4] = 1;
-				game(&m, stayInMenu);
+				case 1:settings.mode = normal; break;
+				case 2:settings.mode = xtile; break;
+				case 3:settings.mode = autoplay; break;
+				case 4:settings.mode = autoplayx; break;
 			}
 			break;
-			case 3: m = newMatrix(4); autoplay(&m, stayInMenu); break;
-			case 4:exit(0); break;
+			case 3: 
+			while (stayInMenu)
+			{
+				switch (options(optionsMenu))
+				{
+					case 1: switch (menu(sizeMenu, 0, 0))
+					{
+						case 1:settings.size = 4; break;
+						case 2:settings.size = 5; break;
+					}break;
+					
+					case 2: switch (menu(themesMenu, 0, 0))
+					{
+						case 1:settings.theme = plava; break;
+						case 2:settings.theme = crvena; break;
+						case 3:settings.theme = zelena; break;
+					}intiateColors(settings.theme); break;
+					case 3:stayInMenu = 0; break;
+			}
+			}stayInMenu = 1; break;
+			case 6:exit(0); break;
 		}
 		stayInMenu = 1;
 	}
@@ -51,119 +141,280 @@ void swipe(matrix *M, int direction, unsigned int *score)
 	{
 		changes = moveStep(M, direction, last_merged, score);
 		_sleep(75);
-		displayMatrix(6, 3, *M);
+		displayMatrix(0, -1, *M);
 	}
 	if (moved)
 	{
-		_sleep(50);
+		_sleep(25);
 		spawnNumber(M);
-		displayMatrix(6, 3, *M);
+		displayMatrix(0, -1, *M);
 	}
 }
 
-void game(matrix *m, int stayInMenu)
+void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
 {
-	unsigned int score = 0;
-	int h;
-	attron(COLOR_PAIR(INTERFACE));
-	mvprintw(1, 45, "Press ESC-to get back to menu!");
-	mvprintw(2, 45, "Press h-to get hint!");
-	mvprintw(3, 45, "Press u-for undo");
-	attroff(COLOR_PAIR(INTERFACE));
-	displayMatrix(6, 3, *m);
-	while (stayInMenu)
+	int changes, moved, last_merged[5] = { 0 };
+	changes = moved = moveStep(M, direction, last_merged, score);
+	while (changes)
 	{
-		attron(COLOR_PAIR(INTERFACE));
-		mvprintw(4 * 3 + 3 + 2, 7, "SCORE: %d", score);
-		attroff(COLOR_PAIR(INTERFACE));
-		switch (getch())
+		changes = moveStep(M, direction, last_merged, score);	
+	}
+	if (moved)
+	{
+		spawnNumber(M);
+		displayMatrix(0, -1, *M);
+	}
+}
+
+void game(matrix *m, enum rezim rezim, int stayInMenu)
+{
+	if (settings.size == 4) resize_term(15, 62);
+	else resize_term(18, 75);
+	unsigned int score = 0;
+	*m = newMatrix(settings.size);
+	box(stdscr, 0, 0);
+	switch (rezim)
+	{
+	case xtile:
 		{
-			case KEY_LEFT:
-				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				swipe(m, LEFT, &score);
+			int x = randomInt(0, settings.size*settings.size-1);
+			m->set[x / settings.size][x%settings.size] = 3;
+		}
+	case normal:
+		while (stayInMenu)
+		{
+			mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score);
+			mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+			mvprintw(5, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni h za pomoc!");
+			mvprintw(6, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni u za undo!");
+			displayMatrix(0, -1, *m);
+			switch (getch())
+			{
+				case KEY_LEFT: swipe(m, LEFT, &score); break;
+				case KEY_RIGHT: swipe(m, RIGHT, &score); break;
+				case KEY_UP: swipe(m, UP, &score); break;
+				case KEY_DOWN: swipe(m, DOWN, &score); break;
+				case KEY_ESC:stayInMenu = 0; break;
+				case 'u': break;
+				case 'h': showHint(m, 8, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0)); break;
+				case 'x':if(settings.mode==xtile)xTo2048(m); break;
+				case '2':if (settings.mode == normal)doubleDouble(m); score *= 2; break;
+				case 'f':if (settings.mode == normal)freeTwo(m); break;
+			}
+		}
+		break;
+	case autoplayx:
+	{
+		int x = randomInt(0, settings.size*settings.size - 1);
+		m->set[x / settings.size][x%settings.size] = 3;
+	}
+	case autoplay:
+		halfdelay(1);
+		mvprintw(4, 4 * WIDTH + 2, "Pritisni ESC za meni!");
+		displayMatrix(0, -1, *m);
+		while (stayInMenu)
+		{
+			mvprintw(2, 4 * WIDTH + 2, "REZULTAT: %d", score);
+			switch (get_hint(*m))
+			{
+			case LEFT:
+				swipeNoAnimation(m, LEFT, &score);
 				break;
-			case KEY_RIGHT:
-				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				swipe(m, RIGHT, &score);
+			case RIGHT:
+				swipeNoAnimation(m, RIGHT, &score);
 				break;
-			case KEY_UP:
-				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				swipe(m, UP, &score);
+			case UP:
+				swipeNoAnimation(m, UP, &score);
 				break;
-			case KEY_DOWN:
-				mvprintw(4 * 3 + 3 + 3, 7, "                                ");
-				swipe(m, DOWN, &score);
+			case DOWN:
+				swipeNoAnimation(m, DOWN, &score);
 				break;
-			case KEY_ESC:stayInMenu = 0; break;
-			case 'u'://OVDE UBACI ZA UNDO ILI URADI POSEBNU F-JU
+			case 4:stayInMenu = 0;
+				mvprintw(4, 4 * WIDTH + 2, "Kraj, pritsni bilo koje dugme!");
+				nocbreak();
+				cbreak();
+				getch();
 				break;
-			case 'h': 
-				h = get_hint(*m);
-				if (h == LEFT)
-				{
-					attron(COLOR_PAIR(INTERFACE));
-					mvprintw(4 * 3 + 3 + 3, 7, "Najbolji izbor je LEVO!");
-					attroff(COLOR_PAIR(INTERFACE));
-				}
-				else if (h == RIGHT)
-				{
-					attron(COLOR_PAIR(INTERFACE));
-					mvprintw(4 * 3 + 3 + 3, 7, "Najbolji izbor je DESNO!");
-					attroff(COLOR_PAIR(INTERFACE));
-				}
-				else if (h == UP)
-				{
-					attron(COLOR_PAIR(INTERFACE));
-					mvprintw(4 * 3 + 3 + 3, 7, "Najbolji izbor je GORE!");
-					attroff(COLOR_PAIR(INTERFACE));
-				}
-				else if (h == DOWN)
-				{
-					attron(COLOR_PAIR(INTERFACE));
-					mvprintw(4 * 3 + 3 + 3, 7, "Najbolji izbor je DOLE!");
-					attroff(COLOR_PAIR(INTERFACE));
-				}
-				refresh();
-				break;
+			}
+			if (getch() == KEY_ESC)stayInMenu = 0;
 		}
 	}
 	freeMatrix(m);
 	erase();
+	resize_term(20, 100);
+	bkgd(COLOR_PAIR(INTERFACE)); refresh();
 }
 
-void autoplay(matrix *m, int stayInMenu)
+void showHint(matrix *m, int starty, int startx)
 {
-	unsigned int score = 0;
-	attron(COLOR_PAIR(INTERFACE));
-	//mvprintw(1, 45, "Press ESC-to get back to menu!");
-	attroff(COLOR_PAIR(INTERFACE));
-	displayMatrix(6, 3, *m);
-	while (stayInMenu)
+	int h = get_hint(*m);
+	WINDOW *hint;
+	hint = newwin(5, 27, starty, startx);
+	wbkgd(hint, COLOR_PAIR(INTERFACE));
+	box(hint, 0, 0);
+	switch (h)
 	{
-		attron(COLOR_PAIR(INTERFACE));
-		mvprintw(4 * 3 + 3 + 2, 7, "SCORE: %d", score);
-		attroff(COLOR_PAIR(INTERFACE));
-		switch (get_hint(*m))
+	case LEFT: mvwprintw(hint, 2, 2, "Najbolji izbor je LEVO!"); break;
+	case RIGHT: mvwprintw(hint, 2, 2, "Najbolji izbor je DESNO!"); break;
+	case UP:mvwprintw(hint, 2, 2, "Najbolji izbor je GORE!"); break;
+	case DOWN:mvwprintw(hint, 2, 2, "Najbolji izbor je DOLE!"); break;
+	case 4:mvwprintw(hint, 2, 6, "IGRA JE GOTOVA!"); break;
+	}
+	wrefresh(hint);
+	wgetch(hint);
+	werase(hint);
+	wrefresh(hint);
+}
+
+int options(char *menu[])
+{
+	WINDOW *menu_win;
+	int highlight = 1, choice = 0, c, n_choices;
+	for (n_choices = 0; menu[n_choices]; n_choices++);
+	cbreak();
+	menu_win = newwin(20, 20, 0, 0);
+	keypad(menu_win, TRUE);
+
+	int x=3, y=2, i;
+
+	wbkgd(menu_win, COLOR_PAIR(INTERFACE));
+	box(menu_win, 0, 0);
+	for (i = 0; i < n_choices; ++i)
+	{
+
+		switch (i + 1)
 		{
-		case LEFT:
-			swipe(m, LEFT, &score);
+		case 1:
+			if (highlight == i + 1)wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+			mvwprintw(menu_win, y + i, x, "%s", menu[i]);
+			if (highlight == i + 1)wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+			wattron(menu_win, A_NORMAL);
+			wprintw(menu_win, "%s", settings.size == 4 ? ": 4x4" : ": 5x5");
+			wattroff(menu_win, A_NORMAL);
+
 			break;
-		case RIGHT:
-			swipe(m, RIGHT, &score);
+		case 2:
+			if (highlight == i + 1)wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+			mvwprintw(menu_win, y + i, x, "%s", menu[i]);
+			if (highlight == i + 1)wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+			wattron(menu_win, A_NORMAL);
+			wprintw(menu_win, ": %s", settings.theme.name);
+			wattroff(menu_win, A_NORMAL);
 			break;
-		case UP:
-			swipe(m, UP, &score);
-			break;
-		case DOWN:
-			swipe(m, DOWN, &score);
-			break;
-		case 4:stayInMenu = 0;
+		case 3:
+			if (highlight == i + 1)wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+			mvwprintw(menu_win, y + i, x, "%s", menu[i]);
+			if (highlight == i + 1)wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
 			break;
 		}
+		++y;
 	}
-	freeMatrix(m);
-	mvprintw(18, 7, "GAME OVER");
-	mvprintw(19, 7, "Pritisni bilo koje dugme za povratak u glavni meni!");
-	getch();
-	erase();
+	wrefresh(menu_win);
+
+	while (TRUE)
+	{
+		c = wgetch(menu_win);
+		switch (c)
+		{
+		case KEY_UP:
+			if (highlight == 1)
+				highlight = n_choices;
+			else
+				--highlight;
+			break;
+		case KEY_DOWN:
+			if (highlight == n_choices)
+				highlight = 1;
+			else
+				++highlight;
+			break;
+		case 10:
+			choice = highlight;
+			break;
+		}
+		y = 2;
+		wbkgd(menu_win, COLOR_PAIR(INTERFACE));
+		box(menu_win, 0, 0);
+		for (i = 0; i < n_choices; ++i)
+		{
+
+			switch (i + 1)
+			{
+			case 1:
+				if (highlight == i + 1)wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+				mvwprintw(menu_win, y + i, x, "%s", menu[i]);
+				if (highlight == i + 1)wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+				wattron(menu_win, A_NORMAL);
+				wprintw(menu_win, "%s", settings.size == 4 ? ": 4x4" : ": 5x5");
+				wattroff(menu_win, A_NORMAL);
+
+				break;
+			case 2:
+				if (highlight == i + 1)wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+				mvwprintw(menu_win, y + i, x, "%s", menu[i]);
+				if (highlight == i + 1)wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+				wattron(menu_win, A_NORMAL);
+				wprintw(menu_win, ": %s", settings.theme.name);
+				wattroff(menu_win, A_NORMAL);
+				break;
+			case 3:
+				if (highlight == i + 1)wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+				mvwprintw(menu_win, y + i, x, "%s", menu[i]);
+				if (highlight == i + 1)wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+				break;
+			}
+			++y;
+		}
+		wrefresh(menu_win);
+
+		if (choice != 0)
+			break;
+	}
+
+
+		werase(menu_win);
+		wrefresh(menu_win);
+		return choice;
+}
+
+void xTo2048(matrix *m)
+{
+	for (int i = 0; i < settings.size; i++)
+		for (int j = 0; j < settings.size; j++)
+		{
+			if (m->set[i][j] == 3)
+			{
+				m->set[i][j] = 2048;
+				break;
+			}
+		}
+}
+
+void doubleDouble(matrix *m)
+{
+	for (int i = 0; i < settings.size; i++)
+		for (int j = 0; j < settings.size; j++)
+		{
+			m->set[i][j] *= 2;
+		}
+}
+
+void freeTwo(matrix *m)
+{
+	int xmin, ymin, min;
+	for (int k = 0; k < 2; k++)
+	{
+		xmin = ymin = 0; min = 65536;
+		for (int i = 0; i < settings.size; i++)
+			for (int j = 0; j < settings.size; j++)
+			{
+				if (m->set[i][j]!=0 && m->set[i][j] < min)
+				{
+					min = m->set[i][j];
+					ymin = j;
+					xmin = i;
+				}
+			}
+		m->set[xmin][ymin] = 0;
+	}
 }
