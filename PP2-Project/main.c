@@ -217,6 +217,7 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 					pushHistory(&hist, previous);//Push(previous)
 				previous = getState(*m, score);
 				break;
+			case KEY_ESC:stayInMenu = 0; break;
 				case 'u': 
 					popHistory(&hist, &score);
 					previous = getState(*m, score);
@@ -239,11 +240,11 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 	}
 	case autoplay:
 		halfdelay(1);
-		mvprintw(4, 4 * WIDTH + 2, "Pritisni ESC za meni!");
+		mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
 		displayMatrix(0, -1, *m);
 		while (stayInMenu)
 		{
-			mvprintw(2, 4 * WIDTH + 2, "REZULTAT: %d", score);
+			mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score);
 			switch (get_hint(*m))
 			{
 			case LEFT:
@@ -259,7 +260,7 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 				swipeNoAnimation(m, DOWN, &score);
 				break;
 			case 4:stayInMenu = 0;
-				mvprintw(4, 4 * WIDTH + 2, "Kraj, pritsni bilo koje dugme!");
+				mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Kraj, pritsni bilo koje dugme!");
 				nocbreak();
 				cbreak();
 				getch();
