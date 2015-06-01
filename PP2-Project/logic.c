@@ -51,16 +51,18 @@ void spawnNumber(matrix *M)
 			}
 			matrix_index++;
 		}
-
-	array_index = randomInt(0, array_index);
-	matrix_index = free_tiles[array_index];
-	i = matrix_index / M->size;
-	j = matrix_index % M->size;
-	r = randomInt(1, 10);
-	if (r > 8)
-		M->set[i][j] = 4;
-	else
-		M->set[i][j] = 2;
+	if (array_index > -1)
+	{
+		array_index = randomInt(0, array_index);
+		matrix_index = free_tiles[array_index];
+		i = matrix_index / M->size;
+		j = matrix_index % M->size;
+		r = randomInt(1, 10);
+		if (r > 8)
+			M->set[i][j] = 4;
+		else
+			M->set[i][j] = 2;
+	}
 }
 
 
