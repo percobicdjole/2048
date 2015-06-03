@@ -43,7 +43,7 @@ matrix newMatrix(int size);
 void freeMatrix(matrix *M);
 
 //Kopiranje matrice
-void copyMatrix(matrix *dest, matrix *source);
+void copyMatrix(matrix *dest, matrix M);
 
 //Ubacuje broj 2 ili 4
 void spawnNumber(matrix *M);

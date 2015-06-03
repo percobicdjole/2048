@@ -22,10 +22,10 @@ entry newEntry(char *player_name, unsigned int score);
 void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore);
 
 //Snima highcsore iz niza u datoteku
-void saveHsc(char *file_name, entry *score_list, unsigned int entry_count);
+void saveHsc(entry *score_list, unsigned int entry_count);
 
 //Ucitava highscore iz datoteke u niz (NULL ako nema datoteke)
-entry *loadHsc(char *file_name, unsigned int *entry_conunt, unsigned int *bit_check);
+entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check);
 
 //Cuva stanje igre u unapred definisanu datoteku savegame.dat
 void saveGame(matrix M, unsigned int score);

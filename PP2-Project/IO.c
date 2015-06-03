@@ -82,12 +82,12 @@ void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 	}
 }
 
-void saveHsc(char *file_name, entry *score_list, unsigned int entry_count)
+void saveHsc(entry *score_list, unsigned int entry_count)
 {
 	int i;
 	file_info inf;
 	entry buffer;
-	FILE *hsc_file = fopen(file_name, "wb");
+	FILE *hsc_file = fopen("hscore.dat", "wb");
 	fseek(hsc_file, sizeof(inf), SEEK_SET);
 	inf.bit_count = 0;
 	inf.entry_count = entry_count;
@@ -104,9 +104,9 @@ void saveHsc(char *file_name, entry *score_list, unsigned int entry_count)
 	fclose(hsc_file);
 }
 
-entry *loadHsc(char *file_name, unsigned int *entry_conunt, unsigned int *bit_check)
+entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check)
 {
-	FILE *hsc_file = fopen(file_name, "rb");
+	FILE *hsc_file = fopen("hscore.dat", "rb");
 	entry *score_list = NULL;
 	if (hsc_file)
 	{
