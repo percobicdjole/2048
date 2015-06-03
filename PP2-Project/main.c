@@ -9,6 +9,8 @@ int options(char *menu[]);
 int swipe(matrix *M, int direction, unsigned int *score);
 void swipeNoAnimation(matrix *M, int direction, unsigned int *score);
 void showHint(matrix *m, int starty, int startx);
+void getHsc(unsigned int score);
+
 void xTo2048(matrix *m);
 void doubleDouble(matrix *m);
 void freeTwo(matrix *m);
@@ -186,6 +188,8 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 	if (settings.size == 4) resize_term(15, 62);
 	else resize_term(18, 75);
 	unsigned int score = 0;
+	//char status;
+	//*m = loadGame(&score, &status); NE FUNKCIONISE, nisi napisao sta je status
 	*m = newMatrix(settings.size);
 	box(stdscr, 0, 0);
 	switch (rezim)
@@ -196,14 +200,15 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 			m->set[x / settings.size][x%settings.size] = 3;
 		}
 	case normal:
-		{history hist = newHistory(5, m);
+	{
+		history hist = newHistory(5, m);
 		state previous = getState(*m, 0);
+		mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score);
+		mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+		mvprintw(5, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni h za pomoc!");
+		mvprintw(6, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni u za undo!");
 		while (stayInMenu)
 		{
-			mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score);
-			mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
-			mvprintw(5, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni h za pomoc!");
-			mvprintw(6, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni u za undo!");
 			int h, valid_move = 1;
 			displayMatrix(0, -1, *m);
 			switch (getch())
@@ -232,16 +237,24 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 					pushHistory(&hist, previous);//Push(previous)
 				previous = getState(*m, score);
 				break;
-			case KEY_ESC:stayInMenu = 0; break;
+			case KEY_ESC:stayInMenu = 0; saveGame(*m, score); break;
 				case 'u': 
 					popHistory(&hist, &score);
 					previous = getState(*m, score);
 					displayMatrix(0, -1, *m); 
+					saveGame(*m, score);
 				break;
 				case 'h': showHint(m, 8, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0)); break;
 				case 'x':if(settings.mode==xtile)xTo2048(m); break;
 				case '2':if (settings.mode == normal)doubleDouble(m); score *= 2; break;
 				case 'f':if (settings.mode == normal)freeTwo(m); break;
+			}
+			mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score); refresh();
+			if (!checkGameOver(*m))
+			{
+				displayGameOver(3,0);
+				getHsc(score);
+				stayInMenu = 0;
 			}
 		}
 	freeState(&previous, m->size);
@@ -338,6 +351,28 @@ void showHint(matrix *m, int starty, int startx)
 	wgetch(hint);
 	werase(hint);
 	wrefresh(hint);
+}
+
+void getHsc(unsigned int score)
+{
+	WINDOW *highscore;
+	entry  player;
+	char playerName[50];
+	highscore = newwin(10, 25, 1, 25);
+	echo();
+	wattron(highscore, COLOR_PAIR(INTERFACE));
+	box(highscore, 0, 0);
+	mvwprintw(highscore, 1, 5, "UNOS REZULTATA");
+	mvwprintw(highscore, 3, 2, "REZULTAT: %u", score);
+	mvwprintw(highscore, 5, 2, "IME:");
+	mvwscanw(highscore, 5, 6, "%s", &playerName);
+	mvwprintw(highscore, 7, 2, " Pritisnite bilo koje");
+	mvwprintw(highscore, 8, 2, " dugme za nastavak!");
+	wattroff(highscore, COLOR_PAIR(INTERFACE));
+	wrefresh(highscore);
+	noecho();
+	player = newEntry(playerName, score);//Ivane vidi sta dalje treba da se radi sa ovim
+	getch();
 }
 
 int options(char *menu[])

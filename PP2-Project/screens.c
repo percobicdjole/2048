@@ -22,6 +22,20 @@ void display2048(int starty, int startx)
 	refresh();
 }
 
+void displayGameOver(int starty, int startx)
+{
+	resize_term(12, 81);
+	erase();
+	mvprintw(0 + starty, startx, "___oooo______ooo____ooo_____ooo_ooooooo_______oooo____oo____oo_ooooooo_ooooooo___");
+	mvprintw(1 + starty, startx, "_oo____oo__oo___oo__oooo___oooo_oo__________oo____oo__oo____oo_oo______oo____oo__");
+	mvprintw(2 + starty, startx, "oo________oo_____oo_oo_oo_oo_oo_oooo_______oo______oo_oo____oo_oooo____oo____oo__");
+	mvprintw(3 + starty, startx, "oo____ooo_ooooooooo_oo__ooo__oo_oo_________oo______oo__oo__oo__oo______ooooooo___");
+	mvprintw(4 + starty, startx, "_oo____oo_oo_____oo_oo_______oo_oo__________oo____oo____oooo___oo______oo____oo__");
+	mvprintw(5 + starty, startx, "___oooo___oo_____oo_oo_______oo_ooooooo_______oooo_______oo____ooooooo_oo_____oo_");
+	refresh();
+	_sleep(1000);
+}
+
 void splashScreen()
 {
 	init_pair(7, 15, 4);
