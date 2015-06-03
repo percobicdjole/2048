@@ -9,7 +9,7 @@ int options(char *menu[]);
 int swipe(matrix *M, int direction, unsigned int *score);
 void swipeNoAnimation(matrix *M, int direction, unsigned int *score);
 void showHint(matrix *m, int starty, int startx);
-void getHsc(unsigned int score);
+void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score);
 
 void xTo2048(matrix *m);
 void doubleDouble(matrix *m);
@@ -130,7 +130,9 @@ main()
 					case 3:stayInMenu = 0; break;
 			}
 			}stayInMenu = 1; break;
-			case 6:exit(0); break;
+			case 6:
+				exit(0);
+				break;
 		}
 		stayInMenu = 1;
 	}
@@ -183,14 +185,28 @@ void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
 	}
 }
 
+void showHSC(entry *score_list, unsigned int entry_count)
+{
+	int i;
+	for (i = 0; i < entry_count; i++)
+	{
+		//printf("&s:%d\n", score_list[i].name, score_list[i].score);
+	}
+}
+
 void game(matrix *m, enum rezim rezim, int stayInMenu)
 {
 	if (settings.size == 4) resize_term(15, 62);
 	else resize_term(18, 75);
-	unsigned int score = 0;
-	//char status;
-	//*m = loadGame(&score, &status); NE FUNKCIONISE, nisi napisao sta je status
+	unsigned int score = 0, entry_count, bit_check;
+	char status;
+	//*m = loadGame(&score, &status); //-- Vraca se gde je stao!
 	*m = newMatrix(settings.size);
+	entry *score_list = loadHsc(&entry_count, &bit_check);
+	if (score_list != NULL && bit_check == 0)
+	{
+		;//Greska (fajl je izmenjen vam programa)
+	}
 	box(stdscr, 0, 0);
 	switch (rezim)
 	{
@@ -234,15 +250,17 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 			case KEY_DOWN:
 				valid_move = swipe(m, DOWN, &score);
 				if (valid_move)
-					pushHistory(&hist, previous);//Push(previous)
+					pushHistory(&hist, previous);
 				previous = getState(*m, score);
 				break;
-			case KEY_ESC:stayInMenu = 0; saveGame(*m, score); break;
+			case KEY_ESC:
+					stayInMenu = 0; 
+					saveGame(*m, score);
+				break;
 				case 'u': 
 					popHistory(&hist, &score);
 					previous = getState(*m, score);
 					displayMatrix(0, -1, *m); 
-					saveGame(*m, score);
 				break;
 				case 'h': showHint(m, 8, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0)); break;
 				case 'x':if(settings.mode==xtile)xTo2048(m); break;
@@ -253,7 +271,8 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 			if (!checkGameOver(*m))
 			{
 				displayGameOver(3,0);
-				getHsc(score);
+				getHsc(&score_list, &entry_count, score);
+				saveHsc(score_list,entry_count);
 				stayInMenu = 0;
 			}
 		}
@@ -325,6 +344,7 @@ void game(matrix *m, enum rezim rezim, int stayInMenu)
 		break;
 	}
 	freeMatrix(m);
+	free(score_list);
 	erase();
 	resize_term(20, 100);
 	bkgd(COLOR_PAIR(INTERFACE)); refresh();
@@ -353,7 +373,7 @@ void showHint(matrix *m, int starty, int startx)
 	wrefresh(hint);
 }
 
-void getHsc(unsigned int score)
+void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score)
 {
 	WINDOW *highscore;
 	entry  player;
@@ -371,7 +391,8 @@ void getHsc(unsigned int score)
 	wattroff(highscore, COLOR_PAIR(INTERFACE));
 	wrefresh(highscore);
 	noecho();
-	player = newEntry(playerName, score);//Ivane vidi sta dalje treba da se radi sa ovim
+	player = newEntry(playerName, score);
+	addEntry(score_list, entry_count, player);
 	getch();
 }
 

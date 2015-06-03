@@ -6,18 +6,14 @@
 
 void cdcEntry(entry *E)
 {
+	checkMemError(E);
 	char *s = E->name;
 	while (*s)
 	{
 		*s ^= CHAR_MASK;
 		s++;
 	}
-	if (E)
-	{
-		E->score ^= INT_MASK;
-	}
-	//else
-		//Poruka o greski
+	E->score ^= INT_MASK;
 }
 
 void cdcInfo(file_info *inf)
@@ -61,11 +57,11 @@ entry newEntry(char *player_name, unsigned int score)
 void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 {
 	(*entry_count)++;
-	if (score_list)
+	if (*score_list)
 	{
 		unsigned int i = 0, mem;
 		entry *P = *score_list;
-		*score_list = realloc(*score_list, sizeof(entry)*(*entry_count));
+		*score_list = realloc(P, (sizeof(entry)*(*entry_count)));
 		checkMemError(score_list);
 		while (P[i].score > newScore.score  && i<entry_count)
 			i++;
@@ -131,6 +127,11 @@ entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check)
 		*bit_check = (inf.bit_count == readBits);
 		fclose(hsc_file);
 	}
+	else
+	{
+		*entry_conunt = 0;
+		*bit_check = 0;
+	}
 	return score_list;
 }
 
@@ -176,7 +177,7 @@ matrix loadGame(unsigned int *score, char *status)
 		fread(&N.size, sizeof(N.size), 1, svg);
 		N.size ^= CHAR_MASK;
 		readBits += countBits(N.size);
-		**M = malloc(N.size*sizeof(int*));
+		M = malloc(N.size*sizeof(int*));
 		checkMemError(M);
 		for (i = 0; i < N.size; i++)
 		{
