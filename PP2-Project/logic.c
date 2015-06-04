@@ -3,6 +3,7 @@
 #include <time.h>
 #include <string.h>
 #include "Logic.h"
+void checkMemError(void *new_pointer);
 
 //Postavljanje SEED-a
 void setSeed()
@@ -275,6 +276,7 @@ history newHistory(short undo_depth, matrix *M)
 	H.mat = M;
 	H.depth = undo_depth;
 	H.stack = malloc(undo_depth*sizeof(state));
+	checkMemError(H.stack);
 	for (i = 0; i < H.depth; i++)
 	{
 		H.stack[i].set = NULL;
