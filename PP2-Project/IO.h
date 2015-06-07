@@ -31,7 +31,7 @@ entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check);
 void saveGame(matrix M, unsigned int score);
 
 //Ucitava igru iz datoteke, vraca matricu ako je uspesno procitana
-matrix loadGame(unsigned int *score, char *status);
+int loadGame(matrix *Mp, unsigned int *score, unsigned int new_size);
 
 //Provera greske pri dodeli memorije
 void checkMemError(void *new_pointer);

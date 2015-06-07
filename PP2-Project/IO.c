@@ -60,8 +60,9 @@ void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 	if (*score_list)
 	{
 		unsigned int i = 0, mem;
-		entry *P = *score_list;
-		*score_list = realloc(P, (sizeof(entry)*(*entry_count)));
+		entry *P;
+		*score_list = realloc(*score_list, (sizeof(entry)*(*entry_count)));
+		P = *score_list;
 		checkMemError(score_list);
 		while (P[i].score > newScore.score  && i<entry_count)
 			i++;
@@ -103,6 +104,7 @@ void saveHsc(entry *score_list, unsigned int entry_count)
 entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check)
 {
 	FILE *hsc_file = fopen("hscore.dat", "rb");
+	//checkFileError(hsc_file);
 	entry *score_list = NULL;
 	if (hsc_file)
 	{
@@ -140,7 +142,7 @@ void saveGame(matrix M, unsigned int score)
 	int bit_count = 0, i, j, buffer;
 	char size = M.size ^ CHAR_MASK;
 	FILE *svg = fopen("savegame.dat", "wb");
-	checkFileError(svg);
+	//checkFileError(svg);
 	fseek(svg, sizeof(bit_count), SEEK_SET);
 	bit_count = countBits(score) + countBits(M.size);
 	score ^= INT_MASK;
@@ -160,13 +162,16 @@ void saveGame(matrix M, unsigned int score)
 	fclose(svg);
 }
 
-matrix loadGame(unsigned int *score, char *status)
+int loadGame(matrix *Mp, unsigned int *score, unsigned int new_size)
 {
 	FILE *svg = fopen("savegame.dat", "rb");
+	//checkFileError(svg);
+	Mp = malloc(sizeof(matrix));
+	checkMemError(Mp);
 	if (svg)
 	{
 		matrix N;
-		int i,j, **M;
+		int i, j, **M;
 		int expectBits, readBits, buffer;
 		readBits = 0;
 		fread(&expectBits, sizeof(expectBits), 1, svg);
@@ -192,14 +197,23 @@ matrix loadGame(unsigned int *score, char *status)
 			}
 		}
 		N.set = M;
-		*status = (readBits == expectBits);
-		return N;
+		if (readBits == expectBits)
+		{
+			*Mp = N;
+			return 2;
+		}
+		else
+		{
+			*Mp = newMatrix(new_size);
+			*score = 0;
+			return 1;
+		}
 	}
 	else
 	{
-		*status = 0;
+		*Mp = newMatrix(new_size);
 		*score = 0;
-		return newMatrix(4);
+		return 0;
 	}
 }
 
