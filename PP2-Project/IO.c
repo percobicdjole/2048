@@ -166,7 +166,6 @@ int loadGame(matrix *Mp, unsigned int *score, unsigned int new_size)
 {
 	FILE *svg = fopen("savegame.dat", "rb");
 	//checkFileError(svg);
-	Mp = malloc(sizeof(matrix));
 	checkMemError(Mp);
 	if (svg)
 	{

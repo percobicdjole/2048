@@ -215,7 +215,7 @@ void game(enum rezim rezim, int stayInMenu)
 	unsigned int score = 0, entry_count, bit_check;
 	char status;
 	//NOVO
-	matrix *m=NULL;
+	matrix *m = malloc(sizeof(matrix));
 	switch (loadGame(m, &score, settings.size))//-- Vraca se gde je stao!
 	{
 	case 0:
