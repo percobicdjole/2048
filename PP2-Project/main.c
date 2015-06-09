@@ -4,12 +4,13 @@
 #include "ai.h"
 #include "IO.h"
 
-void game(matrix *m, enum modes rezim, int stayInMenu);
+void game(enum modes rezim, int stayInMenu);
 int options(char *menu[]);
 int swipe(matrix *M, int direction, unsigned int *score);
 void swipeNoAnimation(matrix *M, int direction, unsigned int *score);
 void showHint(matrix *m, int starty, int startx);
 void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score);
+void msgBox(int starty, int startx, char text[30]);
 
 void xTo2048(matrix *m);
 void doubleDouble(matrix *m);
@@ -26,8 +27,6 @@ struct settings
 
 main()
 {
-	matrix m;
-
 	char *mainMenu[] = {
 		"Igraj",
 		"Rezim",
@@ -100,7 +99,7 @@ main()
 		display2048(0, 20);
 		switch (menu(mainMenu,0,0))
 		{
-			case 1: erase(); game(&m, settings.mode, stayInMenu); break;
+			case 1: erase(); game(settings.mode, stayInMenu); break;
 			case 2: switch (menu(modesMenu, 0, 0))
 			{
 				case 1:settings.mode = normal; break;
@@ -194,14 +193,43 @@ void showHSC(entry *score_list, unsigned int entry_count)
 	}
 }
 
-void game(matrix *m, enum rezim rezim, int stayInMenu)
+void msgBox(int starty, int startx, char text[30])
+{
+	WINDOW *message;
+	cbreak();
+	message = newwin(5, 40, starty, startx);
+	keypad(message, TRUE);
+	wbkgd(message, COLOR_PAIR(INTERFACE));
+	box(message, 0, 0);
+	mvwaddstr(message, 2, 2, text);
+	wrefresh(message);
+	wgetch(message);
+	werase(message);
+	wrefresh(message);
+}
+
+void game(enum rezim rezim, int stayInMenu)
 {
 	if (settings.size == 4) resize_term(15, 62);
 	else resize_term(18, 75);
 	unsigned int score = 0, entry_count, bit_check;
 	char status;
-	//*m = loadGame(&score, &status); //-- Vraca se gde je stao!
-	*m = newMatrix(settings.size);
+	//NOVO
+	matrix *m=NULL;
+	switch (loadGame(m, &score, settings.size))//-- Vraca se gde je stao!
+	{
+	case 0:
+		msgBox(2, 2, "Ne postoji savegame!");
+		break;
+	case 1:
+		msgBox(2, 2, "Postoji savegame ali nije ispravan!");
+		break;
+	case 2:
+		msgBox(2, 5, "Uspesan loadgame!");
+		break;
+	}
+	//Ne vraca se m
+	//NOVO
 	entry *score_list = loadHsc(&entry_count, &bit_check);
 	if (score_list != NULL && bit_check == 0)
 	{
