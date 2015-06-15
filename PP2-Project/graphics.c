@@ -97,42 +97,124 @@ mystrcpy(char dest[], char src[])
 void initiateThemes()
 {
 	//crvena
-	crvena.first = 4;   //2	
-	crvena.second = 12;  //4-16	  
-	crvena.third = 5;   //32-64
-	crvena.fourth = 13; //128-256
-	crvena.fifth = 8;  //512-2048
-	crvena.interfaceColor = 12;
+	crvena.first.color = 4;   //2	
+	crvena.first.contrast = 15;
+	
+	crvena.second.color = 12;  //4-16
+	crvena.second.contrast = 15;
+
+	crvena.third.color = 5;   //32-64
+	crvena.third.contrast = 14;
+
+	crvena.fourth.color = 13; //128-256
+	crvena.fourth.contrast = 14;
+
+	crvena.fifth.color = 12;  //512-2048
+	crvena.fifth.contrast = 11;
+
+	crvena.interface.color = 4;
+	crvena.interface.contrast = 7;
+
 	mystrcpy(crvena.name, "crvena");
 	
 	//plava
-	plava.first = 1;   //2	
-	plava.second = 9;  //4-16	  
-	plava.third = 3;   //32-64
-	plava.fourth = 11; //128-256
-	plava.fifth = 8;  //512-2048
-	plava.interfaceColor = 9;
+	plava.first.color = 1;   //2	
+	plava.first.contrast = 15;
+
+	plava.second.color = 9;  //4-16
+	plava.second.contrast = 15;
+
+	plava.third.color = 3;   //32-64
+	plava.third.contrast = 13;
+
+	plava.fourth.color = 11; //128-256
+	plava.fourth.contrast = 0;
+
+	plava.fifth.color = 10;  //512-2048
+	plava.fifth.contrast = 14;
+
+	plava.interface.color = 9;
+	plava.interface.contrast = 7;
+
 	mystrcpy(plava.name, "plava");
 
 	//zelena
-	zelena.first = 2;   //2	
-	zelena.second = 10;  //4-16	  
-	zelena.third = 5;   //32-64
-	zelena.fourth = 13; //128-256
-	zelena.fifth = 8;  //512-2048
-	zelena.interfaceColor = 10;
+	zelena.first.color = 2;   //2	
+	zelena.first.contrast = 0;
+
+	zelena.second.color = 10;  //4-16
+	zelena.second.contrast = 0;
+
+	zelena.third.color = 3;   //32-64
+	zelena.third.contrast = 0;
+
+	zelena.fourth.color = 11; //128-256
+	zelena.fourth.contrast = 0;
+
+	zelena.fifth.color = 10;  //512-2048
+	zelena.fifth.contrast = 12;
+
+	zelena.interface.color = 10;
+	zelena.interface.contrast = 0;
+
 	mystrcpy(zelena.name, "zelena");
+
+	//zuta
+	zuta.first.color = 6;   //2	
+	zuta.first.contrast = 0;
+
+	zuta.second.color = 14;  //4-16
+	zuta.second.contrast = 0;
+
+	zuta.third.color = 4;   //32-64
+	zuta.third.contrast = 14;
+
+	zuta.fourth.color = 12; //128-256
+	zuta.fourth.contrast = 0;
+
+	zuta.fifth.color = 14;  //512-2048
+	zuta.fifth.contrast = 9;
+
+	zuta.interface.color = 14;
+	zuta.interface.contrast = 0;
+
+	mystrcpy(zuta.name, "zuta");
+
+	//bios
+	BIOS.first.color = 6;   //2	
+	BIOS.first.contrast = 9;
+
+	BIOS.second.color = 14;  //4-16
+	BIOS.second.contrast = 9;
+
+	BIOS.third.color = 14;   //32-64
+	BIOS.third.contrast = 4;
+
+	BIOS.fourth.color = 14; //128-256
+	BIOS.fourth.contrast = 12;
+
+	BIOS.fifth.color = 11;  //512-2048
+	BIOS.fifth.contrast = 12;
+
+	BIOS.interface.color = 14;
+	BIOS.interface.contrast = 9;
+
+	mystrcpy(BIOS.name, "BIOS");
 }
 
 void intiateColors(theme tema)
 {
 	init_pair(BW, COLOR_BLACK, WHITE);
-	init_pair(FIRST, WHITE, tema.first);
-	init_pair(SECOND, WHITE, tema.second);
-	init_pair(THIRD, WHITE, tema.third);
-	init_pair(FOURTH, WHITE, tema.fourth);
-	init_pair(FIFTH, WHITE, tema.fifth);
-	init_pair(INTERFACE, tema.interfaceColor, 0);//za tekst
+	init_pair(FIRST, tema.first.contrast, tema.first.color);
+	init_pair(SECOND, tema.second.contrast, tema.second.color);
+	init_pair(THIRD, tema.third.contrast, tema.third.color);
+	init_pair(FOURTH, tema.fourth.contrast, tema.fourth.color);
+	init_pair(FIFTH, tema.fifth.contrast, tema.fifth.color);
+	init_pair(INTERFACE, tema.interface.color, tema.interface.contrast);//za tekst
+
+	//init_pair(INTERFACE, 3, 7);//za tekst
+
+	init_pair(8, tema.interface.color, tema.interface.color);//za digitalni displej
 }
 
 int menu(char *choices[], int starty, int startx)
@@ -193,4 +275,94 @@ void printMenu(WINDOW *menu_win, char *choices[], int n_choices, int highlight)
 		++y;
 	}
 	wrefresh(menu_win);
+}
+
+void displayNumber(int starty, int startx, int number)
+{	
+	int endx = 30;
+	WINDOW *score;
+	score = newwin(5, 30, starty, startx);
+	werase(score);
+	wbkgd(score, COLOR_PAIR(INTERFACE));
+	int space = -5;
+	wattron(score,COLOR_PAIR(8));
+	while (number)
+	{
+		switch (number % 10)
+		{
+			case 0:
+				mvwprintw(score,0, endx + space, "xxxx");
+				for (int i = 1; i <= 3; i++)mvwprintw(score,i, endx + space, "x");
+				for (int i = 1; i <= 3; i++)mvwprintw(score,i, 3 + endx + space, "x");
+				mvwprintw(score,4, endx + space, "xxxx");
+			break;
+			case 1:
+				mvwprintw(score,0, endx + space, "xxx");
+				for (int i = 1; i <= 3; i++)mvwprintw(score,i, 1 + endx + space, "xx");
+				mvwprintw(score,4, endx + space, "xxxx");
+			break;
+			case 2:
+				mvwprintw(score,0, endx + space,"xxxx");
+				mvwprintw(score,1, 3 + endx + space, "x");
+				mvwprintw(score,2, endx + space, "xxxx");
+				mvwprintw(score,3, endx + space, "x");
+				mvwprintw(score,4, endx + space, "xxxx");
+			break;
+			case 3:
+				mvwprintw(score,0, endx + space,     "xxxx");
+				mvwprintw(score,1, 3 + endx + space, "x");
+				mvwprintw(score,2, endx + space, "xxxx");
+				mvwprintw(score,3, 3 + endx + space, "x");
+				mvwprintw(score,4, endx + space, "xxxx");
+			break;
+			case 4:
+				for (int i = 0; i <= 4; i++)mvwprintw(score,i, 3 + endx + space, "x");
+				for (int i = 0; i <= 1; i++)mvwprintw(score,i, endx + space, "x");
+				mvwprintw(score,2, endx + space, "xxx");
+			break;
+			case 5:
+				mvwprintw(score,0, endx + space,     "xxxx");
+				mvwprintw(score,1, endx + space, "x");
+				mvwprintw(score,2, endx + space, "xxxx");
+				mvwprintw(score,3, 3 + endx + space, "x");
+				mvwprintw(score,4, endx + space, "xxxx");
+			break;
+			case 6:
+				mvwprintw(score,0, endx + space,   "xxxx");
+				mvwprintw(score,1, endx + space, "x");
+				mvwprintw(score,2, endx + space, "xxxx");
+				mvwprintw(score,3, endx + space, "x");
+				mvwprintw(score,3, 3 + endx + space, "x");
+				mvwprintw(score,4, endx + space, "xxxx");
+			break;
+			case 7:
+				mvwprintw(score,0, endx + space,     "xxxx");
+				mvwprintw(score,1, 3 + endx + space, "x");
+				mvwprintw(score,2, 1 + endx + space, "xxx");
+				mvwprintw(score,3, 2 + endx + space, "x");
+				mvwprintw(score,4, 2 + endx + space, "x");		
+			break;
+			case 8:
+				mvwprintw(score,0, endx + space,     "xxxx");
+				mvwprintw(score,1, endx + space, "x");
+				mvwprintw(score,1, 3 + endx + space, "x");
+				mvwprintw(score,2, endx + space, "xxxx");
+				mvwprintw(score,3, endx + space, "x");
+				mvwprintw(score,3, 3 + endx + space, "x");
+				mvwprintw(score,4, endx + space, "xxxx");
+			break;
+			case 9:
+				mvwprintw(score,0, endx + space,     "xxxx");
+				mvwprintw(score,1, endx + space, "x");
+				mvwprintw(score,1, 3 + endx + space, "x");
+				mvwprintw(score,2, endx + space, "xxxx");
+				mvwprintw(score,3, 3 + endx + space, "x");
+				mvwprintw(score,4, endx + space, "xxxx");
+			break;
+		}
+		number /= 10;
+		space -= 5;
+	}
+	wrefresh(score);
+	wattroff(score,COLOR_PAIR(8));
 }

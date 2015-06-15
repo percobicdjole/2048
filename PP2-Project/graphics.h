@@ -1,12 +1,17 @@
 #include <curses.h> 
 
+struct colorComposition
+{
+	unsigned char color, contrast;
+};
+
 typedef struct theme
 {
-	unsigned char first, second, third, fourth, fifth, interfaceColor;
+	struct colorComposition first, second, third, fourth, fifth, interface;
 	char name[10];
 }theme;
 
-theme crvena, zelena, plava;
+theme crvena, zelena, plava, zuta, BIOS;
 
 //MATRIX PARAMETERS
 #define HEIGHT 3//visina jednog polja, 3 reda
@@ -30,4 +35,4 @@ void displayMatrix();//ne dozvoljava mi da koristim matrix type ovde!! nije odgo
 unsigned char colorOfNumber(unsigned short x);//vraca boju odredjenog broja
 void printMenu(WINDOW *menu_win, char *choices[], int n_choices, int highlight);//ispisuje menu
 int menu(char *choices[], int starty, int startx);
-
+void displayNumber(int starty, int startx, int number);

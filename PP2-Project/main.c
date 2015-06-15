@@ -1,4 +1,3 @@
-//Probna verzija igre
 #include "logic.h"
 #include "graphics.h"
 #include "ai.h"
@@ -15,7 +14,6 @@ void msgBox(int starty, int startx, char text[30]);
 void xTo2048(matrix *m);
 void doubleDouble(matrix *m);
 void freeTwo(matrix *m);
-
 enum modes {normal, xtile, speed, autoplay, autoplayx};
 
 struct settings
@@ -32,6 +30,7 @@ main()
 		"Rezim",
 		"Opcije",
 		"Uputstvo",
+		"Tabela",
 		"O autorima",
 		"Izlaz",
 		NULL
@@ -49,7 +48,6 @@ main()
 	char *optionsMenu[] = {
 		"Dimenzije",
 		"Tema",
-	//	"Pozadina",
 		"Nazad",
 		NULL
 	};
@@ -63,9 +61,11 @@ main()
 
 	char *themesMenu[] =
 	{
-		"Plava",
-		"Crvena",
-		"Zelena",
+		"Plava - SVETLA",
+		"Crvena - SVETLA",
+		"Zelena - TAMNA",
+		"Zuta - TAMNA",
+		"BIOS - Sta reci?",
 		NULL
 	};
 
@@ -86,16 +86,20 @@ main()
 	//Podrazumevana settings
 	settings.mode = normal;
 	settings.size = 4;
-	settings.theme = zelena;
+	settings.theme = BIOS;
 	//
 	
 	intiateColors(settings.theme);
 
 	setSeed();
 	resize_term(20, 100);
-	bkgd(COLOR_PAIR(INTERFACE)); refresh();
+
 	while (stayInMenu)
 	{
+		
+		clear();
+		bkgd(COLOR_PAIR(INTERFACE));
+		refresh();
 		display2048(0, 20);
 		switch (menu(mainMenu,0,0))
 		{
@@ -125,11 +129,16 @@ main()
 						case 1:settings.theme = plava; break;
 						case 2:settings.theme = crvena; break;
 						case 3:settings.theme = zelena; break;
+						case 4:settings.theme = zuta; break;
+						case 5:settings.theme = BIOS; break;
 					}intiateColors(settings.theme); break;
 					case 3:stayInMenu = 0; break;
 			}
 			}stayInMenu = 1; break;
-			case 6:
+			case 5:
+				break;
+			
+			case 7:
 				exit(0);
 				break;
 		}
@@ -184,16 +193,25 @@ void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
 	}
 }
 
-void showHSC(entry *score_list, unsigned int entry_count)
+void DisplayHSC(entry *score_list, unsigned int entry_count)
 {
 	int i;
+	resize_term(13, 60);
+	box(stdscr, 0, 0);
+	mvprintw(1, getmaxx(stdscr) / 6, "MESTO"); mvprintw(1, getmaxx(stdscr) * 3 / 7, "IME"); mvprintw(1, getmaxx(stdscr)*2/3, "REZULTAT");
 	for (i = 0; i < entry_count; i++)
 	{
-		//printf("&s:%d\n", score_list[i].name, score_list[i].score);
+		for (int i = 0; i < entry_count; i++)
+		{
+			mvprintw(i + 2, getmaxx(stdscr) / 6 + 2, "%d.", i + 1);
+			mvprintw(i + 2, getmaxx(stdscr) *3 / 7, "%s", score_list[i].name);
+			mvprintw(i + 2, getmaxx(stdscr) * 2 / 3 + 2, "%u", score_list[i].score);
+		}
+		refresh();
 	}
 }
 
-void msgBox(int starty, int startx, char text[30])
+void msgBox(int starty, int startx, char text[25])
 {
 	WINDOW *message;
 	cbreak();
@@ -201,7 +219,7 @@ void msgBox(int starty, int startx, char text[30])
 	keypad(message, TRUE);
 	wbkgd(message, COLOR_PAIR(INTERFACE));
 	box(message, 0, 0);
-	mvwaddstr(message, 2, 2, text);
+	mvwaddstr(message, 2, (40-strlen(text))/2, text);
 	wrefresh(message);
 	wgetch(message);
 	werase(message);
@@ -212,30 +230,68 @@ void game(enum rezim rezim, int stayInMenu)
 {
 	if (settings.size == 4) resize_term(15, 62);
 	else resize_term(18, 75);
-	unsigned int score = 0, entry_count, bit_check;
+	box(stdscr, 0, 0);
+
+	unsigned int score, entry_count, bit_check;
+	
 	char status;
-	//NOVO
+	
 	matrix *m = malloc(sizeof(matrix));
-	switch (loadGame(m, &score, settings.size))//-- Vraca se gde je stao!
+	if (settings.mode == normal)
 	{
-	case 0:
-		msgBox(2, 2, "Ne postoji savegame!");
-		break;
-	case 1:
-		msgBox(2, 2, "Postoji savegame ali nije ispravan!");
-		break;
-	case 2:
-		msgBox(2, 5, "Uspesan loadgame!");
-		break;
+		switch (loadGame(m, &score, settings.size))
+		{
+		case 1:
+			msgBox((getmaxy(stdscr) - 5) / 2, (getmaxx(stdscr) - 40) / 2, "Savegame nije ispravan!");
+			remove("savegame.dat");
+			break;
+		case 2:
+			mvprintw((getmaxy(stdscr) - 5) / 2, (getmaxx(stdscr) - 23) / 2, "Da li zelite novu igru?");
+			_Bool highlight = 0;
+			_Bool stay = 1;
+			while (stay)
+			{
+				if (highlight)
+				{
+					attron(A_REVERSE);
+					mvprintw((getmaxy(stdscr) - 5) / 2 + 3, (getmaxx(stdscr) + 11) / 2, "DA");
+					attroff(A_REVERSE);
+					mvprintw((getmaxy(stdscr) - 5) / 2 + 3, (getmaxx(stdscr) - 11) / 2, "NE");
+				}
+				else
+				{
+					mvprintw((getmaxy(stdscr) - 5) / 2 + 3, (getmaxx(stdscr) + 11) / 2, "DA");
+					attron(A_REVERSE);
+					mvprintw((getmaxy(stdscr) - 5) / 2 + 3, (getmaxx(stdscr) - 11) / 2, "NE");
+					attroff(A_REVERSE);
+				}
+				switch (getch())
+				{
+				case KEY_LEFT:case KEY_RIGHT: highlight = !highlight; break;
+				case 10: stay = 0; break;
+				}
+			}
+			clear();
+			switch (highlight)
+			{
+				case 0:msgBox((getmaxy(stdscr) - 5) / 2, (getmaxx(stdscr) - 40) / 2, "Uspesan loadgame!");break;//dobro centriranje
+				case 1:*m = newMatrix(settings.size); score = 0; break;
+			}
+			break;
+		}
+
 	}
-	//Ne vraca se m
-	//NOVO
+	else{ *m = newMatrix(settings.size); score = 0; }
+
+	box(stdscr, 0, 0);
+	
 	entry *score_list = loadHsc(&entry_count, &bit_check);
 	if (score_list != NULL && bit_check == 0)
 	{
 		;//Greska (fajl je izmenjen vam programa)
 	}
-	box(stdscr, 0, 0);
+	
+
 	switch (rezim)
 	{
 	case xtile:
@@ -247,10 +303,11 @@ void game(enum rezim rezim, int stayInMenu)
 	{
 		history hist = newHistory(5, m);
 		state previous = getState(*m, 0);
-		mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score);
-		mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
-		mvprintw(5, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni h za pomoc!");
-		mvprintw(6, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni u za undo!");
+		mvprintw(1, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT:");
+		mvprintw(10, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+		mvprintw(11, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni h za pomoc!");
+		mvprintw(12, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni u za undo!");
+		displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), score);
 		while (stayInMenu)
 		{
 			int h, valid_move = 1;
@@ -295,13 +352,16 @@ void game(enum rezim rezim, int stayInMenu)
 				case '2':if (settings.mode == normal)doubleDouble(m); score *= 2; break;
 				case 'f':if (settings.mode == normal)freeTwo(m); break;
 			}
-			mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score); refresh();
+			displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), score);
 			if (!checkGameOver(*m))
 			{
 				displayGameOver(3,0);
 				getHsc(&score_list, &entry_count, score);
 				saveHsc(score_list,entry_count);
 				stayInMenu = 0;
+				clear();
+				DisplayHSC(score_list, entry_count);
+				getch();
 			}
 		}
 	freeState(&previous, m->size);
@@ -315,11 +375,13 @@ void game(enum rezim rezim, int stayInMenu)
 	}
 	case autoplay:
 		halfdelay(1);
-		mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+		mvprintw(10, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+		mvprintw(1, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT:");
+		displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), score);
 		displayMatrix(0, -1, *m);
 		while (stayInMenu)
 		{
-			mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score);
+			displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), score);
 			switch (get_hint(*m))
 			{
 			case LEFT:
@@ -345,7 +407,7 @@ void game(enum rezim rezim, int stayInMenu)
 			if (getch() == KEY_ESC)stayInMenu = 0, writeAIstats(*m);
 		}
 	case speed:
-		while (stayInMenu)
+		while (stayInMenu)//DA ZAVRSIM
 		{
 			mvprintw(2, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT: %d", score);
 			mvprintw(4, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
@@ -409,6 +471,7 @@ void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score)
 	highscore = newwin(10, 25, 1, 25);
 	echo();
 	wattron(highscore, COLOR_PAIR(INTERFACE));
+	wbkgd(highscore, COLOR_PAIR(INTERFACE));
 	box(highscore, 0, 0);
 	mvwprintw(highscore, 1, 5, "UNOS REZULTATA");
 	mvwprintw(highscore, 3, 2, "REZULTAT: %u", score);
