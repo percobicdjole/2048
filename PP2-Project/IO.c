@@ -64,7 +64,7 @@ void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 		*score_list = realloc(*score_list, (sizeof(entry)*(*entry_count)));
 		P = *score_list;
 		checkMemError(score_list);
-		while (P[i].score > newScore.score  && i<entry_count)//OVDE PUCA KAD JE SKOR NULA
+		while (P[i].score > newScore.score  && i < *entry_count-1)//OVDE PUCA KAD JE SKOR NULA
 			i++;
 		P += i;
 		mem = (*entry_count - (i + 1))*(sizeof(entry));
