@@ -265,3 +265,32 @@ void writeAIstats(matrix M)
 	}
 	fclose(stats);
 }
+
+int findCode(char *cheats[], char *buffer, int prev_code)
+{
+	/*
+		Povratne vrednosti:
+		-1: Ne postoji string ili se ne poklapa
+		-2: string se poklopio, treba da se izvrsi cheat sa indeksom prev_code
+		0 ili vise: string se za sada poklapa sa ocekivanim
+	*/
+	int code;
+	int n = strlen(buffer);
+	if (n == 0)
+		return -1;
+	if (n == 1)
+	{
+		for (code = 0; *cheats; code++)
+		{
+			if (*cheats == *buffer)
+				return code;
+		}
+		return -1;
+	}
+	if (strncmp(cheats[prev_code], buffer, n) == 0)
+	{
+		if (n == strlen(cheats[prev_code]))
+			return -2;
+		return prev_code;
+	}
+}
