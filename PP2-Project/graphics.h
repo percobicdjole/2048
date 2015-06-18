@@ -26,6 +26,7 @@ theme crvena, zelena, plava, zuta, BIOS;
 #define FOURTH 4
 #define FIFTH 5
 #define INTERFACE 6
+#define DIGITAL 7
 #define WHITE 15
 
 void colorPalette();//paletu boja prikazuje funkcija colorPalette

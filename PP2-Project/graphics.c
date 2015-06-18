@@ -1,66 +1,57 @@
 #include "graphics.h"
 #include "logic.h"
 
-void displayMatrix(int startx, int starty, matrix m)//dodati opciju za x tile
+void displayMatrix(int starty, int startx, matrix m)//dodati opciju za x tile
 {
+	WINDOW *matrica = newwin(m.size*HEIGHT, m.size*WIDTH, starty, startx);
 	for (int i = 0; i < m.size; i++)
 	{
 		for (int j = 0; j < m.size; j++)
-		{
-			
-			if (m.set[i][j] == 3)
+		{	
+			if (m.set[i][j])
 			{
-				attron(COLOR_PAIR(0) | A_REVERSE);
-				for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
+				unsigned char boja = colorOfNumber(m.set[i][j]);
+				wattron(matrica, COLOR_PAIR(boja));
+				if (m.set[i][j] == 3)wattron(matrica, getattrs(matrica) | A_REVERSE);
+
+				//FARBA PLOCICU
+				for (int k = i*HEIGHT; k < (i+1) * HEIGHT; k++)
 				{
-					for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(starty + k + 2, startx + l + 1, " ");
+					for (int l = j*WIDTH; l < (j+1) * WIDTH; l++)mvwprintw(matrica, k, l, " ");
 				}
-				mvprintw((i + 1) * HEIGHT + starty, (j + 1) * 4 + 3 * j + startx, "X");
-				attroff(COLOR_PAIR(0) | A_REVERSE);
+				//
+
+				//ISPISUJE BROJ ILI X
+				if (m.set[i][j] == 3) mvwprintw(matrica, i * HEIGHT + HEIGHT/2, j * WIDTH + WIDTH/2, "X");
+				else
+				{
+					int x = j * WIDTH + WIDTH / 2;
+					if (m.set[i][j] >= 100 && m.set[i][j] < 1000)			x -= 1;
+					else if (m.set[i][j] >= 1000)							x -= 2;
+					mvwprintw(matrica, i * HEIGHT + HEIGHT / 2, x, "%d", m.set[i][j]);
+				}
+				//
+				wattroff(matrica, getattrs(matrica));
 			}
 			else
 			{
-				if (m.set[i][j])
+				wattron(matrica, COLOR_PAIR(INTERFACE));
+				for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
 				{
-					unsigned char boja = colorOfNumber(m.set[i][j]);
-					attron(COLOR_PAIR(boja));
-
-					for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
-					{
-						for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2 + starty, l + 1 + startx, " ");
-					}
-
-					{
-						unsigned char y, x;
-						y = (i + 1) * HEIGHT;
-						if (m.set[i][j] < 100)									x = (j + 1) * 4 + 3 * j;
-						else if (m.set[i][j] >= 100 && m.set[i][j] < 1000)		x = (j + 1) * 4 + 3 * j - 1;
-						else if (m.set[i][j] >= 1000)							x = (j + 1) * 4 + 3 * j - 2;
-						mvprintw(y+starty, x+startx, "%d", m.set[i][j]);
-					}
-
-					attroff(COLOR_PAIR(boja));
+					for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvwprintw(matrica, k, l, " ");
 				}
-				else
-				{
-					attron(COLOR_PAIR(BW));
-					for (int k = i*HEIGHT; k < (i + 1) * HEIGHT; k++)
-					{
-						for (int l = j*WIDTH; l < (j + 1) * WIDTH; l++)mvprintw(k + 2+starty, l + 1+startx, " ");
-					}
-					mvprintw((i + 1) * HEIGHT+starty, (j + 1) * 4 + 3 * j+startx, ".");
-					attroff(COLOR_PAIR(BW));
-				}
+				mvwprintw(matrica, i * HEIGHT + HEIGHT / 2, j * WIDTH + WIDTH / 2, ".");
+				wattroff(matrica, COLOR_PAIR(INTERFACE));
 			}
 		}
 	}
-
-	refresh();
+	wrefresh(matrica);
+	delwin(matrica);
 }
 
 unsigned char colorOfNumber(unsigned short x)
 {
-	if (x == 2)					    return FIRST;
+	if (x < 4)					    return FIRST;
 	else if (x >= 4 && x <= 16)     return SECOND;
 	else if (x >= 32 && x <= 64)    return THIRD;
 	else if (x >= 128 && x <= 256)  return FOURTH;
@@ -90,7 +81,6 @@ mystrcpy(char dest[], char src[])
 		dest[i] = src[i];
 		i++;
 	}
-
 	dest[i] = '\0';
 }
 
@@ -211,10 +201,7 @@ void intiateColors(theme tema)
 	init_pair(FOURTH, tema.fourth.contrast, tema.fourth.color);
 	init_pair(FIFTH, tema.fifth.contrast, tema.fifth.color);
 	init_pair(INTERFACE, tema.interface.color, tema.interface.contrast);//za tekst
-
-	//init_pair(INTERFACE, 3, 7);//za tekst
-
-	init_pair(8, tema.interface.color, tema.interface.color);//za digitalni displej
+	init_pair(DIGITAL, tema.interface.color, tema.interface.color);//za digitalni displej
 }
 
 int menu(char *choices[], int starty, int startx)
@@ -285,8 +272,15 @@ void displayNumber(int starty, int startx, int number)
 	werase(score);
 	wbkgd(score, COLOR_PAIR(INTERFACE));
 	int space = -5;
-	wattron(score,COLOR_PAIR(8));
-	while (number)
+	wattron(score,COLOR_PAIR(DIGITAL));
+	if (number == 0)
+	{
+		mvwprintw(score, 0, endx + space, "xxxx");
+		for (int i = 1; i <= 3; i++)mvwprintw(score, i, endx + space, "x");
+		for (int i = 1; i <= 3; i++)mvwprintw(score, i, 3 + endx + space, "x");
+		mvwprintw(score, 4, endx + space, "xxxx");
+	}
+	else while (number)
 	{
 		switch (number % 10)
 		{
@@ -364,5 +358,6 @@ void displayNumber(int starty, int startx, int number)
 		space -= 5;
 	}
 	wrefresh(score);
-	wattroff(score,COLOR_PAIR(8));
+	wattroff(score,DIGITAL);
+	delwin(score);
 }
