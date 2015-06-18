@@ -276,14 +276,14 @@ int findCode(char *cheats[], char *buffer, int prev_code)
 	*/
 	int code;
 	int n = strlen(buffer);
-	if (n == 0)
-		return -1;
 	if (n == 1)
 	{
-		for (code = 0; *cheats; code++)
+		code = 0;
+		while (cheats[code])
 		{
-			if (*cheats == *buffer)
+			if (cheats[code][0] == *buffer)
 				return code;
+			code++;
 		}
 		return -1;
 	}
@@ -293,4 +293,6 @@ int findCode(char *cheats[], char *buffer, int prev_code)
 			return -2;
 		return prev_code;
 	}
+	else
+		return -1;
 }

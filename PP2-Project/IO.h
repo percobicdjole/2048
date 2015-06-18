@@ -41,3 +41,6 @@ void checkFileError(FILE *file_pointer);
 
 //Upisuje podatke o AI statistici
 void writeAIstats(matrix M);
+
+//Detektuje cheat za dati string
+int findCode(char *cheats[], char *buffer, int prev_code);

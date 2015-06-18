@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 
 void game(enum modes rezim, int stayInMenu);
 int options(char *menu[]);
@@ -14,6 +15,7 @@ void showHint(matrix *m, int starty, int startx);
 void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score);
 void msgBox(int startx, char text[25]);
 
+void executeCheat(int code, int *score, matrix *m);
 void xTo2048(matrix *m);
 void doubleDouble(matrix *m);
 void freeTwo(matrix *m);
@@ -235,9 +237,11 @@ void game(enum rezim rezim, int stayInMenu)
 	box(stdscr, 0, 0);
 
 	unsigned int score, entry_count, bit_check;
-	
+	int code, c, prev_code;
 	char status;
-	
+	char *cheats[] = { "leavemealone","abrakadabra","zartozelite" ,NULL};
+	char buffer[20] = "";
+
 	matrix *m = malloc(sizeof(matrix));
 	if (settings.mode == normal)
 	{
@@ -305,6 +309,7 @@ void game(enum rezim rezim, int stayInMenu)
 	{
 		history hist = newHistory(5, m);
 		state previous = getState(*m, 0);
+		prev_code = code = -1;
 		mvprintw(1, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "REZULTAT:");
 		mvprintw(10, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
 		mvprintw(11, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni h za pomoc!");
@@ -315,7 +320,8 @@ void game(enum rezim rezim, int stayInMenu)
 		while (stayInMenu)
 		{
 			int valid_move = 1;
-			switch (getch())
+			c = getch();
+			switch (c)
 			{
 			case KEY_LEFT:
 				valid_move = swipe(m, LEFT, &score);
@@ -357,11 +363,26 @@ void game(enum rezim rezim, int stayInMenu)
 					mvprintw(12, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni CTRL + Z za undo!");
 					refresh();
 				break;
-				case 'x':if(settings.mode==xtile)xTo2048(m); break;
-				case '2':if (settings.mode == normal)doubleDouble(m); score *= 2; break;
-				case 'f':if (settings.mode == normal)freeTwo(m); break;
+				
+			}
+			if (isalpha((char)c))
+			{
+				strcat(buffer, &c);
+				code = findCode(cheats, buffer, prev_code);
+				if (code == -1)
+					strcpy(buffer, "");
+				if (code == -2)
+				{
+					executeCheat(prev_code, &score, m);
+					strcpy(buffer, "");
+				}
+				prev_code = code;
 			}
 			displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), score);
+			mvprintw(13, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "%s",buffer);
+			if (strcmp(buffer, "")==0)
+				mvprintw(13, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "            ");
+			displayMatrix(1, 1, *m);
 			if (!checkGameOver(*m))
 			{
 				displayGameOver(3,0);
@@ -625,34 +646,38 @@ int options(char *menu[])
 
 void xTo2048(matrix *m)
 {
-	for (int i = 0; i < settings.size; i++)
-		for (int j = 0; j < settings.size; j++)
+	int i, j;
+	for (i = 0; i < settings.size; i++)
+		for (j = 0; j < settings.size; j++)
 		{
 			if (m->set[i][j] == 3)
 			{
 				m->set[i][j] = 2048;
-				break;
+				return;
 			}
 		}
 }
 
 void doubleDouble(matrix *m)
 {
-	for (int i = 0; i < settings.size; i++)
-		for (int j = 0; j < settings.size; j++)
+	int i, j;
+	for (i = 0; i < settings.size; i++)
+		for (j = 0; j < settings.size; j++)
 		{
-			m->set[i][j] *= 2;
+			if (m->set[i][j]!=0)
+				m->set[i][j] <<= 1;
 		}
 }
 
 void freeTwo(matrix *m)
 {
-	int xmin, ymin, min;
-	for (int k = 0; k < 2; k++)
+	int xmin, ymin, min,i,j,k;
+	for (k = 0; k < 2; k++)
 	{
-		xmin = ymin = 0; min = 65536;
-		for (int i = 0; i < settings.size; i++)
-			for (int j = 0; j < settings.size; j++)
+		xmin = ymin = 0;
+		min = 65536;
+		for (i = 0; i < settings.size; i++)
+			for (j = 0; j < settings.size; j++)
 			{
 				if (m->set[i][j]!=0 && m->set[i][j] < min)
 				{
@@ -662,5 +687,29 @@ void freeTwo(matrix *m)
 				}
 			}
 		m->set[xmin][ymin] = 0;
+	}
+}
+
+void executeCheat(int code, int *score, matrix *m)
+{
+	switch (code)
+	{
+	case 0:
+		if (settings.mode == xtile)
+			xTo2048(m);
+		break;
+	case 1:
+		if (settings.mode == normal)
+		{
+			doubleDouble(m);
+			if (*score == 0)
+				(*score)++;
+			*score *= 2;
+		}
+		break;
+	case 2:
+		if (settings.mode == normal)
+			freeTwo(m);
+		break;
 	}
 }
