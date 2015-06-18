@@ -345,7 +345,7 @@ void game(enum rezim rezim, int stayInMenu)
 					stayInMenu = 0; 
 					saveGame(*m, score);
 				break;
-				case 'u': 
+				case '\032':
 					popHistory(&hist, &score);
 					previous = getState(*m, score);
 					displayMatrix(1, 1, *m); 
@@ -354,7 +354,7 @@ void game(enum rezim rezim, int stayInMenu)
 					showHint(m, 8, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0)); 
 					mvprintw(10, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni ESC za meni!");
 					mvprintw(11, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni h za pomoc!");
-					mvprintw(12, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni u za undo!");
+					mvprintw(12, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), "Pritisni CTRL + Z za undo!");
 					refresh();
 				break;
 				case 'x':if(settings.mode==xtile)xTo2048(m); break;
