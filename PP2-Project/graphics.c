@@ -204,66 +204,6 @@ void intiateColors(theme tema)
 	init_pair(DIGITAL, tema.interface.color, tema.interface.color);//za digitalni displej
 }
 
-int menu(char *choices[], int starty, int startx)
-{
-	WINDOW *menu_win;
-	int highlight = 1, choice = 0, c, n_choices;
-	for (n_choices = 0; choices[n_choices]; n_choices++);
-	cbreak(); 
-	menu_win = newwin(20, 20, starty, startx);
-	keypad(menu_win, TRUE);
-	printMenu(menu_win, choices, n_choices, highlight);
-	while (TRUE)
-	{
-		c = wgetch(menu_win);
-		switch (c)
-		{
-		case KEY_UP:
-			if (highlight == 1)
-				highlight = n_choices;
-			else
-				--highlight;
-			break;
-		case KEY_DOWN:
-			if (highlight == n_choices)
-				highlight = 1;
-			else
-				++highlight;
-			break;
-		case 10:
-			choice = highlight;
-			break;
-		}
-		printMenu(menu_win, choices, n_choices, highlight);
-		if (choice != 0) 
-			break;
-	}
-	werase(menu_win);
-	wrefresh(menu_win);
-	return choice;
-}
-
-void printMenu(WINDOW *menu_win, char *choices[], int n_choices, int highlight)
-{
-	int x, y, i;
-	x = 3;
-	y = 2;
-	wbkgd(menu_win, COLOR_PAIR(INTERFACE));
-	box(menu_win, 0, 0);
-	for (i = 0; i < n_choices; ++i)
-	{
-		if (highlight == i + 1)
-		{
-			wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
-			mvwprintw(menu_win, y + i, x, "%s", choices[i]);
-			wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
-		}
-		else mvwprintw(menu_win, y + i, x, "%s", choices[i]);
-		++y;
-	}
-	wrefresh(menu_win);
-}
-
 void displayNumber(int starty, int startx, int number)
 {	
 	int endx = 30;
@@ -280,82 +220,85 @@ void displayNumber(int starty, int startx, int number)
 		for (int i = 1; i <= 3; i++)mvwprintw(score, i, 3 + endx + space, "x");
 		mvwprintw(score, 4, endx + space, "xxxx");
 	}
-	else while (number)
+	else
 	{
-		switch (number % 10)
+		while (number)
 		{
+			switch (number % 10)
+			{
 			case 0:
-				mvwprintw(score,0, endx + space, "xxxx");
-				for (int i = 1; i <= 3; i++)mvwprintw(score,i, endx + space, "x");
-				for (int i = 1; i <= 3; i++)mvwprintw(score,i, 3 + endx + space, "x");
-				mvwprintw(score,4, endx + space, "xxxx");
-			break;
+				mvwprintw(score, 0, endx + space, "xxxx");
+				for (int i = 1; i <= 3; i++)mvwprintw(score, i, endx + space, "x");
+				for (int i = 1; i <= 3; i++)mvwprintw(score, i, 3 + endx + space, "x");
+				mvwprintw(score, 4, endx + space, "xxxx");
+				break;
 			case 1:
-				mvwprintw(score,0, endx + space, "xxx");
-				for (int i = 1; i <= 3; i++)mvwprintw(score,i, 1 + endx + space, "xx");
-				mvwprintw(score,4, endx + space, "xxxx");
-			break;
+				mvwprintw(score, 0, endx + space, "xxx");
+				for (int i = 1; i <= 3; i++)mvwprintw(score, i, 1 + endx + space, "xx");
+				mvwprintw(score, 4, endx + space, "xxxx");
+				break;
 			case 2:
-				mvwprintw(score,0, endx + space,"xxxx");
-				mvwprintw(score,1, 3 + endx + space, "x");
-				mvwprintw(score,2, endx + space, "xxxx");
-				mvwprintw(score,3, endx + space, "x");
-				mvwprintw(score,4, endx + space, "xxxx");
-			break;
+				mvwprintw(score, 0, endx + space, "xxxx");
+				mvwprintw(score, 1, 3 + endx + space, "x");
+				mvwprintw(score, 2, endx + space, "xxxx");
+				mvwprintw(score, 3, endx + space, "x");
+				mvwprintw(score, 4, endx + space, "xxxx");
+				break;
 			case 3:
-				mvwprintw(score,0, endx + space,     "xxxx");
-				mvwprintw(score,1, 3 + endx + space, "x");
-				mvwprintw(score,2, endx + space, "xxxx");
-				mvwprintw(score,3, 3 + endx + space, "x");
-				mvwprintw(score,4, endx + space, "xxxx");
-			break;
+				mvwprintw(score, 0, endx + space, "xxxx");
+				mvwprintw(score, 1, 3 + endx + space, "x");
+				mvwprintw(score, 2, endx + space, "xxxx");
+				mvwprintw(score, 3, 3 + endx + space, "x");
+				mvwprintw(score, 4, endx + space, "xxxx");
+				break;
 			case 4:
-				for (int i = 0; i <= 4; i++)mvwprintw(score,i, 3 + endx + space, "x");
-				for (int i = 0; i <= 1; i++)mvwprintw(score,i, endx + space, "x");
-				mvwprintw(score,2, endx + space, "xxx");
-			break;
+				for (int i = 0; i <= 4; i++)mvwprintw(score, i, 3 + endx + space, "x");
+				for (int i = 0; i <= 1; i++)mvwprintw(score, i, endx + space, "x");
+				mvwprintw(score, 2, endx + space, "xxx");
+				break;
 			case 5:
-				mvwprintw(score,0, endx + space,     "xxxx");
-				mvwprintw(score,1, endx + space, "x");
-				mvwprintw(score,2, endx + space, "xxxx");
-				mvwprintw(score,3, 3 + endx + space, "x");
-				mvwprintw(score,4, endx + space, "xxxx");
-			break;
+				mvwprintw(score, 0, endx + space, "xxxx");
+				mvwprintw(score, 1, endx + space, "x");
+				mvwprintw(score, 2, endx + space, "xxxx");
+				mvwprintw(score, 3, 3 + endx + space, "x");
+				mvwprintw(score, 4, endx + space, "xxxx");
+				break;
 			case 6:
-				mvwprintw(score,0, endx + space,   "xxxx");
-				mvwprintw(score,1, endx + space, "x");
-				mvwprintw(score,2, endx + space, "xxxx");
-				mvwprintw(score,3, endx + space, "x");
-				mvwprintw(score,3, 3 + endx + space, "x");
-				mvwprintw(score,4, endx + space, "xxxx");
-			break;
+				mvwprintw(score, 0, endx + space, "xxxx");
+				mvwprintw(score, 1, endx + space, "x");
+				mvwprintw(score, 2, endx + space, "xxxx");
+				mvwprintw(score, 3, endx + space, "x");
+				mvwprintw(score, 3, 3 + endx + space, "x");
+				mvwprintw(score, 4, endx + space, "xxxx");
+				break;
 			case 7:
-				mvwprintw(score,0, endx + space,     "xxxx");
-				mvwprintw(score,1, 3 + endx + space, "x");
-				mvwprintw(score,2, 1 + endx + space, "xxx");
-				mvwprintw(score,3, 2 + endx + space, "x");
-				mvwprintw(score,4, 2 + endx + space, "x");		
-			break;
+				mvwprintw(score, 0, endx + space, "xxxx");
+				mvwprintw(score, 1, 3 + endx + space, "x");
+				mvwprintw(score, 2, 1 + endx + space, "xxx");
+				mvwprintw(score, 3, 2 + endx + space, "x");
+				mvwprintw(score, 4, 2 + endx + space, "x");
+				break;
 			case 8:
-				mvwprintw(score,0, endx + space,     "xxxx");
-				mvwprintw(score,1, endx + space, "x");
-				mvwprintw(score,1, 3 + endx + space, "x");
-				mvwprintw(score,2, endx + space, "xxxx");
-				mvwprintw(score,3, endx + space, "x");
-				mvwprintw(score,3, 3 + endx + space, "x");
-				mvwprintw(score,4, endx + space, "xxxx");
-			break;
+				mvwprintw(score, 0, endx + space, "xxxx");
+				mvwprintw(score, 1, endx + space, "x");
+				mvwprintw(score, 1, 3 + endx + space, "x");
+				mvwprintw(score, 2, endx + space, "xxxx");
+				mvwprintw(score, 3, endx + space, "x");
+				mvwprintw(score, 3, 3 + endx + space, "x");
+				mvwprintw(score, 4, endx + space, "xxxx");
+				break;
 			case 9:
-				mvwprintw(score,0, endx + space,     "xxxx");
-				mvwprintw(score,1, endx + space, "x");
-				mvwprintw(score,1, 3 + endx + space, "x");
-				mvwprintw(score,2, endx + space, "xxxx");
-				mvwprintw(score,3, 3 + endx + space, "x");
-				mvwprintw(score,4, endx + space, "xxxx");
-			break;
+				mvwprintw(score, 0, endx + space, "xxxx");
+				mvwprintw(score, 1, endx + space, "x");
+				mvwprintw(score, 1, 3 + endx + space, "x");
+				mvwprintw(score, 2, endx + space, "xxxx");
+				mvwprintw(score, 3, 3 + endx + space, "x");
+				mvwprintw(score, 4, endx + space, "xxxx");
+				break;
+			}
+			number /= 10;
+			space -= 5;
 		}
-		number /= 10;
-		space -= 5;
 	}
 	wrefresh(score);
 	wattroff(score,DIGITAL);
