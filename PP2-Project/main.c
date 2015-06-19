@@ -8,7 +8,7 @@
 #include <ctype.h>
 
 void game(enum modes rezim, int stayInMenu);
-int options(char *menu[]);
+
 int swipe(matrix *M, int direction, unsigned int *score);
 void swipeNoAnimation(matrix *M, int direction, unsigned int *score);
 void showHint(matrix *m, int starty, int startx);
@@ -166,6 +166,7 @@ main()
 	endwin();
 }
 
+//DA SE IZBACI IZ MAIN-A
 int swipe(matrix *M, int direction, unsigned int *score)
 {
 	int changes, moved, last_merged[5] = { 0 };
@@ -211,6 +212,8 @@ void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
 		displayMatrix(1, 1, *M);
 	}
 }
+//DA SE IZBACI IZ MAIN-A
+
 
 void displayHSC(entry *score_list, unsigned int entry_count)
 {
@@ -296,7 +299,6 @@ void game(enum rezim rezim, int stayInMenu)
 {
 	unsigned int score, entry_count, bit_check;
 	int code, c, prev_code;
-	char status;
 	char *cheats[] = { "leavemealone","abrakadabra","zartozelite" ,NULL};
 	char buffer[20] = "";
 	matrix *m = malloc(sizeof(matrix));
@@ -309,12 +311,11 @@ void game(enum rezim rezim, int stayInMenu)
 		;//Greska (fajl je izmenjen vam programa)
 	}
 	
-
 	switch (rezim)
 	{
 	case xtile:
 		{
-			if (!score)//DA NE BI POSTAVLJAO X-TILE KAD SE LOADUJE
+			if (score==0)//DA NE BI POSTAVLJAO X-TILE KAD SE LOADUJE
 			{
 				int x = randomInt(0, settings.size*settings.size - 1);
 				m->set[x / settings.size][x%settings.size] = 3;
@@ -325,10 +326,10 @@ void game(enum rezim rezim, int stayInMenu)
 		history hist = newHistory(5, m);
 		state previous = getState(*m, 0);
 		prev_code = code = -1;
-		mvprintw(1, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "REZULTAT:");
-		mvprintw(10, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "Pritisni ESC za meni!");
-		mvprintw(11, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "Pritisni h za pomoc!");
-		mvprintw(12, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "Pritisni u za undo!");
+		mvprintw(1, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "REZULTAT:");
+		mvprintw(10, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+		mvprintw(11, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "Pritisni h za pomoc!");
+		mvprintw(12, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "Pritisni CTRL + Z za undo!");
 		refresh();
 		displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), score);
 		displayMatrix(1, 1, *m);
@@ -372,10 +373,13 @@ void game(enum rezim rezim, int stayInMenu)
 					displayMatrix(1, 1, *m); 
 				break;
 				case 'h':
-					showHint(m, 8, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0));
-					mvprintw(10, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "Pritisni ESC za meni!");
-					mvprintw(11, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "Pritisni h za pomoc!");
-					mvprintw(12, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "Pritisni CTRL + Z za undo!");
+					showHint(m, 9, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0));
+					
+					bkgd(COLOR_PAIR(INTERFACE));//OMG!!!
+					
+					mvprintw(10, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+					mvprintw(11, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "Pritisni h za pomoc!");
+					mvprintw(12, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "Pritisni CTRL + Z za undo!");
 					refresh();
 				break;
 				
@@ -421,8 +425,8 @@ void game(enum rezim rezim, int stayInMenu)
 		m->set[x / settings.size][x%settings.size] = 3;
 	}
 	case autoplay:
-		mvprintw(10, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "Pritisni ESC za meni!");
-		mvprintw(1, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "REZULTAT:");
+		mvprintw(10, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+		mvprintw(1, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "REZULTAT:");
 		refresh();
 		displayNumber(3, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), score);
 		displayMatrix(1, 1, *m);
@@ -444,7 +448,6 @@ void game(enum rezim rezim, int stayInMenu)
 				swipeNoAnimation(m, DOWN, &score);
 				break;
 			case 4:stayInMenu = 0;
-				nodelay(stdscr, FALSE);
 				msgBox((getmaxx(stdscr)-12) / 7, "Gotova igra!");
 				break;
 			}
@@ -455,14 +458,15 @@ void game(enum rezim rezim, int stayInMenu)
 				nodelay(stdscr, FALSE);
 			}
 		}
+		nodelay(stdscr, FALSE);
 	break;
 	case speed:
 		nodelay(stdscr, TRUE);
 		clock_t start=clock(), end;
 		while (stayInMenu)
 		{
-			mvprintw(10, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "Pritisni ESC za meni!");
-			mvprintw(1, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "REZULTAT:");
+			mvprintw(10, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "Pritisni ESC za meni!");
+			mvprintw(1, 4 * WIDTH + 3 + (m->size == 5 ? 10 : 0), "REZULTAT:");
 			displayNumber(3, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), score);
 			displayMatrix(1, 1, *m);
 			switch (getch())

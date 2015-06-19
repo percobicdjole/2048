@@ -172,13 +172,13 @@ void initiateThemes()
 
 	//bios
 	BIOS.first.color = 6;   //2	
-	BIOS.first.contrast = 9;
+	BIOS.first.contrast = 14;
 
-	BIOS.second.color = 14;  //4-16
-	BIOS.second.contrast = 9;
+	BIOS.second.color = 1;  //4-16
+	BIOS.second.contrast = 6;
 
-	BIOS.third.color = 14;   //32-64
-	BIOS.third.contrast = 4;
+	BIOS.third.color = 4;   //32-64
+	BIOS.third.contrast = 14;
 
 	BIOS.fourth.color = 14; //128-256
 	BIOS.fourth.contrast = 12;

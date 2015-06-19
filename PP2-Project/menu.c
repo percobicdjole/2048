@@ -17,6 +17,7 @@ int menu(char *choices[], int starty, int startx)
 	for (n_choices = 0; choices[n_choices]; n_choices++);
 	cbreak();
 	menu_win = newwin(20, 20, starty, startx);
+	werase(menu_win);
 	keypad(menu_win, TRUE);
 	printMenu(menu_win, choices, n_choices, highlight);
 	while (TRUE)
@@ -44,8 +45,7 @@ int menu(char *choices[], int starty, int startx)
 		if (choice != 0)
 			break;
 	}
-	werase(menu_win);
-	wrefresh(menu_win);
+	delwin(menu_win);
 	return choice;
 }
 
@@ -108,6 +108,7 @@ void showHint(matrix *m, int starty, int startx)
 	wgetch(hint);
 	werase(hint);
 	wrefresh(hint);
+	delwin(hint);
 }
 
 int options(char *menu[])
@@ -215,6 +216,6 @@ int options(char *menu[])
 			break;
 	}
 	werase(menu_win);
-	wrefresh(menu_win);
+	delwin(menu_win);
 	return choice;
 }
