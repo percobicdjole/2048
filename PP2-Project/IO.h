@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #define INT_MASK 48621488
 #define CHAR_MASK 61
 

@@ -1,8 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
-#include "Logic.h"
+#ifndef LOGIC
+#define LOGIC
+#include "logic.h"
+#endif
+
 void checkMemError(void *new_pointer);
 
 //Postavljanje SEED-a

@@ -1,7 +1,16 @@
+#ifndef LOGIC
+#define LOGIC
 #include "logic.h"
+#endif
+
+#ifndef IO
+#define IO
+#include "IO.h"
+#endif
+
 #include "graphics.h"
 #include "ai.h"
-#include "IO.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -299,7 +308,7 @@ void game(enum rezim rezim, int stayInMenu)
 {
 	unsigned int score, entry_count, bit_check;
 	int code, c, prev_code;
-	char *cheats[] = { "leavemealone","abrakadabra","zartozelite" ,NULL};
+	char *cheats[] = { "leavemealone","abrakadabra","zartozelite" ,"robot",NULL};
 	char buffer[20] = "";
 	matrix *m = malloc(sizeof(matrix));
 
@@ -392,16 +401,12 @@ void game(enum rezim rezim, int stayInMenu)
 					strcpy(buffer, "");
 				if (code == -2)
 				{
-					executeCheat(prev_code, &score, m);
 					strcpy(buffer, "");
+					executeCheat(prev_code, &score, m);
 				}
 				prev_code = code;
 			}
 			displayNumber(3, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), score);
-
-			mvprintw(13, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "%s", buffer);
-			if (strcmp(buffer, "")==0)
-				mvprintw(13, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), "            ");
 			
 			displayMatrix(1, 1, *m);
 			if (!checkGameOver(*m))
@@ -631,6 +636,10 @@ void executeCheat(int code, int *score, matrix *m)
 		}
 		break;
 	case 2:
+		if (settings.mode == normal)
+			freeTwo(m);
+		break;
+	case 3:
 		if (settings.mode == normal)
 			timedAutoplay(m, score);
 		break;

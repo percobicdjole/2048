@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
 //Zamena za argumente funkcija pomeranja
 #define LEFT 0
 #define RIGHT 1

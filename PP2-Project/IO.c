@@ -1,8 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ifndef LOGIC
+#define LOGIC
 #include "logic.h"
+#endif
+
+#ifndef IO
+#define IO
 #include "IO.h"
+#endif
 
 void cdcEntry(entry *E)
 {
