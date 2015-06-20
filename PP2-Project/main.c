@@ -20,6 +20,7 @@ void executeCheat(int code, int *score, matrix *m);
 void xTo2048(matrix *m);
 void doubleDouble(matrix *m);
 void freeTwo(matrix *m);
+void autoplaySolve(matrix *m, unsigned int *score);
 enum modes {normal, xtile, speed, autoplay, autoplayx};
 
 struct settings
@@ -244,7 +245,7 @@ void game(enum rezim rezim, int stayInMenu)
 {
 	unsigned int score, entry_count, bit_check, mode = rezim;
 	int code, c, prev_code;
-	char *cheats[] = { "leavemealone","abrakadabra","jeltozelite" ,"robot",NULL};
+	char *cheats[] = { "leavemealone","abrakadabra","jeltozelite" ,"robot","solveit",NULL};
 	char buffer[20] = "";
 	matrix *m = malloc(sizeof(matrix));
 
@@ -596,6 +597,29 @@ void timedAutoplay(matrix *m, unsigned int *score)
 	}
 }
 
+void autoplaySolve(matrix *m, unsigned int *score)
+{
+	while (checkGameOver(*m))
+	{
+		switch (get_hint(*m))
+		{
+		case LEFT:
+			swipeNoAnimation(m, LEFT, score);
+			break;
+		case RIGHT:
+			swipeNoAnimation(m, RIGHT, score);
+			break;
+		case UP:
+			swipeNoAnimation(m, UP, score);
+			break;
+		case DOWN:
+			swipeNoAnimation(m, DOWN, score);
+			break;
+		}
+		displayNumber(3, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), *score);
+	}
+}
+
 void executeCheat(int code, int *score, matrix *m)
 {
 	switch (code)
@@ -621,7 +645,11 @@ void executeCheat(int code, int *score, matrix *m)
 		if (settings.mode == normal)
 			timedAutoplay(m, score);
 		break;
+	case 4:
+		if (settings.mode == normal)
+			autoplaySolve(m, score);
+		break;
 	}
-	displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), score);
+	displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), *score);
 	displayMatrix(1, 1, *m);
 }
