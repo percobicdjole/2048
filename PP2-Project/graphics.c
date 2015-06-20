@@ -1,7 +1,18 @@
 #include "graphics.h"
 #include "logic.h"
+#include <string.h>
 
-void displayMatrix(int starty, int startx, matrix m)//dodati opciju za x tile
+unsigned char colorOfNumber(unsigned short x)
+{
+	if (x < 4)					    return FIRST;
+	else if (x >= 4 && x <= 16)     return SECOND;
+	else if (x >= 32 && x <= 64)    return THIRD;
+	else if (x >= 128 && x <= 256)  return FOURTH;
+	else if (x >= 512)				return FIFTH;
+	else return 0;
+}
+
+void displayMatrix(int starty, int startx, matrix m)
 {
 	WINDOW *matrica = newwin(m.size*HEIGHT, m.size*WIDTH, starty, startx);
 	for (int i = 0; i < m.size; i++)
@@ -49,16 +60,6 @@ void displayMatrix(int starty, int startx, matrix m)//dodati opciju za x tile
 	delwin(matrica);
 }
 
-unsigned char colorOfNumber(unsigned short x)
-{
-	if (x < 4)					    return FIRST;
-	else if (x >= 4 && x <= 16)     return SECOND;
-	else if (x >= 32 && x <= 64)    return THIRD;
-	else if (x >= 128 && x <= 256)  return FOURTH;
-	else if (x >= 512)				return FIFTH;
-	else return 0;
-}
-
 void colorPalette()
 {
 	start_color();
@@ -72,19 +73,7 @@ void colorPalette()
 	refresh();
 }
 
-mystrcpy(char dest[], char src[])
-{
-	int i = 0;
-
-	while (src[i] != '\0')
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-}
-
-void initiateThemes()
+void initThemes()
 {
 	//crvena
 	crvena.first.color = 4;   //2	
@@ -105,7 +94,7 @@ void initiateThemes()
 	crvena.interface.color = 4;
 	crvena.interface.contrast = 7;
 
-	mystrcpy(crvena.name, "crvena");
+	strcpy(crvena.name, "crvena");
 	
 	//plava
 	plava.first.color = 1;   //2	
@@ -126,7 +115,7 @@ void initiateThemes()
 	plava.interface.color = 9;
 	plava.interface.contrast = 7;
 
-	mystrcpy(plava.name, "plava");
+	strcpy(plava.name, "plava");
 
 	//zelena
 	zelena.first.color = 2;   //2	
@@ -147,7 +136,7 @@ void initiateThemes()
 	zelena.interface.color = 10;
 	zelena.interface.contrast = 0;
 
-	mystrcpy(zelena.name, "zelena");
+	strcpy(zelena.name, "zelena");
 
 	//zuta
 	zuta.first.color = 6;   //2	
@@ -168,7 +157,7 @@ void initiateThemes()
 	zuta.interface.color = 14;
 	zuta.interface.contrast = 0;
 
-	mystrcpy(zuta.name, "zuta");
+	strcpy(zuta.name, "zuta");
 
 	//bios
 	BIOS.first.color = 6;   //2	
@@ -189,10 +178,10 @@ void initiateThemes()
 	BIOS.interface.color = 14;
 	BIOS.interface.contrast = 9;
 
-	mystrcpy(BIOS.name, "BIOS");
+	strcpy(BIOS.name, "BIOS");
 }
 
-void intiateColors(theme tema)
+void setTheme(theme tema)
 {
 	init_pair(BW, COLOR_BLACK, WHITE);
 	init_pair(FIRST, tema.first.contrast, tema.first.color);
@@ -303,4 +292,93 @@ void displayNumber(int starty, int startx, int number)
 	wrefresh(score);
 	wattroff(score,DIGITAL);
 	delwin(score);
+}
+
+void display2048(int starty, int startx)
+{
+	mvprintw(0 + starty, startx, ".----------------.  .----------------.  .----------------.  .----------------. ");
+	mvprintw(1 + starty, startx, "| .--------------. || .--------------. || .--------------. || .--------------. |");
+	mvprintw(2 + starty, startx, "| |    _____     | || |     ____     | || |   _    _     | || |     ____     | |");
+	mvprintw(3 + starty, startx, "| |   / ___ `.   | || |   .'    '.   | || |  | |  | |    | || |   .' __ '.   | |");
+	mvprintw(4 + starty, startx, "| |  |_/___) |   | || |  |  .--.  |  | || |  | |__| |_   | || |   | (__) |   | |");
+	mvprintw(5 + starty, startx, "| |   .'____.'   | || |  | |    | |  | || |  |____   _|  | || |   .`____'.   | |");
+	mvprintw(6 + starty, startx, "| |  / /____     | || |  |  `--'  |  | || |      _| |_   | || |  | (____) |  | |");
+	mvprintw(7 + starty, startx, "| |  |_______|   | || |   '.____.'   | || |     |_____|  | || |  `.______.'  | |");
+	mvprintw(8 + starty, startx, "| |              | || |              | || |              | || |              | |");
+	mvprintw(9 + starty, startx, "| '--------------' || '--------------' || '--------------' || '--------------' |");
+	mvprintw(10 + starty, startx, " '----------------'  '----------------'  '----------------'  '----------------'");
+	attron(COLOR_PAIR(INTERFACE) | A_REVERSE);
+	mvprintw(12 + starty, 10 + startx, "Autori: Ivan Blazic - logika");
+	mvprintw(14 + starty, 25 + startx, "Jovan Malovic - grafika");
+	mvprintw(16 + starty, 35 + startx, "Djordje Percobic - AI");
+	attroff(COLOR_PAIR(INTERFACE) | A_REVERSE);
+	mvprintw(18 + starty, 23 + startx, "V 1.0 Copyright 2015");
+	refresh();
+}
+
+void displayGameOver(int starty, int startx)
+{
+	resize_term(12, 81);
+	erase();
+	mvprintw(0 + starty, startx, "___oooo______ooo____ooo_____ooo_ooooooo_______oooo____oo____oo_ooooooo_ooooooo___");
+	mvprintw(1 + starty, startx, "_oo____oo__oo___oo__oooo___oooo_oo__________oo____oo__oo____oo_oo______oo____oo__");
+	mvprintw(2 + starty, startx, "oo________oo_____oo_oo_oo_oo_oo_oooo_______oo______oo_oo____oo_oooo____oo____oo__");
+	mvprintw(3 + starty, startx, "oo____ooo_ooooooooo_oo__ooo__oo_oo_________oo______oo__oo__oo__oo______ooooooo___");
+	mvprintw(4 + starty, startx, "_oo____oo_oo_____oo_oo_______oo_oo__________oo____oo____oooo___oo______oo____oo__");
+	mvprintw(5 + starty, startx, "___oooo___oo_____oo_oo_______oo_ooooooo_______oooo_______oo____ooooooo_oo_____oo_");
+	refresh();
+	_sleep(1000);
+}
+
+void splashScreen()
+{
+	init_pair(7, 15, 4);
+	attron(COLOR_PAIR(7));
+	bkgd(COLOR_PAIR(7));
+	mvprintw(0, 0, ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(1, 0, ",,,,,,*/(%&&@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(2, 0, ",,,,,/@@@@@@@@@@@@@@@@&%#((//***,,,,,,,,,**//(%&@@@@@@@@@@,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(3, 0, ",,,,,,&@@@@@/,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,#@@@,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(4, 0, ",,,,,,*@@@@@@,,,,,,,,,,,,**/(#&&@@@@@@@@@@@@@@@#,,,,,#@@@,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(5, 0, ",,,,,,,#@@@@@&,,,,,,,,,,,&@@@@@@@@@@@@@@@@@@@@@@&,,,,,,&@@@,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(6, 0, ",,,,,,,,@@@@@@/,,,,,,,,,,,@@@@@@&(#@@@@%,,,,,,,,,,,,,,,,*#@@@,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(7, 0, ",,,,,,,,/@@@@@@,,,,,,,,,,,,,,,,,,,,/&@@@@@@@@@&(,,,,,,,,,,#@@,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(8, 0, ",,,,,,,,,&@@@@@%,,,,,,,,,,,,,,,,(@@@@@@@@@@@@@@@@@@(,,,,,,,@@@@,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(9, 0, ",,,,,,,,,*@@@@@@*,,,,,,,,,,,,,(@@@@@&*/@@@@@&,,,*#@@@@/,,,,,%@@*,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(10, 0, ",,,,,,,,,,%@@@@@&,,,,,,,,,,,,@@@@@/,,,,#@@@@@#,,,,,,(@@@/,,,,%@@/,,,,,,,,,,,,,,,,,,,");
+	mvprintw(11, 0, ",,,,,,,,,,*@@@@@@(,,,,,,,,,,@@@@&,,,,,,,&@@@@@/,,,,,,,/@@@*,,,%@@(,,,,,,,,,,,,,,,,,,");
+	mvprintw(12, 0, ",,,,,,,,,,,#@@@@@@,,,,,,,,,%@@@&,,,,,,,,*@@@@@@*,,,,,,,,&@@/,,,&@@/,,,,,,,,,,,,,,,,,");
+	mvprintw(13, 0, ",,,,,,,,,,,*@@@@@@#,,,,,,,,@@@@*,,,,,,,,,(@@@@@&,,,,**(#&@@@@@@@@@@*,,,,,,,,,,,,,,,,");
+	mvprintw(14, 0, ",,,,,,,,,,,,#@@@@@@*,,,,,,*@@@@,,,,,,,,,,,&@@@@@@@@@@@@@@@@@@@@@@@@@,,,,,,,,,,,,,,,,");
+	mvprintw(15, 0, ",,,,,,,,,,,,,@@@@@@%,,,,,,*@@@@*/(%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@&,,,,,,,,,,,,,,,");
+	mvprintw(16, 0, ",,,,,,,,,,,,,#@@@@@@*,,,*(%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%@@/,,,&@@#,,,,,,,,,,,,,,,,");
+	mvprintw(17, 0, ",,,,,,,,,,,,,,@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@(,,,,,,,,/@@#,,,*@@@*,,,,,,,,,,,,,");
+	mvprintw(18, 0, ",,,,,,,,,,,,,,#@@@@@@@@@@@@@@@@@@@@@@@@%(*,,(@@@@@&,,,,,,,,(@@#,,,,#@@&,,,,,,,,,,,,,");
+	mvprintw(19, 0, ",,,,,,,,,,,,,,*@@@@@@@@@@@@@&@@@@*,,,,,,,,,,,@@@@@@/,,,,,,,@@@/,,,,,@@@*,,,,,,,,,,,,");
+	mvprintw(20, 0, ",,,,,,,,,,,,,,,#@@@@@@*,,,,,,#@@@@/,,,,,,,,,,(@@@@@@,,,,,,%@@@,,,,,,((@,,,,,,,,,,,,,");
+	mvprintw(21, 0, ",,,,,,,,,,,,,,,*@@@@@@%,,,,,,,(@@@@&,,,,,,,,,,@@@@@@/,,,,&@@@*,,,,,,,(@*,,,,,,,,,,,,");
+	mvprintw(22, 0, ",,,,,,,,,,,,,,,,%@@@@@@*,,,,,,,*@@@@@&*,,,,,,,(@@@@@&,,(@@@@*,,,,,,,,,@*,,,,,,,,,,,,");
+	mvprintw(23, 0, ",,,,,,,,,,,,,,,,*@@@@@@#,,,,,,,,,/@@@@@@&(,,,,,@@@@@@@@@@@&,,,,,,,,,,,@@(,,,,,,,,,,,");
+	mvprintw(24, 0, ",,,,,,,,,,,,,,,,,%@@@@@@,,,,,,,,,,,*&@@@@@@@@@@@@@@@@@@@&,,,,,,,,,,,,*@@@,,,,,,,,,,,");
+	mvprintw(25, 0, ",,,,,,,,,,,,,,,,,*@@@@@@(,,,,,,,,,,,,,*%@@@@@@@@@@@@@&*,,,,,*#%,,,,,,,@@@*,,,,,,,,,,");
+	mvprintw(26, 0, ",,,,,,,,,,,,,,,,,,&@@@@@@,,,,,,,,,,,,,,,,,,,,***#@@@@@/%@@@@@@@,,,,,,,&@@/,,,,,,,,,,");
+	mvprintw(27, 0, ",,,,,,,,,,,,,,,,,,/@@@@@@/,,,,,,,,,,,,,,,,,,,,*/%@@@@@@@@@@@@@@/,,,,,,#@@(,,,,,,,,,,");
+	mvprintw(28, 0, ",,,,,,,,,,,,,,,,,,,@@@@@@&,,,,,,,,,,,,,*(%@@@@@@@@@@@@@@@@@@*,,,,,,,(@@#,,,,,,,,,,,,");
+	mvprintw(29, 0, ",,,,,,,,,,,,,,,,,,,(@@@@@@*,,,,,,,,,,,#@@@@@@@@@@@@@@@@#*,,,,,,,,,,,*#@@@(,,,,,,,,,,");
+	mvprintw(30, 0, ",,,,,,,,,,,,,,,,,,,,@@@@@@%,,,,,,,,,,,*@@@@@@@@@&(*,,,,,,,,,,,,,/&@@@@@@@/,,,,,,,,,,");
+	mvprintw(31, 0, ",,,,,,,,,,,,,,,,,,,,%@@@@@@,,,,,,,,,,,,@@*,,,,,,,,,,,,,,,(&@@@@@@@@@&/,,,,,,,,,,,,,,");
+	mvprintw(32, 0, ",,,,,,,,,,,,,,,,,,,,*@@@@@@(,,,,,,,,,,,,,,,,,,,,,,,,,/%@@@@@@@@@@@@(,,,,,,,,,,,,,,,,");
+	mvprintw(33, 0, ",,,,,,,,,,,,,,,,,,,,,&@@@@@&,,,,,,,,,,,,,,,,,,,/%@@@@@@@@@@@@@&/,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(34, 0, ",,,,,,,,,,,,,,,,,,,,,/@@@@@@*,,,,,,,,,,,*#&@@@@@@@@@@@@@@&/,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(35, 0, ",,,,,,,,,,,,,,,,,,,,,,@@@@@@(,,,,*#&@@@@@@@@@@@@@@@@%*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(36, 0, ",,,,,,,,,,,,,,,,,,,,,,#@@@@@@@@@@@@@@@@@@@@@@@%/,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(37, 0, ",,,,,,,,,,,,,,,,,,,,,,*@@@@@@@@@@@@@@@@&(*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(38, 0, ",,,,,,,,,,,,,,,,,,,,,,,&@@@@@@@@&(*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+	mvprintw(39, 0, ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,");
+
+	attroff(COLOR_PAIR(7));
+	refresh();
+	_sleep(2000);
+	erase();
+	refresh();
 }

@@ -1,3 +1,6 @@
+#ifndef IO_H
+#define IO_H 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,3 +50,5 @@ void writeAIstats(matrix M);
 
 //Detektuje cheat za dati string
 int findCode(char *cheats[], char *buffer, int prev_code);
+
+#endif /* IO_H */

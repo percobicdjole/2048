@@ -1,7 +1,12 @@
+#ifndef LOGIC_H
+#define LOGIC_H 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+
+#pragma once
 
 //Zamena za argumente funkcija pomeranja
 #define LEFT 0
@@ -100,3 +105,5 @@ int checkGameOver(matrix M);
 
 //Provera da li je matrica puna
 int checkFull(matrix M);
+
+#endif /* LOGIC_H */

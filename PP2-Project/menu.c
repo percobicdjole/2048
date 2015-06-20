@@ -1,6 +1,5 @@
 #include <curses.h>
 #include "graphics.h"
-#include "logic.h"
 
 struct settings
 {
@@ -9,6 +8,26 @@ struct settings
 	theme theme;
 }settings;
 
+void printMenu(WINDOW *menu_win, char *choices[], int n_choices, int highlight)
+{
+	int x, y, i;
+	x = 3;
+	y = 2;
+	wbkgd(menu_win, COLOR_PAIR(INTERFACE));
+	box(menu_win, 0, 0);
+	for (i = 0; i < n_choices; ++i)
+	{
+		if (highlight == i + 1)
+		{
+			wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+			mvwprintw(menu_win, y + i, x, "%s", choices[i]);
+			wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
+		}
+		else mvwprintw(menu_win, y + i, x, "%s", choices[i]);
+		++y;
+	}
+	wrefresh(menu_win);
+}
 
 int menu(char *choices[], int starty, int startx)
 {
@@ -49,27 +68,6 @@ int menu(char *choices[], int starty, int startx)
 	return choice;
 }
 
-void printMenu(WINDOW *menu_win, char *choices[], int n_choices, int highlight)
-{
-	int x, y, i;
-	x = 3;
-	y = 2;
-	wbkgd(menu_win, COLOR_PAIR(INTERFACE));
-	box(menu_win, 0, 0);
-	for (i = 0; i < n_choices; ++i)
-	{
-		if (highlight == i + 1)
-		{
-			wattron(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
-			mvwprintw(menu_win, y + i, x, "%s", choices[i]);
-			wattroff(menu_win, COLOR_PAIR(INTERFACE) | A_REVERSE);
-		}
-		else mvwprintw(menu_win, y + i, x, "%s", choices[i]);
-		++y;
-	}
-	wrefresh(menu_win);
-}
-
 void msgBox(int startx, char text[25])
 {
 	WINDOW *message;
@@ -98,11 +96,11 @@ void showHint(matrix *m, int starty, int startx)
 	box(hint, 0, 0);
 	switch (h)
 	{
-	case LEFT: mvwprintw(hint, 2, 2, "Najbolji izbor je LEVO!"); break;
-	case RIGHT: mvwprintw(hint, 2, 2, "Najbolji izbor je DESNO!"); break;
-	case UP:mvwprintw(hint, 2, 2, "Najbolji izbor je GORE!"); break;
-	case DOWN:mvwprintw(hint, 2, 2, "Najbolji izbor je DOLE!"); break;
-	case 4:mvwprintw(hint, 2, 6, "IGRA JE GOTOVA!"); break;
+		case LEFT: mvwprintw(hint, 2, 2, "Najbolji izbor je LEVO!"); break;
+		case RIGHT: mvwprintw(hint, 2, 2, "Najbolji izbor je DESNO!"); break;
+		case UP:mvwprintw(hint, 2, 2, "Najbolji izbor je GORE!"); break;
+		case DOWN:mvwprintw(hint, 2, 2, "Najbolji izbor je DOLE!"); break;
+		case 4:mvwprintw(hint, 2, 6, "IGRA JE GOTOVA!"); break;
 	}
 	wrefresh(hint);
 	wgetch(hint);
@@ -173,7 +171,7 @@ int options(char *menu[])
 			else
 				++highlight;
 			break;
-		case 10:
+		case ENTER:
 			choice = highlight;
 			break;
 		}

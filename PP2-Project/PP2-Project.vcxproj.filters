@@ -1,20 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ai.c" />
-    <ClCompile Include="ai2.c" />
-    <ClCompile Include="graphics.c" />
-    <ClCompile Include="IO.c" />
-    <ClCompile Include="logic.c" />
+    <ClCompile Include="ai.c">
+      <Filter>Codes</Filter>
+    </ClCompile>
+    <ClCompile Include="ai2.c">
+      <Filter>Codes</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics.c">
+      <Filter>Codes</Filter>
+    </ClCompile>
+    <ClCompile Include="IO.c">
+      <Filter>Codes</Filter>
+    </ClCompile>
+    <ClCompile Include="logic.c">
+      <Filter>Codes</Filter>
+    </ClCompile>
+    <ClCompile Include="menu.c">
+      <Filter>Codes</Filter>
+    </ClCompile>
     <ClCompile Include="main.c" />
-    <ClCompile Include="screens.c" />
-    <ClCompile Include="menu.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ai.h" />
-    <ClInclude Include="graphics.h" />
-    <ClInclude Include="IO.h" />
-    <ClInclude Include="logic.h" />
-    <ClInclude Include="menu.h" />
+    <ClInclude Include="ai.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="logic.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="menu.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="IO.h">
+      <Filter>Codes</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{b17534ee-df1a-4430-8a65-aac7b8b1dcf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Codes">
+      <UniqueIdentifier>{1c65b5e0-1e72-4770-a56d-b81d5f4789bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

@@ -1,3 +1,6 @@
+#ifndef AI_H
+#define AI_H
+
 #define MAX_DEPTH 5
 #define MAX_NUMBER_OF_NODES 48
 #define NUMBER_OF_FACTORS 5
@@ -42,3 +45,5 @@ T_node* pop(T_node **stack, int *top);
 float approximate_position(int **table, int table_size);
 void number_of_moves_horizontally(int **table, int table_size, float *score);
 void number_of_moves_vertically(int **table, int table_size, float *score);
+
+#endif /* AI_H */
