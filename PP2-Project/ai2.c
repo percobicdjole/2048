@@ -122,10 +122,6 @@ float approximate_position(int **table, int table_size)
 	if (x == 0 && y == 0)
 	{
 		score+= max_number*MAX_IN_CORNER;
-		// provjera da li su jednaki na obije strane
-		i = 1;
-		while (table[0][i] == table[i][0] && i < table_size-1)
-			i++;
 		// monotonost
 		
 		
@@ -180,10 +176,6 @@ float approximate_position(int **table, int table_size)
 	else if (x == 0 && y == table_size-1)
 	{
 		score+= max_number*MAX_IN_CORNER;
-		// provjera da li su jednaki na obije strane
-		i = 1;
-		while (table[0][table_size-1-i] == table[i][table_size-1] && i < table_size-1)
-			i++;
 		// monotonost
 		
 			for (i = table_size-1; i > 0; i--)
@@ -238,10 +230,6 @@ float approximate_position(int **table, int table_size)
 	else if (x == table_size-1 && y == 0)
 	{
 		score+= max_number*MAX_IN_CORNER;
-		// provjera da li su jednaki na obije strane
-		i = 1;
-		while (table[table_size-1][i] == table[table_size-1-i][0] && i < table_size-1)
-			i++;
 		// monotonost
 		
 			for (i = 1; i < table_size; i++)
@@ -295,10 +283,6 @@ float approximate_position(int **table, int table_size)
 	else if (x == table_size-1 && y == table_size-1)
 	{
 		score+= max_number*MAX_IN_CORNER;
-		// provjera da li su jednaki na obije strane
-		i = 1;
-		while (table[table_size-1][table_size-1-i] == table[table_size-1-i][table_size-1] && i < table_size-1)
-			i++;
 		// monotonost
 		
 			for (i = table_size-1; i > 0; i--)

@@ -4,7 +4,6 @@
 #define MAX_DEPTH 5
 #define MAX_NUMBER_OF_NODES 48
 #define NUMBER_OF_FACTORS 5
-#define MAX_NUMBER_OF_NODES_IN_STABLE 1358954496 // popravi
 #define STACK_SPACE 100000
 
 // konstante za heuristiku // sto manje velikih brojeva
