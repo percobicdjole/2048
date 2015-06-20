@@ -11,10 +11,8 @@
 
 void game(enum modes rezim, int stayInMenu);
 
-int swipe(matrix *M, int direction, unsigned int *score);
-void swipeNoAnimation(matrix *M, int direction, unsigned int *score);
 void showHint(matrix *m, int starty, int startx);
-void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score);
+void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score, enum rezim rezim);
 void msgBox(int startx, char text[25]);
 void displayHSC(entry *score_list, unsigned int entry_count);
 
@@ -180,53 +178,6 @@ main()
 	endwin();
 }
 
-//DA SE IZBACI IZ MAIN-A
-int swipe(matrix *M, int direction, unsigned int *score)
-{
-	int changes, moved, last_merged[5] = { 0 };
-	changes = moved = moveStep(M, direction, last_merged, score);
-	while (changes)
-	{
-		changes = moveStep(M, direction, last_merged, score);
-		_sleep(75);
-		displayMatrix(1, 1, *M);
-	}
-	if (moved)
-	{
-		_sleep(25);
-		spawnNumber(M);
-		displayMatrix(1, 1, *M);
-	}
-	return moved;
-}
-
-void swipeSpeed(matrix *M, int direction, unsigned int *score)
-{
-	int changes, moved, last_merged[5] = { 0 };
-	changes = moved = moveStep(M, direction, last_merged, score);
-	while (changes)
-	{
-		changes = moveStep(M, direction, last_merged, score);
-		_sleep(75);
-		displayMatrix(1, 1, *M);
-	}
-}
-
-void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
-{
-	int changes, moved, last_merged[5] = { 0 };
-	changes = moved = moveStep(M, direction, last_merged, score);
-	while (changes)
-	{
-		changes = moveStep(M, direction, last_merged, score);	
-	}
-	if (moved)
-	{
-		spawnNumber(M);
-		displayMatrix(1, 1, *M);
-	}
-}
-//DA SE IZBACI IZ MAIN-A
 
 
 void newGame(matrix *m, unsigned int *score)
@@ -381,7 +332,7 @@ void game(enum rezim rezim, int stayInMenu)
 			if (!checkGameOver(*m))
 			{
 				displayGameOver(3, 0);
-				getHsc(&score_list, &entry_count, score);
+				getHsc(&score_list, &entry_count, score,rezim);
 				saveHsc(score_list, entry_count);
 				stayInMenu = 0;
 				clear();
@@ -486,7 +437,7 @@ void game(enum rezim rezim, int stayInMenu)
 			if (checkFull(*m) || !checkGameOver(*m))
 			{
 				displayGameOver(3, 0);
-				getHsc(&score_list, &entry_count, score);
+				getHsc(&score_list, &entry_count, score,rezim);
 				saveHsc(score_list, entry_count);
 				stayInMenu = 0;
 				erase();
@@ -506,11 +457,11 @@ void game(enum rezim rezim, int stayInMenu)
 
 /*FUNKCIJE ZA HIGHSCORE*/
 
-void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score)
+void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score, enum rezim rezim)
 {
 	WINDOW *highscore;
 	entry  player;
-	char playerName[50];
+	char playerName[50], mode[20];
 	highscore = newwin(10, 25, 1, 25);
 	echo();
 	wattron(highscore, COLOR_PAIR(INTERFACE));
@@ -528,7 +479,25 @@ void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score)
 	wattroff(highscore, COLOR_PAIR(INTERFACE));
 	wrefresh(highscore);
 	noecho();
-	player = newEntry(playerName, score);
+	switch (rezim)
+	{
+	case normal:
+		strcpy(mode, "Normal");
+		break;
+	case xtile:
+		strcpy(mode, "X-tile");
+		break;
+	case speed:
+		strcpy(mode, "Brzopotezni");
+		break;
+	case autoplay:
+		strcpy(mode, "Autoplay");
+		break;
+	case autoplayx:
+		strcpy(mode, "Autoplay X-tile");
+		break;
+	}
+	player = newEntry(playerName, mode, score);
 	addEntry(score_list, entry_count, player);
 	getch();
 }
@@ -653,4 +622,6 @@ void executeCheat(int code, int *score, matrix *m)
 			timedAutoplay(m, score);
 		break;
 	}
+	displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), score);
+	displayMatrix(1, 1, *m);
 }

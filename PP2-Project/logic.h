@@ -63,6 +63,14 @@ int randomInt(int low, int high);
 //Pomera za jedan korak i vraca broj promena
 int moveStep(matrix *M, int direction, int *last_merged, unsigned int *score);
 
+//Igra potez u datom smeru
+int swipe(matrix *M, int direction, unsigned int *score);
+
+//Igra potez za brzopotezni rezim
+void swipeSpeed(matrix *M, int direction, unsigned int *score);
+
+//Igra potez bez animacije
+void swipeNoAnimation(matrix *M, int direction, unsigned int *score);
 
 //Igra potez za hint
 int snap(unsigned int **table, int table_size, int direction, matrix *M);
@@ -92,7 +100,7 @@ void freeSet(int **set, int size);
 void copyMatrix(matrix *dest, matrix M);
 
 //Kopira set i vraca pokazivac novog
-int **copySet(matrix M);
+int **copySet(int **source, char set_size);
 
 //Dohvata trenutno stanje i vraca novu strukturu
 state getState(matrix M, unsigned int score);

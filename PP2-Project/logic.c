@@ -1,7 +1,7 @@
-#ifndef LOGIC
-#define LOGIC
 #include "logic.h"
-#endif
+#include "graphics.h"
+
+
 
 void checkMemError(void *new_pointer);
 
@@ -215,6 +215,52 @@ int snap(unsigned int **table, int table_size, int direction, matrix *M)
 		return 1;
 	else
 		return 0;
+}
+
+int swipe(matrix *M, int direction, unsigned int *score)
+{
+	int changes, moved, last_merged[5] = { 0 };
+	changes = moved = moveStep(M, direction, last_merged, score);
+	while (changes)
+	{
+		changes = moveStep(M, direction, last_merged, score);
+		_sleep(75);
+		displayMatrix(1, 1, *M);
+	}
+	if (moved)
+	{
+		_sleep(25);
+		spawnNumber(M);
+		displayMatrix(1, 1, *M);
+	}
+	return moved;
+}
+
+void swipeSpeed(matrix *M, int direction, unsigned int *score)
+{
+	int changes, moved, last_merged[5] = { 0 };
+	changes = moved = moveStep(M, direction, last_merged, score);
+	while (changes)
+	{
+		changes = moveStep(M, direction, last_merged, score);
+		_sleep(75);
+		displayMatrix(1, 1, *M);
+	}
+}
+
+void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
+{
+	int changes, moved, last_merged[5] = { 0 };
+	changes = moved = moveStep(M, direction, last_merged, score);
+	while (changes)
+	{
+		changes = moveStep(M, direction, last_merged, score);
+	}
+	if (moved)
+	{
+		spawnNumber(M);
+		displayMatrix(1, 1, *M);
+	}
 }
 
 int **copySet(int **source, char set_size)

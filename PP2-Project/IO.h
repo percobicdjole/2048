@@ -11,7 +11,7 @@
 //Highscire unos
 typedef struct entry
 {
-	char name[50];
+	char name[50], mode[20];
 	unsigned int score;
 }entry;
 
@@ -22,7 +22,7 @@ typedef struct file_info
 }file_info;
 
 //Novi unos
-entry newEntry(char *player_name, unsigned int score);
+entry newEntry(char *player_name, char *mode, unsigned int score);
 
 //Dodaje novi unos u niz i odrzava poredak
 void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore);

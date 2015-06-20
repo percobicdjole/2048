@@ -1,21 +1,21 @@
-#ifndef LOGIC
-#define LOGIC
 #include "logic.h"
-#endif
-
-#ifndef IO
-#define IO
 #include "IO.h"
-#endif
+
 
 void cdcEntry(entry *E)
 {
 	checkMemError(E);
 	char *s = E->name;
+	char *m = E->mode;
 	while (*s)
 	{
 		*s ^= CHAR_MASK;
 		s++;
+	}
+	while (*m)
+	{
+		*m ^= CHAR_MASK;
+		m++;
 	}
 	E->score ^= INT_MASK;
 }
@@ -41,19 +41,26 @@ int bitCheck(entry E)
 {
 	int count = 0;
 	char *s = E.name;
+	char *m = E.mode;
 	while (*s)
 	{
 		count += countBits(*s);
 		s++;
 	}
+	while (*m)
+	{
+		count += countBits(*m);
+		m++;
+	}
 	count += countBits(E.score);
 	return count;
 }
 
-entry newEntry(char *player_name, unsigned int score)
+entry newEntry(char *player_name, char *mode, unsigned int score)
 {
 	entry N;
-	memcpy(N.name, player_name, sizeof(char)*(strlen(player_name) + 1));
+	strcpy(N.name, player_name);
+	strcpy(N.mode, mode);
 	N.score = score;
 	return N;
 }
@@ -68,7 +75,7 @@ void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 		*score_list = realloc(*score_list, (sizeof(entry)*(*entry_count)));
 		P = *score_list;
 		checkMemError(score_list);
-		while (P[i].score > newScore.score  && i < *entry_count-1)//OVDE PUCA KAD JE SKOR NULA
+		while (P[i].score > newScore.score  && i < *entry_count-1)
 			i++;
 		P += i;
 		mem = (*entry_count - (i + 1))*(sizeof(entry));
@@ -278,9 +285,10 @@ int findCode(char *cheats[], char *buffer, int prev_code)
 {
 	/*
 		Povratne vrednosti:
-		-1: Ne postoji string ili se ne poklapa
+		1: Ne postoji string ili se ne poklapa ni sa jednim cheat stringom
 		-2: string se poklopio, treba da se izvrsi cheat sa indeksom prev_code
-		0 ili vise: string se za sada poklapa sa ocekivanim
+		0 ili vise: string se za sada poklapa sa ocekivanim cheat stringom
+
 	*/
 	int code;
 	int n = strlen(buffer);

@@ -35,7 +35,7 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="IO.h">
-      <Filter>Codes</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
