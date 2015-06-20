@@ -252,7 +252,7 @@ void newGame(matrix *m, unsigned int *score)
 	box(stdscr, 0, 0);
 	if (settings.mode == normal || settings.mode == xtile || settings.mode == speed)
 	{
-		int load = loadGame(m, score, settings.size);
+		int load = loadGame(m, score, &settings.mode,settings.size);
 		switch (load)
 		{
 		case 1:
@@ -306,7 +306,7 @@ void newGame(matrix *m, unsigned int *score)
 
 void game(enum rezim rezim, int stayInMenu)
 {
-	unsigned int score, entry_count, bit_check;
+	unsigned int score, entry_count, bit_check, mode = rezim;
 	int code, c, prev_code;
 	char *cheats[] = { "leavemealone","abrakadabra","zartozelite" ,"robot",NULL};
 	char buffer[20] = "";
@@ -374,7 +374,7 @@ void game(enum rezim rezim, int stayInMenu)
 				break;
 				case KEY_ESC:
 					stayInMenu = 0; 
-					saveGame(*m, score);
+					saveGame(*m, score, mode);
 				break;
 				case '\032':
 					popHistory(&hist, &score);
@@ -490,7 +490,7 @@ void game(enum rezim rezim, int stayInMenu)
 				break;
 			case KEY_ESC:
 				stayInMenu = 0; 
-				saveGame(*m, score);
+				saveGame(*m, score, mode);
 			break;
 			}
 			end = clock();

@@ -141,7 +141,7 @@ entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check)
 	return score_list;
 }
 
-void saveGame(matrix M, unsigned int score)
+void saveGame(matrix M, unsigned int score, unsigned int mode)
 {
 	int bit_count = 0, i, j, buffer;
 	char size = M.size ^ CHAR_MASK;
@@ -151,6 +151,8 @@ void saveGame(matrix M, unsigned int score)
 	bit_count = countBits(score) + countBits(M.size);
 	score ^= INT_MASK;
 	fwrite(&score, sizeof(score), 1, svg);
+	mode ^= INT_MASK;
+	fwrite(&mode, sizeof(mode), 1, svg);
 	fwrite(&size, sizeof(size), 1, svg);
 	for (i = 0; i < M.size; i++)
 		for (j = 0; j < M.size; j++)
@@ -166,7 +168,7 @@ void saveGame(matrix M, unsigned int score)
 	fclose(svg);
 }
 
-int loadGame(matrix *Mp, unsigned int *score, unsigned int new_size)
+int loadGame(matrix *Mp, unsigned int *score, unsigned int *mode, unsigned int new_size)
 {
 	FILE *svg = fopen("savegame.dat", "rb");
 	//checkFileError(svg);
@@ -181,6 +183,8 @@ int loadGame(matrix *Mp, unsigned int *score, unsigned int new_size)
 		expectBits ^= INT_MASK;
 		fread(score, sizeof(*score), 1, svg);
 		*score ^= INT_MASK;
+		fread(mode, sizeof(*mode), 1, svg);
+		*mode ^= INT_MASK;
 		readBits += countBits(*score);
 		fread(&N.size, sizeof(N.size), 1, svg);
 		N.size ^= CHAR_MASK;

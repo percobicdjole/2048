@@ -31,10 +31,10 @@ void saveHsc(entry *score_list, unsigned int entry_count);
 entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check);
 
 //Cuva stanje igre u unapred definisanu datoteku savegame.dat
-void saveGame(matrix M, unsigned int score);
+void saveGame(matrix M, unsigned int score, unsigned int mode);
 
 //Ucitava igru iz datoteke, vraca matricu ako je uspesno procitana
-int loadGame(matrix *Mp, unsigned int *score, unsigned int new_size);
+int loadGame(matrix *Mp, unsigned int *score, unsigned int *mode, unsigned int new_size);
 
 //Provera greske pri dodeli memorije
 void checkMemError(void *new_pointer);
