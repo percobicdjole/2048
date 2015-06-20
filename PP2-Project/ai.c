@@ -8,28 +8,22 @@ T_node* get_node(int **table, int table_size, int level)
 	T_node *node;
 	node = calloc(1, sizeof(T_node));
 	
-	if (node != NULL)
-	{
-		int i, number_of_nodes;
+	checkMemError(node);
+	int i, number_of_nodes;
 
-		number_of_nodes = 2* (table_size * table_size - 1);
-		node->table = malloc(table_size*sizeof(int*));
-		if (node->table == NULL)
-			exit(3);
+	number_of_nodes = 2* (table_size * table_size - 1);
+	node->table = malloc(table_size*sizeof(int*));
+	checkMemError(node->table);
 		for (i = 0; i < table_size; i++)
 		{
 			node->table[i] = malloc(table_size*sizeof(int)); 
-			if (node->table[i] == NULL)
-				exit(4);
+			checkMemError(node->table[i]);
 			memcpy(node->table[i], table[i], table_size*sizeof(int));
 		}
 		node->table_size = table_size;
 		node->weight = -1;
 		node->level = level;
 		return node;
-	}
-	else
-		exit(1);
 }
 
 void free_tree(T_node *root, T_node ***stack, int *stack_space)
@@ -78,8 +72,7 @@ void push(T_node ***stack, T_node *elem, int *top, int *stack_space)
 		T_node **tmp;
 		*stack_space += STACK_SPACE;
 		tmp = realloc(*stack, (*stack_space + STACK_SPACE)*sizeof(T_node*)); // zasto?
-		if (tmp == NULL)
-			exit(2);
+		checkMemError(tmp);
 		*stack = tmp;
 	}
 	(*stack)[*top] = elem;
@@ -96,8 +89,8 @@ void make_tree_iterative(T_node *root, T_node ***stack, int *stack_space)
 {
 	T_node *helping_node;
 	matrix *M = malloc(sizeof(matrix));
-	int i, j, counter, top = 0;
-
+	checkMemError(M);
+	int i, j, counter, top = 0;	
 	helping_node = root;
 	push(stack, helping_node, &top, stack_space);
 	while (top != 0)
@@ -163,8 +156,7 @@ int get_hint(matrix table)
 	int move = 0;
 	int stack_space = STACK_SPACE;
 	T_node **stack = malloc(STACK_SPACE*sizeof(T_node*));
-	if (stack == NULL)
-		exit(7);
+	checkMemError(stack);
 	T_node *root = get_node(table.set, table.size, 0);
 	root->possibility = 1;
 
@@ -178,6 +170,3 @@ int get_hint(matrix table)
 	return move;
 }
 
-/*  TO-DO optimizacija poteza
-		  dinamicko provjeravanje, hashing
-		 							      */
