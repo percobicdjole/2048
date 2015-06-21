@@ -52,13 +52,11 @@ matrix newMatrix(int size);
 //Unistavanje matrice
 void freeMatrix(matrix *M);
 
-
 //Ubacuje broj 2 ili 4
 void spawnNumber(matrix *M);
 
 //Random integer u granicama, ukljucuje i gornju granicu
 int randomInt(int low, int high);
-
 
 //Pomera za jedan korak i vraca broj promena
 int moveStep(matrix *M, int direction, int *last_merged, unsigned int *score);

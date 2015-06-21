@@ -83,10 +83,13 @@ void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 		P = *score_list;
 		while (P[i].score > newScore.score  && i < *entry_count-1)
 			i++;
-		P += i;
-		mem = (*entry_count - (i + 1))*(sizeof(entry));
-		memmove(P + 1, P, mem);
-		*P = newScore;
+		if (i <= 10)
+		{
+			P += i;
+			mem = (*entry_count - (i + 1))*(sizeof(entry));
+			memmove(P + 1, P, mem);
+			*P = newScore;
+		}
 	}
 	else
 	{
