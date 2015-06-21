@@ -1,16 +1,12 @@
 #include "logic.h"
 #include "graphics.h"
-
-
-
-void checkMemError(void *new_pointer);
+#include "IO.h"
 
 //Postavljanje SEED-a
 void setSeed()
 {
 	srand(time(NULL));
 }
-
 
 //Random broj u opsegu
 int randomInt(int low,int high)
@@ -178,7 +174,7 @@ int moveColumnStep(matrix *M, int column, int direction,int *last_merged,unsigne
 	return changes;
 }
 
-
+//Pomera matricu za jedan korak i vraca broj promena
 int moveStep(matrix *M, int direction,int *last_merged,unsigned int *score)
 {
 	int i, j, changes = 0;
@@ -200,7 +196,7 @@ int moveStep(matrix *M, int direction,int *last_merged,unsigned int *score)
 	return changes;
 }
 
-
+//Igra potez za hint
 int snap(unsigned int **table, int table_size, int direction, matrix *M)
 {
 	M->set = table;
@@ -217,6 +213,7 @@ int snap(unsigned int **table, int table_size, int direction, matrix *M)
 		return 0;
 }
 
+//Igra potez u datom smeru
 int swipe(matrix *M, int direction, unsigned int *score)
 {
 	int changes, moved, last_merged[5] = { 0 };
@@ -236,6 +233,8 @@ int swipe(matrix *M, int direction, unsigned int *score)
 	return moved;
 }
 
+
+//Igra potez za brzopotezni rezim
 void swipeSpeed(matrix *M, int direction, unsigned int *score)
 {
 	int changes, moved, last_merged[5] = { 0 };
@@ -248,6 +247,7 @@ void swipeSpeed(matrix *M, int direction, unsigned int *score)
 	}
 }
 
+//Igra potez bez animacije
 void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
 {
 	int changes, moved, last_merged[5] = { 0 };
@@ -263,6 +263,7 @@ void swipeNoAnimation(matrix *M, int direction, unsigned int *score)
 	}
 }
 
+//Kopira set i vraca pokazivac novog
 int **copySet(int **source, char set_size)
 {
 	int i, **dest_set;
@@ -277,12 +278,14 @@ int **copySet(int **source, char set_size)
 	return dest_set;
 }
 
+//Kopira matricu
 void copyMatrix(matrix *dest, matrix M)
 {
 	dest->set = copySet(M.set,M.size);
 	dest->size = M.size;
 }
 
+//Oslobadja dati set
 void freeSet(int **set, int size)
 {
 	int i;
@@ -292,12 +295,14 @@ void freeSet(int **set, int size)
 	}
 }
 
+//Oslobadja matricu
 void freeMatrix(matrix *M)
 {
 	freeSet(M->set, M->size);
 	free(M->set);
 }
 
+//Dohvata trenutno stanje i vraca novu strukturu
 state getState(matrix M, unsigned int score)
 {
 	state S;
@@ -306,6 +311,7 @@ state getState(matrix M, unsigned int score)
 	return S;
 }
 
+//Oslobadja pokazivace u stanju
 void freeState(state *S, unsigned int tile_size)
 {
 	S->score = 0;
@@ -314,6 +320,7 @@ void freeState(state *S, unsigned int tile_size)
 	S->set = NULL;
 }
 
+//Inicijalizacija istorije igre
 history newHistory(short undo_depth, matrix *M)
 {
 	history H;
@@ -330,6 +337,7 @@ history newHistory(short undo_depth, matrix *M)
 	return H;
 }
 
+//Brisanje istorije
 void clearHistory(history *H)
 {
 	int i;
@@ -340,12 +348,14 @@ void clearHistory(history *H)
 	}
 }
 
+//Unistavanje strukture istorije
 void destroyHistory(history *H)
 {
 	clearHistory(H);
 	free(H->stack);
 }
 
+//Pamti potez u istoriju
 void pushHistory(history *H,state S)
 {
 	if (H->stack[H->latest].set)
@@ -358,6 +368,8 @@ void pushHistory(history *H,state S)
 	H->latest = (H->latest + 1) % H->depth;
 }
 
+
+//Brise poslednji podez iz istorije i vraca stanje matrice
 void popHistory(history *H,unsigned int *score)
 {
 	(H->latest)--;
@@ -372,6 +384,7 @@ void popHistory(history *H,unsigned int *score)
 	}
 }
 
+//Proverava da li je kraj igre
 int checkGameOver(matrix M)
 {
 	matrix N;
@@ -390,6 +403,7 @@ int checkGameOver(matrix M)
 	return 0;
 }
 
+//Provera da li je matrica puna
 int checkFull(matrix M)
 {
 	int i, j;

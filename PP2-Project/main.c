@@ -330,17 +330,6 @@ void game(enum rezim rezim, int stayInMenu)
 			}
 			displayNumber(3, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), score);
 			
-			if (!checkGameOver(*m))
-			{
-				displayGameOver(3, 0);
-				getHsc(&score_list, &entry_count, score,rezim);
-				saveHsc(score_list, entry_count);
-				stayInMenu = 0;
-				clear();
-				displayHSC(score_list, entry_count);
-				getch();
-			}
-
 			if (isalpha((char)c))
 			{
 				strcat(buffer, &c);
@@ -354,6 +343,19 @@ void game(enum rezim rezim, int stayInMenu)
 				}
 				prev_code = code;
 			}
+
+			if (!checkGameOver(*m))
+			{
+				displayGameOver(3, 0);
+				getHsc(&score_list, &entry_count, score,rezim);
+				saveHsc(score_list, entry_count);
+				stayInMenu = 0;
+				clear();
+				displayHSC(score_list, entry_count);
+				getch();
+			}
+
+			
 		}
 		freeState(&previous, m->size);
 		destroyHistory(&hist);

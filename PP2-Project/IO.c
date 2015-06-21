@@ -2,6 +2,7 @@
 #include "IO.h"
 
 
+//Kodiranje/dekodiranje strukture tipa entry
 void cdcEntry(entry *E)
 {
 	checkMemError(E);
@@ -20,12 +21,14 @@ void cdcEntry(entry *E)
 	E->score ^= INT_MASK;
 }
 
+//Kodiranje/dekodiranje strukture tipa file_info
 void cdcInfo(file_info *inf)
 {
 	inf->bit_count ^= INT_MASK;
 	inf->entry_count ^= INT_MASK;
 }
 
+//Brojanje binarnih jedinica
 int countBits(unsigned int data)
 {
 	int count = 0;
@@ -37,6 +40,7 @@ int countBits(unsigned int data)
 	return count;
 }
 
+//Brojanje jedinica u strukturi tipa entry
 int bitCheck(entry E)
 {
 	int count = 0;
@@ -56,6 +60,7 @@ int bitCheck(entry E)
 	return count;
 }
 
+//Kreiranje novog unosa
 entry newEntry(char *player_name, char *mode, unsigned int score)
 {
 	entry N;
@@ -65,6 +70,7 @@ entry newEntry(char *player_name, char *mode, unsigned int score)
 	return N;
 }
 
+//Dodaje novi unos u niz i odrzava poredak
 void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 {
 	(*entry_count)++;
@@ -73,8 +79,8 @@ void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 		unsigned int i = 0, mem;
 		entry *P;
 		*score_list = realloc(*score_list, (sizeof(entry)*(*entry_count)));
-		P = *score_list;
 		checkMemError(score_list);
+		P = *score_list;
 		while (P[i].score > newScore.score  && i < *entry_count-1)
 			i++;
 		P += i;
@@ -90,12 +96,14 @@ void addEntry(entry  **score_list, unsigned int *entry_count, entry newScore)
 	}
 }
 
+//Snima highcsore iz niza u datoteku
 void saveHsc(entry *score_list, unsigned int entry_count)
 {
 	int i;
 	file_info inf;
 	entry buffer;
 	FILE *hsc_file = fopen("hscore.dat", "wb");
+	checkFileError(hsc_file);
 	fseek(hsc_file, sizeof(inf), SEEK_SET);
 	inf.bit_count = 0;
 	inf.entry_count = entry_count;
@@ -112,17 +120,24 @@ void saveHsc(entry *score_list, unsigned int entry_count)
 	fclose(hsc_file);
 }
 
+//Ucitava highscore iz datoteke u niz (NULL ako nema datoteke)
 entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check)
 {
 	FILE *hsc_file = fopen("hscore.dat", "rb");
-	//checkFileError(hsc_file);
 	entry *score_list = NULL;
 	if (hsc_file)
 	{
 		entry buffer;
 		file_info inf;
-		unsigned int readBits = 0, i;
-		fread(&inf, sizeof(inf), 1, hsc_file);
+		unsigned int readBits = 0, i,c;
+		c = fread(&inf, sizeof(inf), 1, hsc_file);
+		if (!c)
+		{
+			fclose(hsc_file);
+			*entry_conunt = 0;
+			*bit_check = 0;
+			return score_list;
+		}
 		cdcInfo(&inf);
 		*entry_conunt = inf.entry_count;
 		if (inf.entry_count)
@@ -148,12 +163,13 @@ entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check)
 	return score_list;
 }
 
+//Cuva stanje igre u unapred definisanu datoteku savegame.dat
 void saveGame(matrix M, unsigned int score, unsigned int mode)
 {
 	int bit_count = 0, i, j, buffer;
 	char size = M.size ^ CHAR_MASK;
 	FILE *svg = fopen("savegame.dat", "wb");
-	//checkFileError(svg);
+	checkFileError(svg);
 	fseek(svg, sizeof(bit_count), SEEK_SET);
 	bit_count = countBits(score) + countBits(M.size);
 	score ^= INT_MASK;
@@ -175,18 +191,30 @@ void saveGame(matrix M, unsigned int score, unsigned int mode)
 	fclose(svg);
 }
 
+//Ucitava igru iz datoteke, vraca matricu ako je uspesno procitana
 int loadGame(matrix *Mp, unsigned int *score, unsigned int *mode, unsigned int new_size)
 {
+	/*
+		Povratne vrednosti:
+		0: Greska pri otvaranju datoteke
+		1: Otvorena datoteka ali neispravna
+		2: Otvorena ispravna datoteka
+	*/
 	FILE *svg = fopen("savegame.dat", "rb");
-	//checkFileError(svg);
 	checkMemError(Mp);
 	if (svg)
 	{
 		matrix N;
 		int i, j, **M;
-		int expectBits, readBits, buffer;
+		int expectBits, readBits, buffer,c;
 		readBits = 0;
-		fread(&expectBits, sizeof(expectBits), 1, svg);
+		c = fread(&expectBits, sizeof(expectBits), 1, svg);
+		if (!c)
+		{
+			fclose(svg);
+			return 0;
+		}
+			
 		expectBits ^= INT_MASK;
 		fread(score, sizeof(*score), 1, svg);
 		*score ^= INT_MASK;
@@ -231,6 +259,7 @@ int loadGame(matrix *Mp, unsigned int *score, unsigned int *mode, unsigned int n
 	}
 }
 
+//Provera greske pri dodeli memorije
 void checkMemError(void *new_pointer)
 {
 	if (new_pointer == NULL)
@@ -240,6 +269,7 @@ void checkMemError(void *new_pointer)
 	}
 }
 
+//Provera greske pri otvaranju datoteke
 void checkFileError(FILE *file_pointer)
 {
 	if (file_pointer == NULL)
@@ -249,6 +279,7 @@ void checkFileError(FILE *file_pointer)
 	}
 }
 
+//Upisuje podatke o AI statistici
 void writeAIstats(matrix M)
 {
 	int i, j, max_tile = 0,n,tile,found = 0;
@@ -281,6 +312,7 @@ void writeAIstats(matrix M)
 	fclose(stats);
 }
 
+//Detektuje cheat za dati string
 int findCode(char *cheats[], char *buffer, int prev_code)
 {
 	/*
