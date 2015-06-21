@@ -167,7 +167,7 @@ entry *loadHsc(unsigned int *entry_conunt, unsigned int *bit_check)
 }
 
 //Cuva stanje igre u unapred definisanu datoteku savegame.dat
-void saveGame(matrix M, unsigned int score, unsigned int mode)
+void saveGame(matrix M, unsigned int score, enum mode mode)
 {
 	int bit_count = 0, i, j, buffer;
 	char size = M.size ^ CHAR_MASK;
@@ -195,7 +195,7 @@ void saveGame(matrix M, unsigned int score, unsigned int mode)
 }
 
 //Ucitava igru iz datoteke, vraca matricu ako je uspesno procitana
-int loadGame(matrix *Mp, unsigned int *score, unsigned int *mode, unsigned int new_size)
+int loadGame(matrix *Mp, unsigned int *score, enum mode *mode, unsigned int new_size)
 {
 	/*
 		Povratne vrednosti:
