@@ -547,7 +547,7 @@ void doubleDouble(matrix *m)
 	for (i = 0; i < settings.size; i++)
 		for (j = 0; j < settings.size; j++)
 		{
-			if (m->set[i][j]!=0)
+			if (m->set[i][j]!=0 && m->set[i][j] < MAX_TILE)
 				m->set[i][j] <<= 1;
 		}
 }
@@ -558,7 +558,7 @@ void freeTwo(matrix *m)
 	for (k = 0; k < 2; k++)
 	{
 		xmin = ymin = 0;
-		min = 65536;
+		min = MAX_TILE;
 		for (i = 0; i < settings.size; i++)
 			for (j = 0; j < settings.size; j++)
 			{

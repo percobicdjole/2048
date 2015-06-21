@@ -17,6 +17,7 @@
 //Potrebne konstante
 #define TRUE 1
 #define FALSE 0
+#define MAX_TILE 35536
 
 //Matrica
 typedef struct matrix
