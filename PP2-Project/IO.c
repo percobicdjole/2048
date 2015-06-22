@@ -195,7 +195,7 @@ void saveGame(matrix M, unsigned int score, enum mode mode)
 }
 
 //Ucitava igru iz datoteke, vraca matricu ako je uspesno procitana
-int loadGame(matrix *Mp, unsigned int *score, enum mode *mode, unsigned int new_size)
+int loadGame(matrix *Mp, unsigned int *score, enum modes *mode, unsigned int new_size)
 {
 	/*
 		Povratne vrednosti:

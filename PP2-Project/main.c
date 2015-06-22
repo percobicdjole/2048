@@ -220,7 +220,7 @@ void newGame(enum load opcija, matrix *m, unsigned int *score)
 				*score = 0;
 				break;
 			case 2:
-				msgBox((getmaxx(stdscr) - 20) / 2, "Uspesan loadgame!");
+				//msgBox((getmaxx(stdscr) - 20) / 2, "Uspesan loadgame!"); - Ne treba!
 				break;
 			}
 		}
@@ -256,7 +256,7 @@ void game(enum rezim rezim, enum load opcija)
 	{
 		;//Greska (fajl je izmenjen vam programa)
 	}
-	
+	rezim = settings.mode;
 	switch (rezim)
 	{
 	case xtile:
@@ -310,7 +310,8 @@ void game(enum rezim rezim, enum load opcija)
 				break;
 			case KEY_ESC:
 				stayInMenu = 0; 
-				if (score!=0) saveGame(*m, score, rezim);
+				if (score!=0 && !varao) 
+					saveGame(*m, score, rezim);
 				break;
 			case CTRL_Z:
 					popHistory(&hist, &score);
@@ -397,6 +398,7 @@ void game(enum rezim rezim, enum load opcija)
 				break;
 			case 4:stayInMenu = 0;
 				msgBox((getmaxx(stdscr)-16) / 7, "Gotova igra!");
+				writeAIstats(*m);
 				break;
 			}
 			displayNumber(3, m->size * WIDTH + 3, score);
@@ -434,7 +436,8 @@ void game(enum rezim rezim, enum load opcija)
 				break;
 			case KEY_ESC:
 				stayInMenu = 0; 
-				if(score!=0)saveGame(*m, score, rezim);
+				if(score!=0)
+					saveGame(*m, score, rezim);
 			break;
 			}
 			end = clock();
@@ -443,7 +446,7 @@ void game(enum rezim rezim, enum load opcija)
 				start = clock();
 				spawnNumber(m);
 			}
-			if (checkFull(*m) || !checkGameOver(*m))
+			if (!checkGameOver(*m) || checkFull(*m))
 			{
 				displayGameOver(3, 0);
 				getHsc(&score_list, &entry_count, score,rezim);
