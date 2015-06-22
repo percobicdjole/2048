@@ -1,6 +1,6 @@
 #include "logic.h"
 #include "IO.h"
-
+#include "menu.h"
 
 //Kodiranje/dekodiranje strukture tipa entry
 void cdcEntry(entry *E)
@@ -271,7 +271,7 @@ void checkMemError(void *new_pointer)
 {
 	if (new_pointer == NULL)
 	{
-		//Poruka o greski
+		errorMsg("Fatalna greska!");
 		exit(1);
 	}
 }
@@ -281,7 +281,7 @@ void checkFileError(FILE *file_pointer)
 {
 	if (file_pointer == NULL)
 	{
-		//Poruka o greski
+		errorMsg("Greska pri upisu!");
 		exit(1);
 	}
 }
