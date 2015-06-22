@@ -215,9 +215,8 @@ int loadGame(matrix *Mp, unsigned int *score, enum mode *mode, unsigned int new_
 		if (!c)
 		{
 			fclose(svg);
-			return 0;
-		}
-			
+			return 1;
+		}	
 		expectBits ^= INT_MASK;
 		fread(score, sizeof(*score), 1, svg);
 		*score ^= INT_MASK;
@@ -226,6 +225,11 @@ int loadGame(matrix *Mp, unsigned int *score, enum mode *mode, unsigned int new_
 		readBits += countBits(*score);
 		fread(&N.size, sizeof(N.size), 1, svg);
 		N.size ^= CHAR_MASK;
+		if (!(N.size <= 5 && N.size > 0))
+		{
+			fclose(svg);
+			return 1;
+		}
 		readBits += countBits(N.size);
 		M = malloc(N.size*sizeof(int*));
 		checkMemError(M);
