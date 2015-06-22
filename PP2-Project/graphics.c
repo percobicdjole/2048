@@ -191,6 +191,7 @@ void setTheme(theme tema)
 	init_pair(FIFTH, tema.fifth.contrast, tema.fifth.color);
 	init_pair(INTERFACE, tema.interface.color, tema.interface.contrast);//za tekst
 	init_pair(DIGITAL, tema.interface.color, tema.interface.color);//za digitalni displej
+	init_pair(ERROR, 14, 12);//za error
 }
 
 void displayNumber(int starty, int startx, int number)
@@ -382,3 +383,30 @@ void splashScreen()
 	erase();
 	refresh();
 }
+
+void uputstvo()
+{
+	resize_term(12, 75);
+	mvprintw(1, 1, "O igri:");
+	mvprintw(2, 1, "2048 se igra na tabli 4x4 ili 5x5 polja koja sadrze brojeve.");
+	mvprintw(3, 1, "Igrac pomera polja u zeljenu stranu izborom strelice na tastaturi.");
+	mvprintw(4, 1, "Nakon poteza igraca stvara se novo polje sa vrednoscu 2 ili 4 na");
+	mvprintw(5, 1, "nasumicnom praznom polju. Polja se pomeraju na jednu stranu dok");
+	mvprintw(6, 1, "ih ne zaustavi polje sa razlicitom vrednoscu ili ne dodju do kraja");
+	mvprintw(7, 1, "table. Ako se dva polja sa istom vrednoscu sudare prilikom pomeranja");
+	mvprintw(8, 1, "doci ce do njihovog spajanja u polje koje predstavlja njihov zbir.");
+	mvprintw(10, 1, "Za nastavak pritisnite bilo koje dugme...");
+	refresh();
+	getch();
+	clear();
+	mvprintw(1, 1, "Rezimi:");
+	mvprintw(2, 1, "-Klasican");
+	mvprintw(3, 1, "-X Polje - nije spojivo ni sa jednim drugim poljem");
+	mvprintw(4, 1, "-Brzopotezno - novo polje svake sekunde, ne smeju da se popune sva polja");
+	mvprintw(5, 1, "-Automatski - posmatrate AI kako igra");
+	mvprintw(10, 1, "Za nastavak pritisnite bilo koje dugme...");
+	refresh();
+	getch();
+	clear();
+}
+

@@ -85,6 +85,23 @@ void msgBox(int startx, char text[25])
 	delwin(message);
 }
 
+void errorMsg(char text[25])
+{
+	WINDOW *message;
+	cbreak();
+	int duzina = strlen(text);
+	message = newwin(5, duzina + 4, (getmaxy(stdscr) - 5) / 2, (getmaxx(stdscr) - duzina) / 2);
+	keypad(message, TRUE);
+	wbkgd(message, COLOR_PAIR(ERROR));
+	box(message, 0, 0);
+	mvwaddstr(message, 2, 2, text);
+	wrefresh(message);
+	wgetch(message);
+	werase(message);
+	wrefresh(message);
+	delwin(message);
+}
+
 void showHint(matrix *m, int starty, int startx)
 {
 	int h = get_hint(*m);

@@ -34,6 +34,7 @@ theme crvena, zelena, plava, zuta, BIOS;
 #define FIFTH 5
 #define INTERFACE 6
 #define DIGITAL 7
+#define ERROR 8
 #define WHITE 15
 
 void colorPalette();	/*OVA FUNKCIJA PRIKAZUJE PALETU OD 16 BOJA KOJE MOZE DA PRIKAZE KONZOLA*/

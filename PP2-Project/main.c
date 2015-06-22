@@ -13,7 +13,6 @@ void game(enum modes rezim, enum load opcija);
 void newGame(enum load opcija, matrix *m, unsigned int *score);
 void showHint(matrix *m, int starty, int startx);
 void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score, enum rezim rezim);
-void msgBox(int startx, char text[25]);
 void displayHSC(entry *score_list, unsigned int entry_count);
 
 void executeCheat(int code, int *score, matrix *m);
@@ -106,7 +105,6 @@ main()
 	bkgd(COLOR_PAIR(INTERFACE));
 	display2048(0, 20);
 	refresh();
-
 	while (stayInMenu)
 	{
 		switch (menu(mainMenu,0,0))
@@ -164,6 +162,12 @@ main()
 			break;
 			
 			case 4:
+				erase();
+				bkgd(COLOR_PAIR(INTERFACE));
+				uputstvo();
+				resize_term(20, 100);
+				erase();
+				display2048(0, 20);
 			break;
 			
 			case 5:
@@ -219,9 +223,6 @@ void newGame(enum load opcija, matrix *m, unsigned int *score)
 				*m = newMatrix(settings.size);
 				*score = 0;
 				break;
-			case 2:
-				//msgBox((getmaxx(stdscr) - 20) / 2, "Uspesan loadgame!"); - Ne treba!
-				break;
 			}
 		}
 		else
@@ -239,7 +240,7 @@ void newGame(enum load opcija, matrix *m, unsigned int *score)
 void game(enum rezim rezim, enum load opcija)
 {
 	unsigned int score, entry_count, bit_check;
-	_Bool varao = 0;
+	_Bool varao = FALSE;
 	int code, c, prev_code, stayInMenu=1;
 	char *cheats[] = { "leavemealone","abrakadabra","jeltozelite" ,"robot","solveit",NULL};
 	char buffer[20] = "";
