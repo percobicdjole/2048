@@ -470,34 +470,34 @@ void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score, 
 {
 	WINDOW *highscore;
 	entry  player;
-	char playerName[21], mode[20];
+	char playerName[20], mode[20];
 	int pozicija = 0, c;
 	_Bool neprazan = FALSE;
 	highscore = newwin(10, 30, 1, 25);
 	wattron(highscore, COLOR_PAIR(INTERFACE));
 	wbkgd(highscore, COLOR_PAIR(INTERFACE));
 	box(highscore, 0, 0);
-	mvwprintw(highscore, 1, 5, "UNOS REZULTATA");
+	mvwprintw(highscore, 1, 8, "UNOS REZULTATA");
 	mvwprintw(highscore, 3, 2, "REZULTAT: %u", score);
 	mvwprintw(highscore, 5, 2, "IME:");
 	/*UNOS IMENA*/
 	//DA uradim:
 	//*da blinkce kursor
 	//*da ispravim da lepo brise
-	keypad(highscore, FALSE);
-	c=getch();
+	curs_set(1);
+	c=wgetch(highscore);
 	while (c != ENTER || !neprazan)
 	{
-		pozicija = pozicija > 19 ? 19 : pozicija;
 		if ((c == '\b') && (pozicija > 0))
 		{
 			playerName[pozicija--] = '\0';
 			mvwprintw(highscore, 5, 6 + pozicija, " ");
+			wmove(highscore, 5, 6 + pozicija);
 		}
 		else if (isgraph(c) || c==' ')
 		{
 			if (!neprazan)neprazan = TRUE;
-			if (!(c == ' ' && pozicija == 0))
+			if (!(c == ' ' && pozicija == 0) && pozicija<19)
 			{
 				mvwprintw(highscore, 5, 6 + pozicija, "%c", c);
 				playerName[pozicija++] = (char)c;
@@ -505,9 +505,9 @@ void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score, 
 			}
 		}
 		wrefresh(highscore);
-		c = getch();
-	}	
-	keypad(highscore, TRUE);
+		c = wgetch(highscore);
+	}
+	curs_set(0);
 	/*UNOS IMENA*/
 	mvwprintw(highscore, 7, 2, " Pritisnite bilo koje");
 	mvwprintw(highscore, 8, 2, " dugme za nastavak!");
