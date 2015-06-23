@@ -127,6 +127,8 @@ float approximate_position(int **table, int table_size)
 		MONOTONICITY_PENALTY = -1512; // 1024
 	else if (max_number > 1024)
 		MONOTONICITY_PENALTY = -1024; // 850
+	else if (max_number > 512)
+		MONOTONICITY_PENALTY = -800;
 	else if (max_number > 256)
 		MONOTONICITY_PENALTY = -600;
 	else
