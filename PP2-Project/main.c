@@ -176,6 +176,9 @@ main()
 				if (score_list != NULL && bit_check == 0)
 				{
 					errorMsg("Datoteka neispravna!");
+					erase();
+					resize_term(20, 100);
+					bkgd(COLOR_PAIR(INTERFACE)); refresh();
 				}
 				else
 				{
@@ -256,6 +259,10 @@ void game(enum rezim rezim, enum load opcija)
 	if (score_list != NULL && bit_check == 0)
 	{
 		errorMsg("Datoteka neispravna!");
+		erase();
+		resize_term(20, 100);
+		bkgd(COLOR_PAIR(INTERFACE)); 
+		refresh();
 	}
 	rezim = settings.mode;
 	switch (rezim)
