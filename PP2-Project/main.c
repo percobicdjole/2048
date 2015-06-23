@@ -175,7 +175,7 @@ main()
 				entry *score_list = loadHsc(&entry_count, &bit_check);
 				if (score_list != NULL && bit_check == 0)
 				{
-					;//Greska (fajl je izmenjen vam programa)
+					errorMsg("Datoteka neispravna!");
 				}
 				else
 				{
@@ -255,7 +255,7 @@ void game(enum rezim rezim, enum load opcija)
 	entry *score_list = loadHsc(&entry_count, &bit_check);
 	if (score_list != NULL && bit_check == 0)
 	{
-		;//Greska (fajl je izmenjen vam programa)
+		errorMsg("Datoteka neispravna!");
 	}
 	rezim = settings.mode;
 	switch (rezim)
@@ -487,9 +487,6 @@ void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score, 
 	mvwprintw(highscore, 3, 2, "REZULTAT: %u", score);
 	mvwprintw(highscore, 5, 2, "IME:");
 	/*UNOS IMENA*/
-	//DA uradim:
-	//*da blinkce kursor
-	//*da ispravim da lepo brise
 	curs_set(1);
 	c=wgetch(highscore);
 	while (c != ENTER || !neprazan)
