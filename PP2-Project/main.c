@@ -47,7 +47,7 @@ main()
 		"X Plocica",
 		"Automatski",
 		"Automatski X",
-		"Brzopotezno",
+		"Brzopotezni",
 		NULL
 	};
 
@@ -457,6 +457,7 @@ void game(enum rezim rezim, enum load opcija)
 			}
 			if (!checkGameOver(*m) || checkFull(*m))
 			{
+				displayMatrix(1, 1, *m);
 				_sleep(2000);
 				displayGameOver(3, 0);
 				getHsc(&score_list, &entry_count, score,rezim);
@@ -504,7 +505,7 @@ void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score, 
 			mvwprintw(highscore, 5, 6 + pozicija, " ");
 			wmove(highscore, 5, 6 + pozicija);
 		}
-		else if (isgraph(c) || c==' ')
+		else if (c<255 && isgraph(c) || c == ' ')
 		{
 			if (!neprazan)neprazan = TRUE;
 			if (!(c == ' ' && pozicija == 0) && pozicija<19)
