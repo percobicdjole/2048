@@ -37,17 +37,15 @@ theme crvena, zelena, plava, zuta, BIOS;
 #define ERROR 8
 #define WHITE 15
 
-void colorPalette();	/*OVA FUNKCIJA PRIKAZUJE PALETU OD 16 BOJA KOJE MOZE DA PRIKAZE KONZOLA*/
+void colorPalette();		/*FUNKCIJA PRIKAZUJE PALETU OD 16 BOJA KOJE MOZE DA PRIKAZE KONZOLA*/
+void initThemes();			/*INICIJALIZUJE BOJE ZA TEME*/
+void setTheme(theme tema);	/*POSTAVLJA TEMU*/
 
-void setTheme(theme tema);	/*INICIJALIZUJE PAROVE BOJA*/
+void displayMatrix(int starty, int startx, matrix m);	/*PRIKAZUJE MATRICU NA ZADATIM POCETNIM KOORDINATAMA*/
+void displayNumber(int starty, int startx, int number);	/*PRIKAZUJE ASCII BROJ NA ZADATIM POCETNIM KOORDINATAMA*/
+void display2048(int starty, int startx);				/*PRIKAZUJE ASCII ART 2048 NA ZADATIM POCETNIM KOORDINATAMA*/
+void displayGameOver(int starty, int startx);			/*PRIKAZUJE ASCII ART GAME OVER NA ZADATIM KOORDINATAMA*/
 
-void initThemes(); //inicijalizuje boje za teme
-
-void displayMatrix(int starty, int startx, matrix m);
-
-void displayNumber(int starty, int startx, int number);
-void display2048(int starty, int startx);
-void displayGameOver(int starty, int startx);
-void splashScreen();// ETF LOGO ASCII ART
+void splashScreen();									/*PRIKAZUJE ASCII ART ETF LOGO*/
 
 #endif /* GRAPHICS_H */

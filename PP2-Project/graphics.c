@@ -313,7 +313,7 @@ void display2048(int starty, int startx)
 	mvprintw(14 + starty, 25 + startx, "Jovan Malovic - grafika");
 	mvprintw(16 + starty, 35 + startx, "Djordje Percobic - AI");
 	attroff(COLOR_PAIR(INTERFACE) | A_REVERSE);
-	mvprintw(18 + starty, 23 + startx, "V 1.0 Copyright 2015");
+	mvprintw(18 + starty, 67 + startx, "V 1.0 (2015)");
 	refresh();
 }
 

@@ -11,7 +11,6 @@
 
 void game(enum modes rezim, enum load opcija);
 void newGame(enum load opcija, matrix *m, unsigned int *score);
-void showHint(matrix *m, int starty, int startx);
 void getHsc(entry  **score_list, unsigned int *entry_count, unsigned int score, enum rezim rezim);
 void displayHSC(entry *score_list, unsigned int entry_count);
 
@@ -228,8 +227,9 @@ void newGame(enum load opcija, matrix *m, unsigned int *score)
 		else
 		{ 
 			*m = newMatrix(settings.size); 
-			*score = 0; 
-			msgBox((getmaxx(stdscr) - 22) / 2, "U ovom rezimu nije\nmoguce nastaviti igru!");
+			*score = 0;
+			msgBox((getmaxx(stdscr) - 45) / 2, "U ovom rezimu nije moguce nastaviti igru!");
+			msgBox((getmaxx(stdscr) - 45) / 2, "           Pocece nova igra!             ");
 		}
 	}
 	erase();
@@ -349,6 +349,7 @@ void game(enum rezim rezim, enum load opcija)
 
 			if (!checkGameOver(*m))
 			{
+				_sleep(2000);
 				displayGameOver(3, 0);
 				if (varao)
 					msgBox((getmaxx(stdscr) - 28) / 2, "Ne mozes da uneses skor!");
@@ -449,6 +450,7 @@ void game(enum rezim rezim, enum load opcija)
 			}
 			if (!checkGameOver(*m) || checkFull(*m))
 			{
+				_sleep(2000);
 				displayGameOver(3, 0);
 				getHsc(&score_list, &entry_count, score,rezim);
 				saveHsc(score_list, entry_count);
@@ -623,7 +625,7 @@ void timedAutoplay(matrix *m, unsigned int *score)
 			swipeNoAnimation(m, DOWN, score);
 			break;
 		}
-		displayNumber(3, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), *score);
+		displayNumber(3, m->size * WIDTH + 3, *score);
 		end = clock();
 		if (!checkGameOver(*m))return;
 	}
@@ -648,7 +650,7 @@ void autoplaySolve(matrix *m, unsigned int *score)
 			swipeNoAnimation(m, DOWN, score);
 			break;
 		}
-		displayNumber(3, 4 * WIDTH + 2 + (m->size == 5 ? 10 : 0), *score);
+		displayNumber(3, m->size * WIDTH + 3, *score);
 	}
 }
 
@@ -682,6 +684,6 @@ void executeCheat(int code, int *score, matrix *m)
 			autoplaySolve(m, score);
 		break;
 	}
-	displayNumber(3, 4 * WIDTH + 2 + (settings.size == 5 ? 10 : 0), *score);
+	displayNumber(3, m->size * WIDTH + 3, *score);
 	displayMatrix(1, 1, *m);
 }
