@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "logic.h"
+#include "IO.h"
 #include "ai.h"
 #include "math.h"
 
@@ -71,7 +72,7 @@ void push(T_node ***stack, T_node *elem, int *top, int *stack_space)
 	{
 		T_node **tmp;
 		*stack_space += STACK_SPACE;
-		tmp = realloc(*stack, (*stack_space + STACK_SPACE)*sizeof(T_node*)); // zasto?
+		tmp = realloc(*stack, (*stack_space + STACK_SPACE)*sizeof(T_node*)); 
 		checkMemError(tmp);
 		*stack = tmp;
 	}
@@ -107,7 +108,7 @@ void make_tree_iterative(T_node *root, T_node ***stack, int *stack_space)
 					for (j = 0; j < root->table_size; j++)
 						free(helping_node->next[i]->table[j]);
 					free(helping_node->next[i]->table);
-				 	free(helping_node->next[i]); // kako skloniti
+				 	free(helping_node->next[i]); 
 				 	helping_node->next[i] = NULL;
 					counter++;
 				}
@@ -118,7 +119,7 @@ void make_tree_iterative(T_node *root, T_node ***stack, int *stack_space)
 				}
 			}
 			if (counter == 4)
-				helping_node->weight = 0;
+				helping_node->weight = approximate_position(helping_node->table, helping_node->table_size);
 		}
 		else if (helping_node->level != MAX_DEPTH)
 		{
@@ -143,7 +144,7 @@ void make_tree_iterative(T_node *root, T_node ***stack, int *stack_space)
 				}
 			}
 			if (counter == 0)
-				helping_node->weight = 0;
+				helping_node->weight = approximate_position(helping_node->table, helping_node->table_size);
 		}
 		else
 			helping_node->weight = approximate_position(helping_node->table, helping_node->table_size);

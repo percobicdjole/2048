@@ -7,14 +7,14 @@
 #define STACK_SPACE 100000
 
 // konstante za heuristiku // sto manje velikih brojeva
-#define MAX_IN_CORNER 4096 // 1024 // 4096
-#define MAX_NOT_IN_CORNER_PENALTY -128 // 100  // -128
-#define MONOTONICITY 1024 // 512 mozda da se smanji  // 1024
-#define MOVES 256// 64 // 256
-#define NO_MONOTONICITY_PENALTY -128 // nije ga bilo // -256
-#define NO_MOVES_PENALTY -2048 // -1024 // -2048
-#define EMPTY_SPACES 256 // 8 // 512
-#define BIG_NUMBERS_PENALTY -4096 // nije ga bilo
+#define MAX_IN_CORNER 256 
+#define MAX_NOT_IN_CORNER_PENALTY -16 
+#define MONOTONICITY 150 
+#define MOVES 5500
+#define NO_MONOTONICITY_PENALTY -512
+#define NO_MOVES_PENALTY -4096
+#define EMPTY_SPACES 4096 
+#define BIG_NUMBERS_PENALTY -50 
 
 typedef struct tnode
 {
@@ -28,6 +28,7 @@ typedef struct tnode
 // vraca najbolji potez
 int get_hint(matrix table);
 
+// pravi stablo sa svim mogucim potezima do odredjenog nivoa
 void make_tree_iterative(T_node *root, T_node ***stack, int *stack_space);
 
 // trazi najbolji potez
