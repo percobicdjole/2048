@@ -60,7 +60,7 @@ void displayMatrix(int starty, int startx, matrix m)
 	delwin(matrica);
 }
 
-void colorPalette()
+void colorPalette()	/*FUNKCIJA PRIKAZUJE PALETU OD 16 BOJA KOJE MOZE DA PRIKAZE KONZOLA*/
 {
 	start_color();
 	for (unsigned char i = 0; i < 16; i++)

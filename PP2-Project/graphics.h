@@ -37,7 +37,6 @@ theme crvena, zelena, plava, zuta, BIOS;
 #define ERROR 8
 #define WHITE 15
 
-void colorPalette();		/*FUNKCIJA PRIKAZUJE PALETU OD 16 BOJA KOJE MOZE DA PRIKAZE KONZOLA*/
 void initThemes();			/*INICIJALIZUJE BOJE ZA TEME*/
 void setTheme(theme tema);	/*POSTAVLJA TEMU*/
 
